@@ -1,0 +1,24 @@
+{
+  "name": "english-learning-app",
+  "version": "1.0.0",
+  "description": "English learning web app with interactive exercises.",
+  "main": "game.js",
+  "scripts": {
+    "start": "http-server . -o",
+    "lint": "eslint .",
+    "test": ""
+  },
+  "keywords": [
+    "english",
+    "learning",
+    "flashcards",
+    "quiz",
+    "education"
+  ],
+  "author": "Genil Suarez",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^9.33.0",
+    "http-server": "^14.1.1"
+  }
+}
