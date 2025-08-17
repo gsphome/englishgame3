@@ -134,6 +134,7 @@ const game = {
             const flashcardSummaryContainer = document.getElementById('flashcard-summary-container');
             const quizSummaryContainer = document.getElementById('quiz-summary-container');
             const completionSummaryContainer = document.getElementById('completion-summary-container');
+            const matchingSummaryContainer = document.getElementById('matching-summary-container');
 
             if (flashcardSummaryContainer && !flashcardSummaryContainer.classList.contains('hidden')) {
                 // Re-render flashcard summary with current data
@@ -144,6 +145,9 @@ const game = {
             } else if (completionSummaryContainer && !completionSummaryContainer.classList.contains('hidden')) {
                 // Re-render completion summary with current data
                 this.completion.showFinalScore(); // This function re-renders the summary
+            } else if (matchingSummaryContainer && !matchingSummaryContainer.classList.contains('hidden')) {
+                // Re-render matching summary with current data
+                this.showMatchingSummary();
             }
         });
 
@@ -568,6 +572,12 @@ const game = {
                     e.preventDefault();
                     game.completion.prev();
                 }
+            } else if (this.currentView === 'matching') { // If matching is active
+                const matchingSummaryContainer = document.getElementById('matching-summary-container');
+                if (matchingSummaryContainer && e.key === 'Enter') {
+                    document.getElementById('matching-summary-back-to-menu-btn').click();
+                    return; // Exit early if summary handled
+                }
             } else if (this.currentView === 'sorting') { // If sorting is active
                 if (e.key === 'Enter') {
                     document.getElementById('check-btn').click();
@@ -888,6 +898,27 @@ const game = {
             document.getElementById('flashcard-summary-title').textContent = MESSAGES.get('sessionScore');
             document.getElementById('flashcard-summary-message').textContent = MESSAGES.get('flashcardSummaryMessage').replace('{count}', totalCards);
             document.getElementById('flashcard-summary-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
+        }
+    },
+
+    showMatchingSummary() {
+        const appContainer = document.getElementById('app-container');
+        appContainer.classList.remove('main-menu-active');
+
+        if (!document.getElementById('matching-summary-container')) {
+            appContainer.innerHTML = `
+                <div id="matching-summary-container" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
+                    <h1 id="matching-summary-title" class="text-2xl font-bold mb-4">${MESSAGES.get('sessionScore')}</h1>
+                    <p id="matching-summary-correct" class="text-xl mb-2">${MESSAGES.get('correct')}: ${game.matching.sessionScore.correct}</p>
+                    <p id="matching-summary-incorrect" class="text-xl mb-4">${MESSAGES.get('incorrect')}: ${game.matching.sessionScore.incorrect}</p>
+                    <button id="matching-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4" onclick="game.renderMenu()">${MESSAGES.get('backToMenu')}</button>
+                </div>
+            `;
+        } else {
+            document.getElementById('matching-summary-title').textContent = MESSAGES.get('sessionScore');
+            document.getElementById('matching-summary-correct').textContent = `${MESSAGES.get('correct')}: ${game.matching.sessionScore.correct}`;
+            document.getElementById('matching-summary-incorrect').textContent = `${MESSAGES.get('incorrect')}: ${game.matching.sessionScore.incorrect}`;
+            document.getElementById('matching-summary-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
         }
     },
 
@@ -1985,10 +2016,9 @@ const game = {
             // Check if all pairs are matched
             if (this.matchedPairs.length === this.moduleData.data.length) {
                 this.feedbackActive = true; // Disable further interaction
-                // Optionally show a completion modal or message
+                // Show the matching summary modal
                 setTimeout(() => {
-                    alert("Congratulations! All pairs matched!"); // Replace with a proper modal
-                    // game.showMatchingCompletionModal(this.moduleData);
+                    game.showMatchingSummary();
                 }, 500);
             }
         },
