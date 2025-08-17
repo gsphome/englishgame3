@@ -149,6 +149,14 @@ const game = {
                 // Re-render matching summary with current data
                 this.showMatchingSummary();
             }
+            // Update matching completion modal text if visible
+            const matchingCompletionModal = document.getElementById('matching-completion-modal');
+            if (matchingCompletionModal && !matchingCompletionModal.classList.contains('hidden')) {
+                document.getElementById('matching-completion-title').textContent = MESSAGES.get('sessionScore');
+                document.getElementById('matching-completion-message').textContent = MESSAGES.get('matchingCompletionMessage');
+                document.getElementById('matching-completion-replay-btn').textContent = MESSAGES.get('replayButton');
+                document.getElementById('matching-completion-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
+            }
         });
 
         this.addKeyboardListeners();
@@ -573,10 +581,14 @@ const game = {
                     game.completion.prev();
                 }
             } else if (this.currentView === 'matching') { // If matching is active
-                const matchingSummaryContainer = document.getElementById('matching-summary-container');
-                if (matchingSummaryContainer && e.key === 'Enter') {
-                    document.getElementById('matching-summary-back-to-menu-btn').click();
-                    return; // Exit early if summary handled
+                const matchingCompletionModal = document.getElementById('matching-completion-modal');
+                if (matchingCompletionModal && !matchingCompletionModal.classList.contains('hidden')) {
+                    if (e.key === 'Enter') {
+                        document.getElementById('matching-completion-replay-btn').click();
+                    } else if (e.key === 'Escape') {
+                        document.getElementById('matching-completion-back-to-menu-btn').click();
+                    }
+                    return; // Consume event if modal is handled
                 }
             } else if (this.currentView === 'sorting') { // If sorting is active
                 if (e.key === 'Enter') {
@@ -905,21 +917,66 @@ const game = {
         const appContainer = document.getElementById('app-container');
         appContainer.classList.remove('main-menu-active');
 
-        if (!document.getElementById('matching-summary-container')) {
-            appContainer.innerHTML = `
-                <div id="matching-summary-container" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
-                    <h1 id="matching-summary-title" class="text-2xl font-bold mb-4">${MESSAGES.get('sessionScore')}</h1>
-                    <p id="matching-summary-correct" class="text-xl mb-2">${MESSAGES.get('correct')}: ${game.matching.sessionScore.correct}</p>
-                    <p id="matching-summary-incorrect" class="text-xl mb-4">${MESSAGES.get('incorrect')}: ${game.matching.sessionScore.incorrect}</p>
-                    <button id="matching-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4" onclick="game.renderMenu()">${MESSAGES.get('backToMenu')}</button>
+        let modal = document.getElementById('matching-completion-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'matching-completion-modal';
+            modal.className = 'fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden';
+            modal.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full text-center">
+                    <h2 id="matching-completion-title" class="text-2xl font-bold mb-4">${MESSAGES.get('sessionScore')}</h2>
+                    <p id="matching-completion-message" class="text-xl mb-4">${MESSAGES.get('matchingCompletionMessage')}</p>
+                    <div id="matched-pairs-container" class="mb-4 text-left max-h-60 overflow-y-auto pr-2">
+                        <!-- Matched pairs will be listed here -->
+                    </div>
+                    <div class="flex justify-center space-x-4">
+                        <button id="matching-completion-replay-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
+                            ${MESSAGES.get('replayButton')}
+                        </button>
+                        <button id="matching-completion-back-to-menu-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">
+                            ${MESSAGES.get('backToMenu')}
+                        </button>
+                    </div>
                 </div>
             `;
-        } else {
-            document.getElementById('matching-summary-title').textContent = MESSAGES.get('sessionScore');
-            document.getElementById('matching-summary-correct').textContent = `${MESSAGES.get('correct')}: ${game.matching.sessionScore.correct}`;
-            document.getElementById('matching-summary-incorrect').textContent = `${MESSAGES.get('incorrect')}: ${game.matching.sessionScore.incorrect}`;
-            document.getElementById('matching-summary-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
+            document.body.appendChild(modal);
+
+            // Add event listeners for the new buttons
+            document.getElementById('matching-completion-replay-btn').addEventListener('click', () => {
+                modal.classList.add('hidden');
+                game.renderMatching(game.currentModule); // Replay the current matching module
+            });
+            document.getElementById('matching-completion-back-to-menu-btn').addEventListener('click', () => {
+                modal.classList.add('hidden');
+                game.renderMenu(); // Go back to main menu
+            });
         }
+
+        // Update modal content
+        document.getElementById('matching-completion-title').textContent = MESSAGES.get('sessionScore');
+        document.getElementById('matching-completion-message').textContent = MESSAGES.get('matchingCompletionMessage');
+        document.getElementById('matching-completion-replay-btn').textContent = MESSAGES.get('replayButton');
+        document.getElementById('matching-completion-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
+
+        const matchedPairsContainer = document.getElementById('matched-pairs-container');
+        matchedPairsContainer.innerHTML = ''; // Clear previous pairs
+
+        // Display matched pairs
+        game.matching.matchedPairs.forEach(pair => {
+            const termData = game.matching.moduleData.data.find(item => item.id === pair.termId);
+            if (termData) {
+                const pairElem = document.createElement('div');
+                pairElem.className = 'flex justify-between items-center py-1 border-b border-gray-200';
+                pairElem.innerHTML = `
+                    <span class="font-semibold">${termData.term}</span>
+                    <span>-</span>
+                    <span>${termData.definition}</span>
+                `;
+                matchedPairsContainer.appendChild(pairElem);
+            }
+        });
+
+        modal.classList.remove('hidden'); // Show the modal
     },
 
     showLogoutConfirmation() {
