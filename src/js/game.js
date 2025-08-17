@@ -1151,13 +1151,18 @@ const game = {
                 if (isCorrect) {
                     this.sessionScore.correct++;
                     auth.updateGlobalScore({ correct: 1, incorrect: 0 });
-                    document.querySelector(`[data-option="${selectedOption}"]`).classList.add('bg-green-500', 'text-white');
                 } else {
                     this.sessionScore.incorrect++;
                     auth.updateGlobalScore({ correct: 0, incorrect: 1 });
-                    document.querySelector(`[data-option="${selectedOption}"]`).classList.add('bg-red-500', 'text-white');
-                    document.querySelector(`[data-option="${questionData.correct}"]`).classList.add('bg-green-500', 'text-white');
                 }
+            }
+
+            // Visual feedback (always apply)
+            if (isCorrect) {
+                document.querySelector(`[data-option="${selectedOption}"]`).classList.add('bg-green-500', 'text-white');
+            } else {
+                document.querySelector(`[data-option="${selectedOption}"]`).classList.add('bg-red-500', 'text-white');
+                document.querySelector(`[data-option="${questionData.correct}"]`).classList.add('bg-green-500', 'text-white');
             }
             
 
@@ -1183,7 +1188,6 @@ const game = {
                     this.currentIndex--;
                     this.render();
                 }
-                game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
             }
         },
 
