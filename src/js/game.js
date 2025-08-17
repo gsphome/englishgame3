@@ -1158,6 +1158,7 @@ const game = {
                     document.querySelector(`[data-option="${selectedOption}"]`).classList.add('bg-red-500', 'text-white');
                     document.querySelector(`[data-option="${questionData.correct}"]`).classList.add('bg-green-500', 'text-white');
                 }
+            }
             
 
             document.getElementById('feedback-container').innerHTML = `<p class="text-lg">${questionData.explanation}</p>`;
