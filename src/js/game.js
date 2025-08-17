@@ -1022,6 +1022,7 @@ const game = {
             this.history = [];
             this.moduleData = module;
             this.appContainer = document.getElementById('app-container');
+            this.scoreFrozen = false;
 
             if (game.randomMode && Array.isArray(this.moduleData.data)) {
                 this.moduleData.data = game.shuffleArray([...this.moduleData.data]);
@@ -1145,15 +1146,17 @@ const game = {
                 sessionScoreBefore: { ...this.sessionScore } // Store the session score before this action
             });
 
-            if (isCorrect) {
-                this.sessionScore.correct++;
-                auth.updateGlobalScore({ correct: 1, incorrect: 0 });
-                document.querySelector(`[data-option="${selectedOption}"]`).classList.add('bg-green-500', 'text-white');
-            } else {
-                this.sessionScore.incorrect++;
-                auth.updateGlobalScore({ correct: 0, incorrect: 1 });
-                document.querySelector(`[data-option="${selectedOption}"]`).classList.add('bg-red-500', 'text-white');
-                document.querySelector(`[data-option="${questionData.correct}"]`).classList.add('bg-green-500', 'text-white');
+            if (!this.scoreFrozen) { // Only update score if not frozen
+                if (isCorrect) {
+                    this.sessionScore.correct++;
+                    auth.updateGlobalScore({ correct: 1, incorrect: 0 });
+                    document.querySelector(`[data-option="${selectedOption}"]`).classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.sessionScore.incorrect++;
+                    auth.updateGlobalScore({ correct: 0, incorrect: 1 });
+                    document.querySelector(`[data-option="${selectedOption}"]`).classList.add('bg-red-500', 'text-white');
+                    document.querySelector(`[data-option="${questionData.correct}"]`).classList.add('bg-green-500', 'text-white');
+                }
             }
 
             document.getElementById('feedback-container').innerHTML = `<p class="text-lg">${questionData.explanation}</p>`;
@@ -1172,6 +1175,7 @@ const game = {
                     this.undo();
                 } else {
                     // If not answered, just go back to the previous question
+                    this.scoreFrozen = false; // Reset scoreFrozen when moving to a new question
                     this.currentIndex--;
                     this.render();
                 }
@@ -1189,6 +1193,7 @@ const game = {
             }
 
             if (this.currentIndex < this.moduleData.data.length - 1) {
+                this.scoreFrozen = false; // Reset scoreFrozen when moving to a new question
                 this.currentIndex++;
                 this.render();
             } else {
@@ -1199,6 +1204,7 @@ const game = {
         undo() {
             if (this.history.length > 0) {
                 const lastAction = this.history.pop();
+                this.scoreFrozen = true;
 
                 // Do not revert scores on undo, as per new logic.
                 // Scores are only updated when a new answer is submitted.
