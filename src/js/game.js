@@ -128,6 +128,8 @@ const game = {
                 this.completion.updateText();
             } else if (this.currentView === 'sorting') {
                 this.sorting.updateText();
+            } else if (this.currentView === 'matching') {
+                this.matching.updateText();
             }
 
             // Re-render summary screens if active
