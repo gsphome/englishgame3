@@ -1200,14 +1200,15 @@ const game = {
             if (this.history.length > 0) {
                 const lastAction = this.history.pop();
 
-                // Revert scores
-                if (lastAction.isCorrect) {
-                    this.sessionScore.correct--;
-                    auth.updateGlobalScore({ correct: -1, incorrect: 0 });
-                } else {
-                    this.sessionScore.incorrect--;
-                    auth.updateGlobalScore({ correct: 0, incorrect: -1 });
-                }
+                // Do not revert scores on undo, as per new logic.
+                // Scores are only updated when a new answer is submitted.
+                // if (lastAction.isCorrect) {
+                //     this.sessionScore.correct--;
+                //     auth.updateGlobalScore({ correct: -1, incorrect: 0 });
+                // } else {
+                //     this.sessionScore.incorrect--;
+                //     auth.updateGlobalScore({ correct: 0, incorrect: -1 });
+                // }
 
                 // Set current index to the question that was undone
                 // Restore the UI state for the undone question
@@ -1225,7 +1226,7 @@ const game = {
                 });
 
                 
-                game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+                game.updateSessionScoreDisplay(lastAction.sessionScoreBefore.correct, lastAction.sessionScoreBefore.incorrect, this.moduleData.data.length);
                 this.currentIndex = lastAction.index;
                 this.render(); // Re-render the question
             }
@@ -1797,14 +1798,15 @@ const game = {
                     previousParent.appendChild(wordElem);
                     this.clearFeedback(); // Clear feedback on undo
 
-                    // Revert scores based on the correctness of the undone move
-                    if (lastAction.isCorrectMove) {
-                        this.sessionScore.correct--;
-                        auth.updateGlobalScore({ correct: -1, incorrect: 0 });
-                    } else {
-                        this.sessionScore.incorrect--;
-                        auth.updateGlobalScore({ correct: 0, incorrect: -1 });
-                    }
+                    // Do not revert scores on undo, as per new logic.
+                    // Scores are only updated when a new answer is submitted.
+                    // if (lastAction.isCorrectMove) {
+                    //     this.sessionScore.correct--;
+                    //     auth.updateGlobalScore({ correct: -1, incorrect: 0 });
+                    // } else {
+                    //     this.sessionScore.incorrect--;
+                    //     auth.updateGlobalScore({ correct: 0, incorrect: -1 });
+                    // }
                     game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
                 }
             }
