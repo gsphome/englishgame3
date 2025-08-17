@@ -1233,8 +1233,7 @@ const game = {
 
                 
                 game.updateSessionScoreDisplay(lastAction.sessionScoreBefore.correct, lastAction.sessionScoreBefore.incorrect, this.moduleData.data.length);
-                this.currentIndex = lastAction.index;
-                this.render(); // Re-render the question
+                
             }
         },
 
