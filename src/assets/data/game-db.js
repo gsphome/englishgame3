@@ -67,7 +67,7 @@ const learningModules = [
     },
     {
         id: 'flashcard-academic-c1',
-        name: 'Flashcard: Academic',
+        name: 'Academic',
         gameMode: 'flashcard',
         dataPath: 'src/assets/data/flashcard-academic-c1.json'
     },
@@ -97,25 +97,25 @@ const learningModules = [
     },
     {
         id: 'quiz-advanced-grammar-inversions',
-        name: 'Quiz: Grammar Inversions',
+        name: 'Grammar Inversions',
         gameMode: 'quiz',
         dataPath: 'src/assets/data/quiz-advanced-grammar-inversions.json'
     },
     {
         id: 'quiz-advanced-collocations-idioms-c2',
-        name: 'Advanced Collocations',
+        name: 'Adv. Collocations',
         gameMode: 'quiz',
         dataPath: 'src/assets/data/quiz-advanced-collocations-idioms-c2.json'
     },
     {
         id: 'quiz-formal-vocabulary-nuance-c2',
-        name: 'Formal Vocabulary & Nuance',
+        name: 'Formal Vocab & Nuance',
         gameMode: 'quiz',
         dataPath: 'src/assets/data/quiz-formal-vocabulary-nuance-c2.json'
     },
     {
         id: 'quiz-advanced-grammatical-structures-c2',
-        name: 'Advanced Grammatical Structures',
+        name: 'Adv. Grammar Structures',
         gameMode: 'quiz',
         dataPath: 'src/assets/data/quiz-advanced-grammatical-structures-c2.json'
     },
@@ -127,7 +127,7 @@ const learningModules = [
     },
     {
         id: 'completion-used-to',
-        name: 'Completion: Grammar UsedTo',
+        name: 'Grammar UsedTo',
         gameMode: 'completion',
         dataPath: 'src/assets/data/completion-used-to.json'
     },
@@ -151,13 +151,13 @@ const learningModules = [
     },
     {
         id: 'sorting-nuance-vocabulary-c2',
-        name: 'Nuance in Vocabulary',
+        name: 'Nuance in Vocab',
         gameMode: 'sorting',
         dataPath: 'src/assets/data/sorting-nuance-vocabulary-c2.json'
     },
     {
         id: 'matching-vocabulary-c1',
-        name: 'Matching: Vocabulary',
+        name: 'Vocabulary',
         gameMode: 'matching',
         dataPath: 'src/assets/data/matching-sample.json'
     }
