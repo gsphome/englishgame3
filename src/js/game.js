@@ -923,7 +923,7 @@ const game = {
             modal.id = 'matching-completion-modal';
             modal.className = 'fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden';
             modal.innerHTML = `
-                <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full text-center">
+                <div class="bg-white p-8 rounded-lg shadow-xl max-w-xl w-full text-center">
                     <h2 id="matching-completion-title" class="text-2xl font-bold mb-4">${MESSAGES.get('sessionScore')}</h2>
                     <p id="matching-completion-message" class="text-xl mb-4">${MESSAGES.get('matchingCompletionMessage')}</p>
                     <div class="mb-4 text-left max-h-60 overflow-y-auto pr-2">
