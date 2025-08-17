@@ -2021,13 +2021,13 @@ const game = {
             const definitions = game.shuffleArray(this.moduleData.data.map(item => ({ id: item.id, text: item.definition, type: 'definition' })));
 
             this.appContainer.innerHTML = `
-                <div id="matching-container" class="max-w-4xl mx-auto p-4">
+                <div id="matching-container" class="max-w-4xl mx-auto p-2">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div id="terms-column" class="bg-white p-4 rounded-lg shadow-md min-h-[200px]">
+                        <div id="terms-column" class="bg-white p-4 rounded-lg shadow-md">
                             <h3 class="text-xl font-semibold mb-3">${MESSAGES.get('terms')}</h3>
                             <!-- Terms will be rendered here -->
                         </div>
-                        <div id="definitions-column" class="bg-white p-4 rounded-lg shadow-md min-h-[200px]">
+                        <div id="definitions-column" class="bg-white p-4 rounded-lg shadow-md">
                             <h3 class="text-xl font-semibold mb-3">${MESSAGES.get('definitions')}</h3>
                             <!-- Definitions will be rendered here -->
                         </div>
