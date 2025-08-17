@@ -2070,8 +2070,8 @@ const game = {
                     <div class="flex justify-between mt-4">
                         <button id="undo-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('undoButton')}</button>
                         <div>
-                            <button id="check-matching-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('checkAnswers')}</button>
                             <button id="reset-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('resetButton')}</button>
+                            <button id="check-matching-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('checkAnswers')}</button>
                         </div>
                     </div>
                     <button id="back-to-menu-matching-btn" class="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('backToMenu')}</button>
