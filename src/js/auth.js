@@ -45,7 +45,7 @@ const auth = {
                     <p class="text-gray-600 mb-6">${MESSAGES.get('welcomeSubtitle')}</p>
 
                     <input type="text" id="username-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out" placeholder="${MESSAGES.get('usernamePlaceholder')}">
-                    <button id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-200 ease-in-out">${MESSAGES.get('loginButton')}</button>
+                    <button id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transform hover:scale-105 transition duration-200 ease-in-out">${MESSAGES.get('loginButton')}</button>
                 </div>
             </div>
         `;

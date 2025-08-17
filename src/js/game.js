@@ -643,7 +643,7 @@ const game = {
                 <span class="text-sm text-gray-500 font-medium">${categoryDisplayName}</span>
                 <span class="text-lg font-semibold">${item.word}</span>
                 <span class="text-base text-gray-700 italic">${item.translation_es}</span>
-                <button title="${MESSAGES.get('showExplanation')}" aria-label="${MESSAGES.get('showExplanation')}" class="explanation-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-md text-sm justify-self-center mr-1">
+                <button title="${MESSAGES.get('showExplanation')}" aria-label="${MESSAGES.get('showExplanation')}" class="explanation-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200 ease-in-out text-sm justify-self-center mr-1">
                     &#x2139;
                 </button>
             `;
@@ -710,14 +710,14 @@ const game = {
                             </div>
                         </div>
                         <div class="flex justify-between mt-4">
-                            <button id="prev-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-l md:py-2 md:px-4">
+                            <button id="prev-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                                 ${MESSAGES.get('prevButton')}
                             </button>
-                            <button id="next-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-r md:py-2 md:px-4">
+                            <button id="next-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                                 ${MESSAGES.get('nextButton')}
                             </button>
                         </div>
-                         <button id="back-to-menu-flashcard-btn" class="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:mt-4 md:py-2 md:px-4" onclick="game.renderMenu()">${MESSAGES.get('backToMenu')}</button>
+                         <button id="back-to-menu-flashcard-btn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out" onclick="game.renderMenu()">${MESSAGES.get('backToMenu')}</button>
                     </div>
                 `;
 
@@ -906,7 +906,7 @@ const game = {
                 <div id="flashcard-summary-container" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
                     <h1 id="flashcard-summary-title" class="text-2xl font-bold mb-4">${MESSAGES.get('sessionScore')}</h1>
                     <p id="flashcard-summary-message" class="text-xl mb-4">${MESSAGES.get('flashcardSummaryMessage').replace('{count}', totalCards)}</p>
-                    <button id="flashcard-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4" onclick="game.renderMenu()">${MESSAGES.get('backToMenu')}</button>
+                    <button id="flashcard-summary-back-to-menu-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out" onclick="game.renderMenu()">${MESSAGES.get('backToMenu')}</button>
                 </div>
             `;
         } else {
@@ -940,10 +940,10 @@ const game = {
                         </div>
                     </div>
                     <div class="flex justify-center space-x-4">
-                        <button id="matching-completion-replay-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
+                        <button id="matching-completion-replay-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                             ${MESSAGES.get('replayButton')}
                         </button>
-                        <button id="matching-completion-back-to-menu-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">
+                        <button id="matching-completion-back-to-menu-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                             ${MESSAGES.get('backToMenu')}
                         </button>
                     </div>
@@ -1051,7 +1051,7 @@ const game = {
                 const optionLetters = ['A', 'B', 'C', 'D'];
                 optionsToRender.forEach((option, index) => {
                     optionsHtml += `
-                            <button class="w-full text-left bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-3 px-5 rounded-lg shadow-sm transition duration-300 flex items-center border border-gray-200" data-option="${option}">
+                            <button class="w-full text-left bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out flex items-center border border-gray-300" data-option="${option}">
                             <span class="font-bold mr-4">${optionLetters[index]}</span>
                             <span>${option}</span>
                         </button>
@@ -2168,6 +2168,7 @@ const game = {
                     <div class="flex justify-between mt-4">
                         <button id="undo-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('undoButton')}</button>
                         <div>
+                            <button id="check-matching-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('checkButton')}</button>
                             <button id="reset-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('resetButton')}</button>
                         </div>
                     </div>
