@@ -405,6 +405,9 @@ const game = {
                 case 'sorting':
                     this.renderSorting(moduleWithData);
                     break;
+                case 'matching':
+                    this.renderMatching(moduleWithData);
+                    break;
             }
         } catch (error) {
             console.error('Failed to load module data:', error);
@@ -1184,6 +1187,13 @@ const game = {
         this.updateFooterVisibility();
     },
 
+    renderMatching(module) {
+        this.currentView = 'matching';
+        document.body.classList.add('module-active');
+        this.matching.init(module);
+        this.updateFooterVisibility();
+    },
+
     
 
     completion: {
@@ -1863,6 +1873,50 @@ const game = {
                     }
                 }
             });
+        }
+    },
+
+    matching: {
+        currentIndex: 0,
+        moduleData: null,
+        appContainer: null,
+        sessionScore: { correct: 0, incorrect: 0 },
+
+        init(module) {
+            this.currentIndex = 0;
+            this.moduleData = module;
+            this.appContainer = document.getElementById('app-container');
+            this.sessionScore = { correct: 0, incorrect: 0 };
+            if (game.randomMode && Array.isArray(this.moduleData.data)) {
+                this.moduleData.data = game.shuffleArray([...this.moduleData.data]);
+            }
+            this.render();
+        },
+
+        render() {
+            if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
+                console.error("Matching module data is invalid or empty.");
+                game.renderMenu();
+                return;
+            }
+            this.appContainer.classList.remove('main-menu-active');
+            // TODO: Implement matching game rendering logic here
+            this.appContainer.innerHTML = `
+                <div id="matching-container" class="max-w-2xl mx-auto p-4">
+                    <h2 class="text-2xl font-bold mb-4">Matching Game</h2>
+                    <p>Module: ${this.moduleData.name}</p>
+                    <p>Current Index: ${this.currentIndex}</p>
+                    <button id="back-to-menu-matching-btn" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg" onclick="game.renderMenu()">Back to Menu</button>
+                </div>
+            `;
+            document.getElementById('back-to-menu-matching-btn').textContent = MESSAGES.get('backToMenu');
+            game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        },
+
+        updateText() {
+            // Update button texts or any other dynamic text within the matching game view
+            document.getElementById('back-to-menu-matching-btn').textContent = MESSAGES.get('backToMenu');
+            // If there are other elements with dynamic text, update them here
         }
     },
 

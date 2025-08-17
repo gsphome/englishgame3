@@ -154,5 +154,11 @@ const learningModules = [
         name: 'Nuance in Vocabulary',
         gameMode: 'sorting',
         dataPath: 'src/assets/data/sorting-nuance-vocabulary-c2.json'
+    },
+    {
+        id: 'matching-vocabulary-c1',
+        name: 'Matching: Vocabulary C1',
+        gameMode: 'matching',
+        dataPath: 'src/assets/data/matching-sample.json'
     }
 ];

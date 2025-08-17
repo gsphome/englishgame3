@@ -1,0 +1,62 @@
+[
+  {
+    "id": "pair1",
+    "term": "Ephemeral",
+    "definition": "Lasting for a very short time.",
+    "explanation": "Ephemeral means lasting for a very short time, like a fleeting moment or a short-lived trend."
+  },
+  {
+    "id": "pair2",
+    "term": "Ubiquitous",
+    "definition": "Present, appearing, or found everywhere.",
+    "explanation": "Ubiquitous describes something that is found everywhere, like smartphones in modern society."
+  },
+  {
+    "id": "pair3",
+    "term": "Benevolent",
+    "definition": "Well meaning and kindly.",
+    "explanation": "A benevolent person is kind and generous, often doing good deeds for others."
+  },
+  {
+    "id": "pair4",
+    "term": "Capricious",
+    "definition": "Given to sudden and unaccountable changes of mood or behavior.",
+    "explanation": "Someone capricious is unpredictable and changes their mind or behavior often, without clear reason."
+  },
+  {
+    "id": "pair5",
+    "term": "Dichotomy",
+    "definition": "A division or contrast between two things that are or are represented as being opposed or entirely different.",
+    "explanation": "A dichotomy is a sharp contrast between two things, like the dichotomy between good and evil."
+  },
+  {
+    "id": "pair6",
+    "term": "Equanimity",
+    "definition": "Calmness and composure, especially in a difficult situation.",
+    "explanation": "Equanimity is the ability to remain calm and composed, even when facing stress or difficulty."
+  },
+  {
+    "id": "pair7",
+    "term": "Fiduciary",
+    "definition": "Involving trust, especially with regard to the relationship between a trustee and a beneficiary.",
+    "explanation": "A fiduciary relationship is one based on trust, where one party acts on behalf of another, like a financial advisor."
+  },
+  {
+    "id": "pair8",
+    "term": "Gregarious",
+    "definition": "Fond of company; sociable.",
+    "explanation": "A gregarious person enjoys being with others and is very sociable."
+  },
+  {
+    "id": "pair9",
+    "term": "Hegemony",
+    "definition": "Leadership or dominance, especially by one state or social group over others.",
+    "explanation": "Hegemony refers to the dominance of one group or nation over others, often culturally or politically."
+  },
+  {
+    "id": "pair10",
+    "term": "Incontrovertible",
+    "definition": "Not able to be denied or disputed.",
+    "explanation": "An incontrovertible fact is one that cannot be argued against because it is clearly true."
+  }
+]
