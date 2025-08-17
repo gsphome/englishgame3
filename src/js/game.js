@@ -1811,9 +1811,20 @@ const game = {
                 const lastAction = this.history.pop();
                 const wordElem = document.getElementById(lastAction.wordId);
                 const previousParent = document.getElementById(lastAction.from);
+
                 if (wordElem && previousParent) {
                     previousParent.appendChild(wordElem);
                     this.clearFeedback(); // Clear feedback on undo
+
+                    // Revert scores based on the correctness of the undone move
+                    if (lastAction.isCorrectMove) {
+                        this.sessionScore.correct--;
+                        auth.updateGlobalScore({ correct: -1, incorrect: 0 });
+                    } else {
+                        this.sessionScore.incorrect--;
+                        auth.updateGlobalScore({ correct: 0, incorrect: -1 });
+                    }
+                    game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
                 }
             }
         },
@@ -1821,6 +1832,7 @@ const game = {
         clearFeedback() {
             document.querySelectorAll('.word').forEach(wordElem => {
                 wordElem.classList.remove('bg-green-500', 'bg-red-500', 'text-white');
+                wordElem.classList.add('bg-gray-100', 'hover:bg-gray-200', 'text-gray-800', 'dark:text-black');
             });
         },
 
@@ -1859,10 +1871,17 @@ const game = {
 
                 if (oldParentId !== newParentId) {
                     // Record the action for undo
+                    // Determine if the move is correct or incorrect for scoring
+                    const word = wordElem.dataset.word;
+                    const originalWordData = this.moduleData.data.find(item => item.word === word);
+                    const correctCategory = originalWordData ? originalWordData.category : null;
+                    const isCorrectMove = (newParentId === 'word-bank' && correctCategory === null) || (newParentId === `category-${correctCategory}`);
+
                     game.sorting.history.push({
                         wordId: wordId,
                         from: oldParentId,
-                        to: newParentId
+                        to: newParentId,
+                        isCorrectMove: isCorrectMove // Store correctness of the move
                     });
                     target.appendChild(wordElem);
                     game.sorting.userAnswers[wordElem.dataset.word] = newParentId.replace('category-', '').replace('word-', '');
@@ -1932,10 +1951,17 @@ const game = {
                     const newParentId = dropTarget.id;
 
                     if (oldParentId !== newParentId) {
+                        // Determine if the move is correct or incorrect for scoring
+                        const word = this.currentDraggedElement.dataset.word;
+                        const originalWordData = this.moduleData.data.find(item => item.word === word);
+                        const correctCategory = originalWordData ? originalWordData.category : null;
+                        const isCorrectMove = (newParentId === 'word-bank' && correctCategory === null) || (newParentId === `category-${correctCategory}`);
+
                         game.sorting.history.push({
                             wordId: this.currentDraggedElement.id,
                             from: oldParentId,
-                            to: newParentId
+                            to: newParentId,
+                            isCorrectMove: isCorrectMove // Store correctness of the move
                         });
                         dropTarget.appendChild(this.currentDraggedElement);
                         game.sorting.userAnswers[this.currentDraggedElement.dataset.word] = newParentId;
