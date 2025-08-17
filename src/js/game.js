@@ -327,7 +327,13 @@ const game = {
             button.classList.add(colorClass); // Add the dynamic color class
             button.dataset.moduleId = module.id;
 
-            button.querySelector('[data-module-index]').textContent = `${String.fromCharCode(65 + index)}.`;
+            // Only add letter for modules A-Z
+            if (index <= 25) { // ASCII for 'A' is 65, 'Z' is 90. 65 + 25 = 90
+                button.querySelector('[data-module-index]').textContent = `${String.fromCharCode(65 + index)}.`;
+            } else {
+                // If index is beyond 'Z', do not add a letter.
+                // The button will still be generated but without a letter prefix.
+            }
             button.querySelector('[data-module-name]').textContent = module.name.replace('Flashcard: ', '').replace('Quiz: ', '').replace('Completion: ', '');
             button.querySelector('[data-game-mode-icon]').textContent = `${module.gameMode === 'flashcard' ? '🧠' : module.gameMode === 'quiz' ? '❓' : module.gameMode === 'sorting' ? '🧩' : '✍️'}`;
 
@@ -350,6 +356,7 @@ const game = {
         }
 
         document.querySelectorAll('[data-module-id]').forEach(button => {
+            // All buttons should be clickable via mouse, regardless of whether they have a letter.
             button.addEventListener('click', () => {
                 // Save scroll position before navigating away
                 const currentScrollWrapper = document.getElementById('main-menu-scroll-wrapper');

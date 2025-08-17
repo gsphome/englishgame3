@@ -157,7 +157,7 @@ const learningModules = [
     },
     {
         id: 'matching-vocabulary-c1',
-        name: 'Matching: Vocabulary C1',
+        name: 'Matching: Vocabulary',
         gameMode: 'matching',
         dataPath: 'src/assets/data/matching-sample.json'
     }
