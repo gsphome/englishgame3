@@ -1030,7 +1030,7 @@ const game = {
             this.render();
         },
 
-        render() {
+        render(actionToRender = null) {
             if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
                 console.error("Quiz module data is invalid or empty.");
                 game.renderMenu();
@@ -1039,12 +1039,17 @@ const game = {
             const questionData = this.moduleData.data[this.currentIndex];
             this.appContainer.classList.remove('main-menu-active');
 
-            // Create a copy of options to shuffle, so the original data is not permanently altered
-            let optionsToRender = [...questionData.options];
+            let optionsToRender;
+            if (actionToRender && actionToRender.shuffledOptions) {
+                optionsToRender = actionToRender.shuffledOptions.map(opt => ({ ...opt })); // Deep copy to avoid modifying history
+            } else {
+                // Create a copy of options to shuffle, so the original data is not permanently altered
+                optionsToRender = [...questionData.options];
 
-            // Shuffle options if random mode is active
-            if (game.randomMode) {
-                optionsToRender = game.shuffleArray(optionsToRender);
+                // Shuffle options if random mode is active
+                if (game.randomMode) {
+                    optionsToRender = game.shuffleArray(optionsToRender);
+                }
             }
 
             if (!document.getElementById('quiz-container')) {
@@ -1114,11 +1119,13 @@ const game = {
             const optionsContainer = document.getElementById('options-container');
             optionsContainer.innerHTML = '';
             const optionLetters = ['A', 'B', 'C', 'D'];
-            optionsToRender.forEach((option, index) => {
+            optionsToRender.forEach((optionData, index) => { // Changed 'option' to 'optionData'
                 const button = document.createElement('button');
-                button.className = "w-full text-left bg-white hover:bg-gray-200 text-gray-800 font-semibold py-3 px-5 rounded-lg shadow-md transition duration-300 flex items-center";
-                button.dataset.option = option;
-                button.innerHTML = `<span class="font-bold mr-4">${optionLetters[index]}</span><span>${option}</span>`;
+                // Use className and disabled from optionData if available, otherwise default
+                button.className = optionData.className || "w-full text-left bg-white hover:bg-gray-200 text-gray-800 font-semibold py-3 px-5 rounded-lg shadow-md transition duration-300 flex items-center";
+                button.dataset.option = optionData.option; // Use optionData.option
+                button.innerHTML = `<span class="font-bold mr-4">${optionLetters[index]}</span><span>${optionData.option}</span>`; // Use optionData.option
+                button.disabled = optionData.disabled || false; // Use disabled from optionData
                 button.addEventListener('click', (e) => this.handleAnswer(e.target.closest('[data-option]').dataset.option));
                 optionsContainer.appendChild(button);
             });
@@ -1241,7 +1248,7 @@ const game = {
 
                 
                 game.updateSessionScoreDisplay(lastAction.sessionScoreBefore.correct, lastAction.sessionScoreBefore.incorrect, this.moduleData.data.length);
-                
+                this.render(lastAction);
             }
         },
 
