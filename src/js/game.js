@@ -1127,7 +1127,22 @@ const game = {
         handleAnswer(selectedOption) {
             const questionData = this.moduleData.data[this.currentIndex];
             const isCorrect = selectedOption === questionData.correct;
-            this.history.push({ correct: isCorrect, index: this.currentIndex });
+            const feedbackHtml = document.getElementById('feedback-container').innerHTML;
+            const optionsContainer = document.getElementById('options-container');
+            const currentOptions = Array.from(optionsContainer.children).map(button => ({
+                option: button.dataset.option,
+                className: button.className,
+                disabled: button.disabled
+            }));
+
+            this.history.push({
+                index: this.currentIndex,
+                selectedOption: selectedOption,
+                correctAnswer: questionData.correct,
+                isCorrect: isCorrect,
+                shuffledOptions: currentOptions, // Store the state of the options as they were rendered
+                feedbackHtml: feedbackHtml // Store the feedback HTML
+            });
 
             if (isCorrect) {
                 this.sessionScore.correct++;
@@ -1150,12 +1165,15 @@ const game = {
 
         prev() {
             if (this.currentIndex > 0) {
-                // If the current question has been answered, undo it before going back
-                if (document.querySelectorAll('[data-option][disabled]').length > 0) {
+                const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
+                if (optionsDisabled) {
+                    // If the current question has been answered, undo it
                     this.undo();
+                } else {
+                    // If not answered, just go back to the previous question
+                    this.currentIndex--;
+                    this.render();
                 }
-                this.currentIndex--;
-                this.render();
                 game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
             }
         },
@@ -1180,15 +1198,55 @@ const game = {
         undo() {
             if (this.history.length > 0) {
                 const lastAction = this.history.pop();
-                if (lastAction.correct) {
+
+                // Revert scores
+                if (lastAction.isCorrect) {
                     this.sessionScore.correct--;
                     auth.updateGlobalScore({ correct: -1, incorrect: 0 });
                 } else {
                     this.sessionScore.incorrect--;
                     auth.updateGlobalScore({ correct: 0, incorrect: -1 });
                 }
+
+                // Set current index to the question that was undone
                 this.currentIndex = lastAction.index;
-                this.render();
+                this.render(); // Re-render the question
+
+                // Restore the UI state for the undone question
+                const optionsContainer = document.getElementById('options-container');
+                const feedbackContainer = document.getElementById('feedback-container');
+
+                // Clear feedback
+                feedbackContainer.innerHTML = '';
+
+                // Re-enable all options and remove color classes
+                document.querySelectorAll('[data-option]').forEach(button => {
+                    button.disabled = false;
+                    button.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    button.classList.add('bg-gray-100', 'hover:bg-gray-200'); // Restore default classes
+                });
+
+                // If the question was answered, re-apply the visual state as it was before the answer
+                if (lastAction.selectedOption) {
+                    const selectedButton = document.querySelector(`[data-option="${lastAction.selectedOption}"]`);
+                    if (selectedButton) {
+                        selectedButton.classList.remove('bg-gray-100', 'hover:bg-gray-200'); // Remove default classes
+                        if (lastAction.isCorrect) {
+                            selectedButton.classList.add('bg-green-500', 'text-white');
+                        } else {
+                            selectedButton.classList.add('bg-red-500', 'text-white');
+                            // Also highlight the correct answer if it was incorrect
+                            const correctButton = document.querySelector(`[data-option="${lastAction.correctAnswer}"]`);
+                            if (correctButton) {
+                                correctButton.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                                correctButton.classList.add('bg-green-500', 'text-white');
+                            }
+                        }
+                        selectedButton.disabled = true; // Re-disable the selected option
+                    }
+                    feedbackContainer.innerHTML = lastAction.feedbackHtml; // Restore feedback
+                }
+                game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
             }
         },
 
