@@ -926,8 +926,14 @@ const game = {
                 <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full text-center">
                     <h2 id="matching-completion-title" class="text-2xl font-bold mb-4">${MESSAGES.get('sessionScore')}</h2>
                     <p id="matching-completion-message" class="text-xl mb-4">${MESSAGES.get('matchingCompletionMessage')}</p>
-                    <div id="matched-pairs-container" class="mb-4 text-left max-h-60 overflow-y-auto pr-2">
-                        <!-- Matched pairs will be listed here -->
+                    <div class="mb-4 text-left max-h-60 overflow-y-auto pr-2">
+                        <div class="grid grid-cols-2 gap-2 font-bold border-b-2 border-gray-300 pb-2 mb-2">
+                            <span>${MESSAGES.get('terms')}</span>
+                            <span>${MESSAGES.get('definitions')}</span>
+                        </div>
+                        <div id="matched-pairs-grid" class="grid grid-cols-2 gap-2">
+                            <!-- Matched pairs will be listed here -->
+                        </div>
                     </div>
                     <div class="flex justify-center space-x-4">
                         <button id="matching-completion-replay-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
@@ -958,21 +964,21 @@ const game = {
         document.getElementById('matching-completion-replay-btn').textContent = MESSAGES.get('replayButton');
         document.getElementById('matching-completion-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
 
-        const matchedPairsContainer = document.getElementById('matched-pairs-container');
-        matchedPairsContainer.innerHTML = ''; // Clear previous pairs
+        const matchedPairsGrid = document.getElementById('matched-pairs-grid');
+        matchedPairsGrid.innerHTML = ''; // Clear previous pairs
 
         // Display matched pairs
         game.matching.matchedPairs.forEach(pair => {
             const termData = game.matching.moduleData.data.find(item => item.id === pair.termId);
             if (termData) {
-                const pairElem = document.createElement('div');
-                pairElem.className = 'flex justify-between items-center py-1 border-b border-gray-200';
-                pairElem.innerHTML = `
-                    <span class="font-semibold">${termData.term}</span>
-                    <span>-</span>
-                    <span>${termData.definition}</span>
-                `;
-                matchedPairsContainer.appendChild(pairElem);
+                const termSpan = document.createElement('span');
+                termSpan.className = 'font-semibold';
+                termSpan.textContent = termData.term;
+                matchedPairsGrid.appendChild(termSpan);
+
+                const definitionSpan = document.createElement('span');
+                definitionSpan.textContent = termData.definition;
+                matchedPairsGrid.appendChild(definitionSpan);
             }
         });
 
