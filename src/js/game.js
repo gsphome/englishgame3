@@ -1993,6 +1993,41 @@ const game = {
             }
         },
 
+        undo() {
+            if (this.matchedPairs.length > 0) {
+                const lastMatch = this.matchedPairs.pop();
+                const termElement = document.getElementById(`term-${lastMatch.termId}`);
+                const defElement = document.getElementById(`definition-${lastMatch.definitionId}`);
+
+                if (termElement) {
+                    termElement.classList.remove('matched', 'bg-green-200', 'cursor-default');
+                    termElement.classList.add('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
+                    termElement.addEventListener('click', (e) => this.handleItemClick(e.target));
+                }
+                if (defElement) {
+                    defElement.classList.remove('matched', 'bg-green-200', 'cursor-default');
+                    defElement.classList.add('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
+                    defElement.addEventListener('click', (e) => this.handleItemClick(e.target));
+                }
+                this.sessionScore.correct--;
+                game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            }
+        },
+
+        resetGame() {
+            this.matchedPairs = [];
+            this.sessionScore = { correct: 0, incorrect: 0 };
+            this.feedbackActive = false;
+
+            // Re-enable all terms and definitions
+            document.querySelectorAll('.matching-item').forEach(element => {
+                element.classList.remove('matched', 'bg-green-200', 'incorrect', 'bg-red-200', 'cursor-default', 'selected');
+                element.classList.add('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
+                element.addEventListener('click', (e) => this.handleItemClick(e.target));
+            });
+            game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        },
+
         checkAnswers() {
             // This function might be redundant if attemptMatch handles real-time feedback
             // However, if we want a final check button, we can implement it here.
@@ -2032,9 +2067,12 @@ const game = {
                             <!-- Definitions will be rendered here -->
                         </div>
                     </div>
-                    <div class="flex justify-center mt-4 space-x-4">
-                        <button id="check-matching-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('checkAnswers')}</button>
-                        <button id="reset-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('resetButton')}</button>
+                    <div class="flex justify-between mt-4">
+                        <button id="undo-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('undoButton')}</button>
+                        <div>
+                            <button id="check-matching-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('checkAnswers')}</button>
+                            <button id="reset-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('resetButton')}</button>
+                        </div>
                     </div>
                     <button id="back-to-menu-matching-btn" class="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('backToMenu')}</button>
                 </div>
@@ -2065,6 +2103,7 @@ const game = {
                 definitionsColumn.appendChild(defElem);
             });
 
+            document.getElementById('undo-matching-btn').addEventListener('click', () => this.undo());
             document.getElementById('check-matching-btn').addEventListener('click', () => this.checkAnswers());
             document.getElementById('reset-matching-btn').addEventListener('click', () => this.resetGame());
             document.getElementById('back-to-menu-matching-btn').addEventListener('click', () => game.renderMenu());
@@ -2075,9 +2114,10 @@ const game = {
         },
 
         updateText() {
-            // Update button texts or any other dynamic text within the matching game view
             document.getElementById('back-to-menu-matching-btn').textContent = MESSAGES.get('backToMenu');
-            // If there are other elements with dynamic text, update them here
+            document.getElementById('undo-matching-btn').textContent = MESSAGES.get('undoButton');
+            document.getElementById('check-matching-btn').textContent = MESSAGES.get('checkAnswers');
+            document.getElementById('reset-matching-btn').textContent = MESSAGES.get('resetButton');
         }
     },
 
