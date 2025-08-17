@@ -2211,6 +2211,8 @@ const game = {
             document.getElementById('undo-matching-btn').textContent = MESSAGES.get('undoButton');
             document.getElementById('check-matching-btn').textContent = MESSAGES.get('checkAnswers');
             document.getElementById('reset-matching-btn').textContent = MESSAGES.get('resetButton');
+            document.querySelector('#terms-column h3').textContent = MESSAGES.get('terms');
+            document.querySelector('#definitions-column h3').textContent = MESSAGES.get('definitions');
         }
     },
 
