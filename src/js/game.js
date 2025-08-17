@@ -1141,7 +1141,8 @@ const game = {
                 correctAnswer: questionData.correct,
                 isCorrect: isCorrect,
                 shuffledOptions: currentOptions, // Store the state of the options as they were rendered
-                feedbackHtml: feedbackHtml // Store the feedback HTML
+                feedbackHtml: feedbackHtml, // Store the feedback HTML
+                sessionScoreBefore: { ...this.sessionScore } // Store the session score before this action
             });
 
             if (isCorrect) {
@@ -1209,9 +1210,6 @@ const game = {
                 }
 
                 // Set current index to the question that was undone
-                this.currentIndex = lastAction.index;
-                this.render(); // Re-render the question
-
                 // Restore the UI state for the undone question
                 const optionsContainer = document.getElementById('options-container');
                 const feedbackContainer = document.getElementById('feedback-container');
@@ -1226,27 +1224,12 @@ const game = {
                     button.classList.add('bg-gray-100', 'hover:bg-gray-200'); // Restore default classes
                 });
 
-                // If the question was answered, re-apply the visual state as it was before the answer
-                if (lastAction.selectedOption) {
-                    const selectedButton = document.querySelector(`[data-option="${lastAction.selectedOption}"]`);
-                    if (selectedButton) {
-                        selectedButton.classList.remove('bg-gray-100', 'hover:bg-gray-200'); // Remove default classes
-                        if (lastAction.isCorrect) {
-                            selectedButton.classList.add('bg-green-500', 'text-white');
-                        } else {
-                            selectedButton.classList.add('bg-red-500', 'text-white');
-                            // Also highlight the correct answer if it was incorrect
-                            const correctButton = document.querySelector(`[data-option="${lastAction.correctAnswer}"]`);
-                            if (correctButton) {
-                                correctButton.classList.remove('bg-gray-100', 'hover:bg-gray-200');
-                                correctButton.classList.add('bg-green-500', 'text-white');
-                            }
-                        }
-                        selectedButton.disabled = true; // Re-disable the selected option
-                    }
-                    feedbackContainer.innerHTML = lastAction.feedbackHtml; // Restore feedback
-                }
+                
+                // Temporary: Force sessionScore for debugging
+                this.sessionScore = { correct: 5, incorrect: 5 };
                 game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+                this.currentIndex = lastAction.index;
+                // this.render(); // Re-render the question - Temporarily removed for debugging
             }
         },
 
