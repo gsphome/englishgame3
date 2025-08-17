@@ -929,12 +929,13 @@ const game = {
                     <h2 id="matching-completion-title" class="text-2xl font-bold mb-4">${MESSAGES.get('sessionScore')}</h2>
                     <p id="matching-completion-message" class="text-xl mb-4">${MESSAGES.get('matchingCompletionMessage')}</p>
                     <div class="mb-4 text-left max-h-60 overflow-y-auto pr-2">
-                        <div class="grid grid-cols-2 gap-2 font-bold border-b-2 border-gray-300 pb-2 mb-2">
+                        <div class="grid grid-cols-3 gap-2 font-bold border-b-2 border-gray-300 pb-2 mb-2">
                             <span>${MESSAGES.get('terms')}</span>
                             <span>${MESSAGES.get('definitions')}</span>
+                            <span></span>
                         </div>
-                        <div id="matched-pairs-grid" class="grid grid-cols-2 gap-2">
-                            <!-- Matched pairs will be listed here -->
+                        <div id="matched-pairs-grid" class="grid grid-cols-3 gap-2">
+                            <!-- Matched pairs and explanation buttons will be listed here -->
                         </div>
                     </div>
                     <div class="flex justify-center space-x-4">
@@ -981,6 +982,20 @@ const game = {
                 const definitionSpan = document.createElement('span');
                 definitionSpan.textContent = termData.definition;
                 matchedPairsGrid.appendChild(definitionSpan);
+
+                // Add explanation button
+                const explanationButton = document.createElement('button');
+                explanationButton.className = 'explanation-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-md text-sm justify-self-end';
+                explanationButton.innerHTML = '&#x2139;'; // Info icon
+                explanationButton.addEventListener('click', () => {
+                    game.showExplanationModal({
+                        word: termData.term,
+                        translation_es: termData.term_es,
+                        example: termData.explanation,
+                        example_es: termData.explanation_es
+                    });
+                });
+                matchedPairsGrid.appendChild(explanationButton);
             }
         });
 
@@ -1704,8 +1719,6 @@ const game = {
                 // Remove previous feedback classes
                 wordElem.classList.remove('bg-green-500', 'bg-red-500', 'text-white');
 
-                const isDarkMode = document.body.classList.contains('dark-mode');
-
                 if (currentCategoryId === correctCategory) {
                     this.sessionScore.correct++;
                     this.wordFeedbackStatus[word] = true; // Store as correct
@@ -2130,15 +2143,7 @@ const game = {
             alert("Answers checked! See highlighted matches.");
         },
 
-        resetGame() {
-            this.currentIndex = 0;
-            this.sessionScore = { correct: 0, incorrect: 0 };
-            this.selectedTerm = null;
-            this.selectedDefinition = null;
-            this.matchedPairs = [];
-            this.feedbackActive = false;
-            this.render(); // Re-render the game to reset the UI
-        },
+        
 
         render() {
             if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
