@@ -1225,11 +1225,9 @@ const game = {
                 });
 
                 
-                // Temporary: Force sessionScore for debugging
-                this.sessionScore = { correct: 5, incorrect: 5 };
                 game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
                 this.currentIndex = lastAction.index;
-                // this.render(); // Re-render the question - Temporarily removed for debugging
+                this.render(); // Re-render the question
             }
         },
 
