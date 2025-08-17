@@ -350,7 +350,7 @@ const game = {
                 // The button will still be generated but without a letter prefix.
             }
             button.querySelector('[data-module-name]').textContent = module.name.replace('Flashcard: ', '').replace('Quiz: ', '').replace('Completion: ', '');
-            button.querySelector('[data-game-mode-icon]').textContent = `${module.gameMode === 'flashcard' ? '🧠' : module.gameMode === 'quiz' ? '❓' : module.gameMode === 'sorting' ? '🧩' : module.gameMode === 'matching' ? '🤝' : '✍️'}`;
+            button.querySelector('[data-game-mode-icon]').innerHTML = game.getGameModeIconSvg(module.gameMode);
 
             moduleButtonsContainer.appendChild(button);
         });
@@ -2227,6 +2227,24 @@ const game = {
             [array[i], array[j]] = [array[j], array[i]];
         }
         return array;
+    },
+
+    getGameModeIconSvg(gameMode) {
+        const svgAttributes = 'class="w-6 h-6 inline-block align-middle ml-2" fill="currentColor" viewBox="0 0 24 24"';
+        switch (gameMode) {
+            case 'flashcard':
+                return `<svg ${svgAttributes}><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H6V4h12v16zM9 10h6v2H9v-2z"/></svg>`; // Placeholder for flashcard
+            case 'quiz':
+                return `<svg ${svgAttributes}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`; // Placeholder for quiz
+            case 'sorting':
+                return `<svg ${svgAttributes}><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>`; // Placeholder for sorting
+            case 'matching':
+                return `<svg ${svgAttributes}><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>`; // Placeholder for matching
+            case 'completion':
+                return `<svg ${svgAttributes}><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>`; // Placeholder for completion (folder icon)
+            default:
+                return `<svg ${svgAttributes}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>`; // Generic placeholder
+        }
     }
 };
 
