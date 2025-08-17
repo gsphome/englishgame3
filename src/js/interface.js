@@ -70,7 +70,7 @@ const MESSAGES = {
         sortingCompletionMessage: "You have sorted all the words correctly!",
         replayButton: "View Summary",
         translationLabel: "Translation",
-        matchingGameTitle: "Matching Game",
+        matchingGameTitle: "",
         terms: "Terms",
         definitions: "Definitions",
         checkAnswers: "Check Answers",

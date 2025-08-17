@@ -335,7 +335,7 @@ const game = {
                 // The button will still be generated but without a letter prefix.
             }
             button.querySelector('[data-module-name]').textContent = module.name.replace('Flashcard: ', '').replace('Quiz: ', '').replace('Completion: ', '');
-            button.querySelector('[data-game-mode-icon]').textContent = `${module.gameMode === 'flashcard' ? '🧠' : module.gameMode === 'quiz' ? '❓' : module.gameMode === 'sorting' ? '🧩' : '✍️'}`;
+            button.querySelector('[data-game-mode-icon]').textContent = `${module.gameMode === 'flashcard' ? '🧠' : module.gameMode === 'quiz' ? '❓' : module.gameMode === 'sorting' ? '🧩' : module.gameMode === 'matching' ? '🤝' : '✍️'}`;
 
             moduleButtonsContainer.appendChild(button);
         });
@@ -1906,6 +1906,7 @@ const game = {
             if (game.randomMode && Array.isArray(this.moduleData.data)) {
                 this.moduleData.data = game.shuffleArray([...this.moduleData.data]);
             }
+            this.moduleData.data = this.moduleData.data.slice(0, 5);
             this.render();
         },
 
@@ -2021,7 +2022,6 @@ const game = {
 
             this.appContainer.innerHTML = `
                 <div id="matching-container" class="max-w-4xl mx-auto p-4">
-                    <h2 class="text-2xl font-bold mb-4 text-center">${MESSAGES.get('matchingGameTitle')}</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div id="terms-column" class="bg-white p-4 rounded-lg shadow-md min-h-[200px]">
                             <h3 class="text-xl font-semibold mb-3">${MESSAGES.get('terms')}</h3>
@@ -2032,11 +2032,11 @@ const game = {
                             <!-- Definitions will be rendered here -->
                         </div>
                     </div>
-                    <div class="flex justify-center mt-6 space-x-4">
+                    <div class="flex justify-center mt-4 space-x-4">
                         <button id="check-matching-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('checkAnswers')}</button>
                         <button id="reset-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('resetButton')}</button>
                     </div>
-                    <button id="back-to-menu-matching-btn" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('backToMenu')}</button>
+                    <button id="back-to-menu-matching-btn" class="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('backToMenu')}</button>
                 </div>
             `;
 
