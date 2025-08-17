@@ -2233,15 +2233,15 @@ const game = {
         const svgAttributes = 'class="w-6 h-6 inline-block align-middle ml-2" fill="currentColor" viewBox="0 0 24 24"';
         switch (gameMode) {
             case 'flashcard':
-                return `<svg ${svgAttributes}><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H6V4h12v16zM9 10h6v2H9v-2z"/></svg>`; // Placeholder for flashcard
+                return `<svg ${svgAttributes}><path d="M20 4H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H6V6h14v12zM10 10h4v2h-4zM10 14h4v2h-4z"/></svg>`; // Two overlapping cards
             case 'quiz':
-                return `<svg ${svgAttributes}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`; // Placeholder for quiz
+                return `<svg ${svgAttributes}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`; // Question mark in a circle
             case 'sorting':
-                return `<svg ${svgAttributes}><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>`; // Placeholder for sorting
+                return `<svg ${svgAttributes}><path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2zm18 3v-2h-6v2h6zM15 9l6 6V9h-6z"/></svg>`; // Up and down arrows with lines
             case 'matching':
-                return `<svg ${svgAttributes}><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>`; // Placeholder for matching
+                return `<svg ${svgAttributes}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 15H9v-2h2v2zm0-4H9V9h2v2zm4 4h-2v-2h2v2zm0-4h-2V9h2v2z"/></svg>`; // Puzzle pieces in a circle
             case 'completion':
-                return `<svg ${svgAttributes}><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>`; // Placeholder for completion (folder icon)
+                return `<svg ${svgAttributes}><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-2 18H6v-2h6v2zm0-4H6v-2h6v2zm4-4H6V6h10v6zM10 10h4v2h-4z"/></svg>`; // Document with a blank line
             default:
                 return `<svg ${svgAttributes}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>`; // Generic placeholder
         }
