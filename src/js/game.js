@@ -1044,12 +1044,18 @@ const game = {
                 optionsToRender = actionToRender.shuffledOptions.map(opt => ({ ...opt })); // Deep copy to avoid modifying history
             } else {
                 // Create a copy of options to shuffle, so the original data is not permanently altered
-                optionsToRender = [...questionData.options];
+                let rawOptions = [...questionData.options];
 
-                // Shuffle options if random mode is active
+                // Shuffle rawOptions if random mode is active
                 if (game.randomMode) {
-                    optionsToRender = game.shuffleArray(optionsToRender);
+                    rawOptions = game.shuffleArray(rawOptions);
                 }
+                // Transform rawOptions (strings) into objects for rendering
+                optionsToRender = rawOptions.map(opt => ({
+                    option: opt,
+                    className: "w-full text-left bg-white hover:bg-gray-200 text-gray-800 font-semibold py-3 px-5 rounded-lg shadow-md transition duration-300 flex items-center",
+                    disabled: false
+                }));
             }
 
             if (!document.getElementById('quiz-container')) {
@@ -1166,10 +1172,19 @@ const game = {
 
             // Visual feedback (always apply)
             if (isCorrect) {
-                document.querySelector(`[data-option="${selectedOption}"]`).classList.add('bg-green-500', 'text-white');
+                const selectedOptionElement = document.querySelector(`[data-option="${selectedOption}"]`);
+                if (selectedOptionElement) {
+                    selectedOptionElement.classList.add('bg-green-500', 'text-white');
+                }
             } else {
-                document.querySelector(`[data-option="${selectedOption}"]`).classList.add('bg-red-500', 'text-white');
-                document.querySelector(`[data-option="${questionData.correct}"]`).classList.add('bg-green-500', 'text-white');
+                const selectedOptionElement = document.querySelector(`[data-option="${selectedOption}"]`);
+                if (selectedOptionElement) {
+                    selectedOptionElement.classList.add('bg-red-500', 'text-white');
+                }
+                const correctOptionElement = document.querySelector(`[data-option="${questionData.correct}"]`);
+                if (correctOptionElement) {
+                    correctOptionElement.classList.add('bg-green-500', 'text-white');
+                }
             }
             
 
