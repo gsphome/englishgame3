@@ -1023,3 +1023,56 @@ body.dark-mode .sorting-summary-item-grid span.text-gray-500.font-medium {
 body.dark-mode .text-gray-600 {
     color: #e2e8f0 !important; /* Change to white for dark mode */
 }
+
+/* Matching Game Styles */
+.matching-item {
+    transition: all 0.2s ease-in-out;
+}
+
+.matching-item.selected {
+    border: 2px solid #3b82f6; /* Blue border for selected */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* Blue glow */
+}
+
+.matching-item.matched {
+    background-color: #d1fae5; /* Light green for matched */
+    color: #065f46; /* Dark green text */
+    cursor: default;
+    border: 1px solid #34d399;
+}
+
+.matching-item.incorrect {
+    background-color: #fee2e2; /* Light red for incorrect */
+    color: #991b1b; /* Dark red text */
+    border: 1px solid #ef4444;
+    animation: shake 0.3s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+/* Dark Mode for Matching Game */
+body.dark-mode .matching-item {
+    background-color: #4a5568; /* Darker gray for items */
+    color: #e2e8f0; /* Light text */
+}
+
+body.dark-mode .matching-item.selected {
+    border: 2px solid #63b3ed; /* Lighter blue border */
+    box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.5); /* Lighter blue glow */
+}
+
+body.dark-mode .matching-item.matched {
+    background-color: #38a169; /* Darker green for matched */
+    color: #e2e8f0; /* Light text */
+    border: 1px solid #48bb78;
+}
+
+body.dark-mode .matching-item.incorrect {
+    background-color: #e53e3e; /* Darker red for incorrect */
+    color: #e2e8f0; /* Light text */
+    border: 1px solid #fc8181;
+}

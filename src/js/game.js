@@ -1888,16 +1888,125 @@ const game = {
         moduleData: null,
         appContainer: null,
         sessionScore: { correct: 0, incorrect: 0 },
+        selectedTerm: null,
+        selectedDefinition: null,
+        matchedPairs: [], // Stores { termId: 'id', definitionId: 'id' }
+        allPairs: [], // Stores all possible pairs from moduleData
+        feedbackActive: false,
 
         init(module) {
             this.currentIndex = 0;
             this.moduleData = module;
             this.appContainer = document.getElementById('app-container');
             this.sessionScore = { correct: 0, incorrect: 0 };
+            this.selectedTerm = null;
+            this.selectedDefinition = null;
+            this.matchedPairs = [];
+            this.feedbackActive = false;
             if (game.randomMode && Array.isArray(this.moduleData.data)) {
                 this.moduleData.data = game.shuffleArray([...this.moduleData.data]);
             }
             this.render();
+        },
+
+        handleItemClick(element) {
+            if (this.feedbackActive) return; // Prevent clicks if feedback is active
+
+            const id = element.dataset.id;
+            const type = element.dataset.type;
+
+            // Clear previous selections of the same type
+            if (type === 'term' && this.selectedTerm) {
+                document.getElementById(`term-${this.selectedTerm.id}`).classList.remove('selected');
+            } else if (type === 'definition' && this.selectedDefinition) {
+                document.getElementById(`definition-${this.selectedDefinition.id}`).classList.remove('selected');
+            }
+
+            // Set new selection
+            element.classList.add('selected');
+            if (type === 'term') {
+                this.selectedTerm = { id: id, element: element };
+            } else {
+                this.selectedDefinition = { id: id, element: element };
+            }
+
+            // Attempt to match if both a term and a definition are selected
+            if (this.selectedTerm && this.selectedDefinition) {
+                this.attemptMatch();
+            }
+        },
+
+        attemptMatch() {
+            if (this.selectedTerm.id === this.selectedDefinition.id) {
+                // Correct match
+                this.matchedPairs.push({
+                    termId: this.selectedTerm.id,
+                    definitionId: this.selectedDefinition.id
+                });
+
+                // Visually confirm match and disable elements
+                this.selectedTerm.element.classList.remove('selected', 'bg-gray-100', 'hover:bg-gray-200');
+                this.selectedTerm.element.classList.add('matched', 'bg-green-200', 'cursor-default');
+                this.selectedTerm.element.removeEventListener('click', this.handleItemClick);
+
+                this.selectedDefinition.element.classList.remove('selected', 'bg-gray-100', 'hover:bg-gray-200');
+                this.selectedDefinition.element.classList.add('matched', 'bg-green-200', 'cursor-default');
+                this.selectedDefinition.element.removeEventListener('click', this.handleItemClick);
+
+                // Update score (optional, can be done on final check)
+                this.sessionScore.correct++;
+                game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+
+            } else {
+                // Incorrect match - provide temporary feedback
+                this.sessionScore.incorrect++;
+                game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+
+                const termElement = this.selectedTerm.element;
+                const defElement = this.selectedDefinition.element;
+
+                termElement.classList.remove('selected');
+                defElement.classList.remove('selected');
+
+                termElement.classList.add('incorrect');
+                defElement.classList.add('incorrect');
+
+                setTimeout(() => {
+                    termElement.classList.remove('incorrect');
+                    defElement.classList.remove('incorrect');
+                }, 500); // Remove feedback after 0.5 seconds
+            }
+
+            // Reset selections
+            this.selectedTerm = null;
+            this.selectedDefinition = null;
+
+            // Check if all pairs are matched
+            if (this.matchedPairs.length === this.moduleData.data.length) {
+                this.feedbackActive = true; // Disable further interaction
+                // Optionally show a completion modal or message
+                setTimeout(() => {
+                    alert("Congratulations! All pairs matched!"); // Replace with a proper modal
+                    // game.showMatchingCompletionModal(this.moduleData);
+                }, 500);
+            }
+        },
+
+        checkAnswers() {
+            // This function might be redundant if attemptMatch handles real-time feedback
+            // However, if we want a final check button, we can implement it here.
+            // For now, the real-time feedback in attemptMatch is sufficient.
+            alert("Answers checked! See highlighted matches.");
+        },
+
+        resetGame() {
+            this.currentIndex = 0;
+            this.sessionScore = { correct: 0, incorrect: 0 };
+            this.selectedTerm = null;
+            this.selectedDefinition = null;
+            this.matchedPairs = [];
+            this.feedbackActive = false;
+            this.render(); // Re-render the game to reset the UI
         },
 
         render() {
@@ -1907,15 +2016,60 @@ const game = {
                 return;
             }
             this.appContainer.classList.remove('main-menu-active');
-            // TODO: Implement matching game rendering logic here
+            const terms = game.shuffleArray(this.moduleData.data.map(item => ({ id: item.id, text: item.term, type: 'term' })));
+            const definitions = game.shuffleArray(this.moduleData.data.map(item => ({ id: item.id, text: item.definition, type: 'definition' })));
+
             this.appContainer.innerHTML = `
-                <div id="matching-container" class="max-w-2xl mx-auto p-4">
-                    <h2 class="text-2xl font-bold mb-4">Matching Game</h2>
-                    <p>Module: ${this.moduleData.name}</p>
-                    <p>Current Index: ${this.currentIndex}</p>
-                    <button id="back-to-menu-matching-btn" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg" onclick="game.renderMenu()">Back to Menu</button>
+                <div id="matching-container" class="max-w-4xl mx-auto p-4">
+                    <h2 class="text-2xl font-bold mb-4 text-center">${MESSAGES.get('matchingGameTitle')}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div id="terms-column" class="bg-white p-4 rounded-lg shadow-md min-h-[200px]">
+                            <h3 class="text-xl font-semibold mb-3">${MESSAGES.get('terms')}</h3>
+                            <!-- Terms will be rendered here -->
+                        </div>
+                        <div id="definitions-column" class="bg-white p-4 rounded-lg shadow-md min-h-[200px]">
+                            <h3 class="text-xl font-semibold mb-3">${MESSAGES.get('definitions')}</h3>
+                            <!-- Definitions will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="flex justify-center mt-6 space-x-4">
+                        <button id="check-matching-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('checkAnswers')}</button>
+                        <button id="reset-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('resetButton')}</button>
+                    </div>
+                    <button id="back-to-menu-matching-btn" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('backToMenu')}</button>
                 </div>
             `;
+
+            const termsColumn = document.getElementById('terms-column');
+            const definitionsColumn = document.getElementById('definitions-column');
+
+            terms.forEach(item => {
+                const termElem = document.createElement('div');
+                termElem.id = `term-${item.id}`;
+                termElem.className = 'matching-item term bg-gray-100 hover:bg-gray-200 text-gray-800 dark:text-black font-semibold py-3 px-4 rounded-lg shadow-sm cursor-pointer mb-2';
+                termElem.textContent = item.text;
+                termElem.dataset.id = item.id;
+                termElem.dataset.type = item.type;
+                termElem.addEventListener('click', (e) => this.handleItemClick(e.target));
+                termsColumn.appendChild(termElem);
+            });
+
+            definitions.forEach(item => {
+                const defElem = document.createElement('div');
+                defElem.id = `definition-${item.id}`;
+                defElem.className = 'matching-item definition bg-gray-100 hover:bg-gray-200 text-gray-800 dark:text-black font-semibold py-3 px-4 rounded-lg shadow-sm cursor-pointer mb-2';
+                defElem.textContent = item.text;
+                defElem.dataset.id = item.id;
+                defElem.dataset.type = item.type;
+                defElem.addEventListener('click', (e) => this.handleItemClick(e.target));
+                definitionsColumn.appendChild(defElem);
+            });
+
+            document.getElementById('check-matching-btn').addEventListener('click', () => this.checkAnswers());
+            document.getElementById('reset-matching-btn').addEventListener('click', () => this.resetGame());
+            document.getElementById('back-to-menu-matching-btn').addEventListener('click', () => game.renderMenu());
+            document.getElementById('back-to-menu-matching-btn').textContent = MESSAGES.get('backToMenu');
+            game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
             document.getElementById('back-to-menu-matching-btn').textContent = MESSAGES.get('backToMenu');
             game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         },

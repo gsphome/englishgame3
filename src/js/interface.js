@@ -32,7 +32,12 @@ const MESSAGES = {
         sortingCompletionTitle: "¡Modo de Clasificación Completado!",
         sortingCompletionMessage: "¡Has clasificado todas las palabras correctamente!",
         replayButton: "Ver Resumen",
-        translationLabel: "Traducción"
+        translationLabel: "Traducción",
+        matchingGameTitle: "Juego de Emparejamiento",
+        terms: "Términos",
+        definitions: "Definiciones",
+        checkAnswers: "Comprobar Respuestas",
+        resetButton: "Reiniciar"
     },
     en: {
         loginTitle: "Welcome",
@@ -64,7 +69,12 @@ const MESSAGES = {
         sortingCompletionTitle: "Sorting Mode Completed!",
         sortingCompletionMessage: "You have sorted all the words correctly!",
         replayButton: "View Summary",
-        translationLabel: "Translation"
+        translationLabel: "Translation",
+        matchingGameTitle: "Matching Game",
+        terms: "Terms",
+        definitions: "Definitions",
+        checkAnswers: "Check Answers",
+        resetButton: "Reset"
     },
 
     get(key) {
