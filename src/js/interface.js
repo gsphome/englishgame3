@@ -37,7 +37,6 @@ const MESSAGES = {
         matchingCompletionMessage: "¡Has emparejado todos los elementos correctamente!",
         terms: "Términos",
         definitions: "Definiciones",
-        checkAnswers: "Comprobar Respuestas",
         resetButton: "Reiniciar",
         moreInfoButton: "Más Información",
         showExplanation: "Mostrar Explicación"
@@ -77,7 +76,6 @@ const MESSAGES = {
         matchingCompletionMessage: "You have matched all items correctly!",
         terms: "Terms",
         definitions: "Definitions",
-        checkAnswers: "Check Answers",
         resetButton: "Reset",
         moreInfoButton: "More Info",
         showExplanation: "Show Explanation"

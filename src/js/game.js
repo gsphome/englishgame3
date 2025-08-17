@@ -2139,12 +2139,7 @@ const game = {
             game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         },
 
-        checkAnswers() {
-            // This function might be redundant if attemptMatch handles real-time feedback
-            // However, if we want a final check button, we can implement it here.
-            // For now, the real-time feedback in attemptMatch is sufficient.
-            alert("Answers checked! See highlighted matches.");
-        },
+        
 
         
 
@@ -2174,7 +2169,6 @@ const game = {
                         <button id="undo-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('undoButton')}</button>
                         <div>
                             <button id="reset-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('resetButton')}</button>
-                            <button id="check-matching-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('checkAnswers')}</button>
                         </div>
                     </div>
                     <button id="back-to-menu-matching-btn" class="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">${MESSAGES.get('backToMenu')}</button>
