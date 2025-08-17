@@ -1146,6 +1146,7 @@ const game = {
                 sessionScoreBefore: { ...this.sessionScore } // Store the session score before this action
             });
 
+            console.log('quiz.handleAnswer(): sessionScore before update:', { ...this.sessionScore });
             if (!this.scoreFrozen) { // Only update score if not frozen
                 if (isCorrect) {
                     this.sessionScore.correct++;
@@ -1157,14 +1158,16 @@ const game = {
                     document.querySelector(`[data-option="${selectedOption}"]`).classList.add('bg-red-500', 'text-white');
                     document.querySelector(`[data-option="${questionData.correct}"]`).classList.add('bg-green-500', 'text-white');
                 }
-            }
+            
 
             document.getElementById('feedback-container').innerHTML = `<p class="text-lg">${questionData.explanation}</p>`;
             document.querySelectorAll('[data-option]').forEach(b => {
                 b.disabled = true;
                 b.classList.remove('hover:bg-gray-200');
             });
-            game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            if (!this.scoreFrozen) { // Only update score display if not frozen
+                game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            }
         },
 
         prev() {
