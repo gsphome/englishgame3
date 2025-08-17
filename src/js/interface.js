@@ -39,7 +39,8 @@ const MESSAGES = {
         definitions: "Definiciones",
         checkAnswers: "Comprobar Respuestas",
         resetButton: "Reiniciar",
-        moreInfoButton: "Más Información"
+        moreInfoButton: "Más Información",
+        showExplanation: "Mostrar Explicación"
     },
     en: {
         loginTitle: "Welcome",
@@ -78,7 +79,8 @@ const MESSAGES = {
         definitions: "Definitions",
         checkAnswers: "Check Answers",
         resetButton: "Reset",
-        moreInfoButton: "More Info"
+        moreInfoButton: "More Info",
+        showExplanation: "Show Explanation"
     },
 
     get(key) {

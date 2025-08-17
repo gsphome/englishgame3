@@ -643,7 +643,7 @@ const game = {
                 <span class="text-sm text-gray-500 font-medium">${categoryDisplayName}</span>
                 <span class="text-lg font-semibold">${item.word}</span>
                 <span class="text-base text-gray-700 italic">${item.translation_es}</span>
-                <button class="explanation-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-md text-sm justify-self-center mr-1">
+                <button title="${MESSAGES.get('showExplanation')}" aria-label="${MESSAGES.get('showExplanation')}" class="explanation-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-md text-sm justify-self-center mr-1">
                     &#x2139;
                 </button>
             `;
@@ -988,6 +988,8 @@ const game = {
                 const explanationButton = document.createElement('button');
                 explanationButton.className = 'explanation-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-md text-sm justify-self-center mr-1';
                 explanationButton.innerHTML = '&#x2139;'; // Info icon
+                explanationButton.title = MESSAGES.get('showExplanation');
+                explanationButton.ariaLabel = MESSAGES.get('showExplanation');
                 explanationButton.addEventListener('click', () => {
                     game.showExplanationModal({
                         word: termData.term,
