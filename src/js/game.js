@@ -180,6 +180,7 @@ const game = {
         document.getElementById('explanation-word-translation').textContent = wordData.translation_es;
         document.getElementById('explanation-example-en').textContent = `"${wordData.example}"`;
         document.getElementById('explanation-example-es').textContent = `"${wordData.example_es}"`;
+        document.body.appendChild(modal);
         modal.classList.remove('hidden');
     },
 
@@ -642,7 +643,7 @@ const game = {
                 <span class="text-sm text-gray-500 font-medium">${categoryDisplayName}</span>
                 <span class="text-lg font-semibold">${item.word}</span>
                 <span class="text-base text-gray-700 italic">${item.translation_es}</span>
-                <button class="explanation-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-md text-sm justify-self-center mr-2">
+                <button class="explanation-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-md text-sm justify-self-center mr-1">
                     &#x2139;
                 </button>
             `;
@@ -985,7 +986,7 @@ const game = {
 
                 // Add explanation button
                 const explanationButton = document.createElement('button');
-                explanationButton.className = 'explanation-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-md text-sm justify-self-center mr-2';
+                explanationButton.className = 'explanation-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-md text-sm justify-self-center mr-1';
                 explanationButton.innerHTML = '&#x2139;'; // Info icon
                 explanationButton.addEventListener('click', () => {
                     game.showExplanationModal({
