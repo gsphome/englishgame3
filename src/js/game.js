@@ -1020,6 +1020,7 @@ const game = {
             this.currentIndex = 0;
             this.sessionScore = { correct: 0, incorrect: 0 };
             this.history = [];
+            this.historyPointer = -1; // Initialize history pointer
             this.moduleData = module;
             this.appContainer = document.getElementById('app-container');
             this.scoreFrozen = false;
@@ -1149,7 +1150,13 @@ const game = {
                 disabled: button.disabled
             }));
 
-            this.history.push({
+            // If we are not at the end of history (i.e., user has undone some actions),
+            // truncate history from historyPointer + 1 onwards.
+            if (this.historyPointer < this.history.length - 1) {
+                this.history.splice(this.historyPointer + 1);
+            }
+
+            const newAction = {
                 index: this.currentIndex,
                 selectedOption: selectedOption,
                 correctAnswer: questionData.correct,
@@ -1157,7 +1164,9 @@ const game = {
                 shuffledOptions: currentOptions, // Store the state of the options as they were rendered
                 feedbackHtml: feedbackHtml, // Store the feedback HTML
                 sessionScoreBefore: { ...this.sessionScore } // Store the session score before this action
-            });
+            };
+            this.history.push(newAction);
+            this.historyPointer = this.history.length - 1; // Update history pointer
 
             console.log('quiz.handleAnswer(): sessionScore before update:', { ...this.sessionScore });
             if (!this.scoreFrozen) { // Only update score if not frozen
@@ -1234,8 +1243,9 @@ const game = {
         },
 
         undo() {
-            if (this.history.length > 0) {
-                const lastAction = this.history.pop();
+            if (this.historyPointer >= 0) {
+                const lastAction = this.history[this.historyPointer];
+                this.historyPointer--;
                 this.scoreFrozen = true;
 
                 // Do not revert scores on undo, as per new logic.
@@ -1250,18 +1260,7 @@ const game = {
 
                 // Set current index to the question that was undone
                 // Restore the UI state for the undone question
-                const optionsContainer = document.getElementById('options-container');
-                const feedbackContainer = document.getElementById('feedback-container');
-
-                // Clear feedback
-                feedbackContainer.innerHTML = '';
-
-                // Re-enable all options and remove color classes
-                document.querySelectorAll('[data-option]').forEach(button => {
-                    button.disabled = false;
-                    button.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
-                    button.classList.add('bg-gray-100', 'hover:bg-gray-200'); // Restore default classes
-                });
+                
 
                 
                 game.updateSessionScoreDisplay(lastAction.sessionScoreBefore.correct, lastAction.sessionScoreBefore.incorrect, this.moduleData.data.length);
