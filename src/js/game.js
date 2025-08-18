@@ -1171,20 +1171,22 @@ const game = {
             }
 
             // Visual feedback (always apply)
+            const selectedOptionElement = document.querySelector(`[data-option="${selectedOption}"]`);
+            const correctOptionElement = document.querySelector(`[data-option="${questionData.correct}"]`);
+
             if (isCorrect) {
-                const selectedOptionElement = document.querySelector(`[data-option="${selectedOption}"]`);
                 if (selectedOptionElement) {
                     selectedOptionElement.classList.add('bg-green-500', 'text-white');
                 }
             } else {
-                const selectedOptionElement = document.querySelector(`[data-option="${selectedOption}"]`);
                 if (selectedOptionElement) {
                     selectedOptionElement.classList.add('bg-red-500', 'text-white');
                 }
-                const correctOptionElement = document.querySelector(`[data-option="${questionData.correct}"]`);
-                if (correctOptionElement) {
-                    correctOptionElement.classList.add('bg-green-500', 'text-white');
-                }
+            }
+
+            // Always highlight the correct answer in green
+            if (correctOptionElement) {
+                correctOptionElement.classList.add('bg-green-500', 'text-white');
             }
             
 

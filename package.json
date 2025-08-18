@@ -18,7 +18,9 @@
   "author": "Genil Suarez",
   "license": "MIT",
   "devDependencies": {
+    "eslint": "^8.57.1",
     "http-server": "^14.1.1",
-    "eslint": "^8.57.1"
+    "jest": "^30.0.5",
+    "playwright": "^1.54.2"
   }
 }
