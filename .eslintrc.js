@@ -10,7 +10,7 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
-    'no-unused-vars': ['warn', { 'varsIgnorePattern': '^(icon|description|feedbackContainer|MESSAGES|learningModules|auth)$' }]
+    'no-unused-vars': ['warn', { 'varsIgnorePattern': '^(icon|description|feedbackContainer|MESSAGES|learningModules|auth|optionsContainer)$' }]
   },
   globals: {
     MESSAGES: 'readonly',
