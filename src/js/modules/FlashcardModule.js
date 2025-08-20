@@ -38,7 +38,7 @@ class FlashcardModule {
         if (!document.getElementById('flashcard-container')) { // Assuming a main container for flashcard view
             this.appContainer.innerHTML = `
                 <div id="flashcard-container" class="max-w-2xl mx-auto">
-                    <div class="flashcard h-64 w-full cursor-pointer shadow-lg rounded-xl" onclick="this.flip()">
+                    <div class="flashcard h-64 w-full cursor-pointer shadow-lg rounded-xl">
                         <div class="flashcard-inner">
                             <div class="flashcard-front bg-white">
                                 <p class="flashcard-en-word text-base md:text-xl" id="flashcard-front-text">${cardData.en}</p>
@@ -70,6 +70,12 @@ class FlashcardModule {
             document.getElementById('prev-btn').addEventListener('click', () => this.prev());
             document.getElementById('next-btn').addEventListener('click', () => this.next());
             document.getElementById('back-to-menu-flashcard-btn').addEventListener('click', () => this.game.renderMenu());
+
+            // Add event listener for flashcard flip
+            const flashcardElement = document.querySelector('.flashcard');
+            if (flashcardElement) {
+                flashcardElement.addEventListener('click', () => this.flip());
+            }
         }
         // Update existing text content by re-rendering innerHTML of front and back
         const flashcardFront = document.querySelector('.flashcard-front');

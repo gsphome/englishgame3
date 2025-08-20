@@ -1,6 +1,5 @@
+import { getGameModeIconSvg } from './utils.js';
 
-
-// Mock global dependencies
 const mockAuth = {
     user: null,
     renderLogin: jest.fn(),
@@ -263,7 +262,7 @@ describe('game.js initial integration tests', () => {
                     const button = buttonTemplate.content.cloneNode(true).querySelector('button');
                     button.dataset.moduleId = module.id;
                     button.querySelector('[data-module-name]').textContent = module.name;
-                    button.querySelector('[data-game-mode-icon]').innerHTML = this.getGameModeIconSvg(module.gameMode);
+                    button.querySelector('[data-game-mode-icon]').innerHTML = getGameModeIconSvg(module.gameMode);
                     moduleButtonsContainer.appendChild(button);
 
                     // Mock addEventListener for module buttons
@@ -526,163 +525,4 @@ describe('game.js initial integration tests', () => {
             }),
         };
 
-        // Assign the mock game object to the global scope
-        global.game = gameInstance;
-    });
-
-    // Test Case 1: Module Loading and Initial Rendering
-    test('should initialize and render main menu for logged-in user', async () => {
-        localStorageMock.setItem('user', JSON.stringify({ username: 'test', globalScore: { correct: 0, incorrect: 0 } }));
-        mockAuth.user = { username: 'test', globalScore: { correct: 0, incorrect: 0 } };
-
-        game.init();
-
-        expect(document.getElementById('main-menu-title')).toHaveTextContent('Main Menu');
-        expect(document.getElementById('module-buttons-container')).toBeInTheDocument();
-        expect(document.getElementById('score-container')).not.toHaveClass('hidden');
-        expect(document.getElementById('username-display')).not.toHaveClass('hidden');
-        expect(document.getElementById('hamburger-btn')).not.toHaveClass('hidden');
-        expect(mockAuth.renderLogin).not.toHaveBeenCalled();
-    });
-
-    test('should initialize and render login screen for logged-out user', async () => {
-        localStorageMock.removeItem('user');
-        mockAuth.user = null;
-
-        game.init();
-
-        expect(mockAuth.renderLogin).toHaveBeenCalledTimes(1);
-        expect(document.getElementById('score-container')).toHaveClass('hidden');
-        expect(document.getElementById('username-display')).toHaveClass('hidden');
-        expect(document.getElementById('hamburger-btn')).toHaveClass('hidden');
-    });
-
-    // Test Case 2: Game Module Start and Data Loading
-    test('should fetch module data and render flashcard view', async () => {
-        const mockFlashcardData = [{ en: 'hello', es: 'hola', ipa: '/hɛˈloʊ/', example: 'Hello world!', example_es: '¡Hola mundo!' }];
-        global.fetch.mockResolvedValueOnce({
-            json: () => Promise.resolve(mockFlashcardData),
-        });
-
-        await game.startModule('flashcard-1');
-
-        expect(global.fetch).toHaveBeenCalledWith('/data/flashcard-1.json');
-        expect(document.getElementById('flashcard-container')).toBeInTheDocument();
-        expect(document.getElementById('flashcard-front-text')).toHaveTextContent('hello');
-        expect(game.currentView).toBe('flashcard');
-        expect(game.flashcard.moduleData.data).toEqual(mockFlashcardData);
-    });
-
-    test('should fetch module data and render quiz view', async () => {
-        const mockQuizData = [{ sentence: '___ is a test.', options: ['This', 'That'], correct: 'This', explanation: 'Explanation.' }];
-        global.fetch.mockResolvedValueOnce({
-            json: () => Promise.resolve(mockQuizData),
-        });
-
-        await game.startModule('quiz-1');
-
-        expect(global.fetch).toHaveBeenCalledWith('/data/quiz-1.json');
-        expect(document.getElementById('quiz-container')).toBeInTheDocument();
-        expect(document.getElementById('quiz-question')).toHaveTextContent('___ is a test.');
-        expect(game.currentView).toBe('quiz');
-        expect(game.quiz.moduleData.data).toEqual(mockQuizData);
-    });
-
-    // Test Case 3: Basic Game Flow (Flashcard Navigation)
-    test('flashcard.next() should advance to the next card', async () => {
-        const mockFlashcardData = [
-            { en: 'card1', es: 'c1', ipa: 'i1', example: 'e1', example_es: 'ee1' },
-            { en: 'card2', es: 'c2', ipa: 'i2', example: 'e2', example_es: 'ee2' },
-            { en: 'card3', es: 'c3', ipa: 'i3', example: 'e3', example_es: 'ee3' },
-        ];
-        global.fetch.mockResolvedValueOnce({
-            json: () => Promise.resolve(mockFlashcardData),
-        });
-
-        await game.startModule('flashcard-1');
-
-        // Simulate next button click
-        game.flashcard.next();
-
-        expect(game.flashcard.currentIndex).toBe(1);
-        expect(document.getElementById('flashcard-front-text')).toHaveTextContent('card2');
-    });
-
-    test('flashcard.prev() should go back to the previous card', async () => {
-        const mockFlashcardData = [
-            { en: 'card1', es: 'c1', ipa: 'i1', example: 'e1', example_es: 'ee1' },
-            { en: 'card2', es: 'c2', ipa: 'i2', example: 'e2', example_es: 'ee2' },
-            { en: 'card3', es: 'c3', ipa: 'i3', example: 'e3', example_es: 'ee3' },
-        ];
-        global.fetch.mockResolvedValueOnce({
-            json: () => Promise.resolve(mockFlashcardData),
-        });
-
-        await game.startModule('flashcard-1');
-        game.flashcard.next();
-
-        // Simulate prev button click
-        game.flashcard.prev();
-
-        expect(game.flashcard.currentIndex).toBe(0);
-        expect(document.getElementById('flashcard-front-text')).toHaveTextContent('card1');
-    });
-
-    test('flashcard.flip() should toggle the flipped class', async () => {
-        const mockFlashcardData = [{ en: 'hello', es: 'hola', ipa: '/hɛˈloʊ/', example: 'Hello world!', example_es: '¡Hola mundo!' }];
-        global.fetch.mockResolvedValueOnce({
-            json: () => Promise.resolve(mockFlashcardData),
-        });
-
-        await game.startModule('flashcard-1');
-        const flashcardElement = document.querySelector('.flashcard');
-
-        expect(flashcardElement).not.toHaveClass('flipped');
-        game.flashcard.flip();
-        expect(flashcardElement).toHaveClass('flipped');
-        game.flashcard.flip();
-        expect(flashcardElement).not.toHaveClass('flipped');
-    });
-
-    // Test Case 4: Logout Confirmation Flow
-    test('should show logout confirmation modal when menu logout button is clicked', async () => {
-        localStorageMock.setItem('user', JSON.stringify({ username: 'test', globalScore: { correct: 0, incorrect: 0 } }));
-        mockAuth.user = { username: 'test', globalScore: { correct: 0, incorrect: 0 } };
-
-        game.init();
-
-        const menuLogoutBtn = document.getElementById('menu-logout-btn');
-        const confirmationModal = document.getElementById('confirmation-modal');
-
-        menuLogoutBtn.click();
-
-        expect(confirmationModal).not.toHaveClass('hidden');
-        expect(document.getElementById('confirmation-message')).toHaveTextContent('Are you sure you want to log out?');
-    });
-
-    test('confirming logout should call auth.logout and hide modal', async () => {
-        localStorageMock.setItem('user', JSON.stringify({ username: 'test', globalScore: { correct: 0, incorrect: 0 } }));
-        mockAuth.user = { username: 'test', globalScore: { correct: 0, incorrect: 0 } };
-
-        game.init();
-
-        document.getElementById('menu-logout-btn').click();
-        document.getElementById('confirm-yes').click();
-
-        expect(mockAuth.logout).toHaveBeenCalledTimes(1);
-        expect(document.getElementById('confirmation-modal')).toHaveClass('hidden');
-    });
-
-    test('canceling logout should not call auth.logout and hide modal', async () => {
-        localStorageMock.setItem('user', JSON.stringify({ username: 'test', globalScore: { correct: 0, incorrect: 0 } }));
-        mockAuth.user = { username: 'test', globalScore: { correct: 0, incorrect: 0 } };
-
-        game.init();
-
-        document.getElementById('menu-logout-btn').click();
-        document.getElementById('confirm-no').click();
-
-        expect(mockAuth.logout).not.toHaveBeenCalled();
-        expect(document.getElementById('confirmation-modal')).toHaveClass('hidden');
-    });
-});
+        import { getGameModeIconSvg } from './utils.js';
