@@ -522,7 +522,5 @@ describe('game.js initial integration tests', () => {
                     default:
                         return '';
                 }
-            }),
+            })
         };
-
-        import { getGameModeIconSvg } from './utils.js';
