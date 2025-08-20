@@ -14,8 +14,7 @@ const localStorageMock = (() => {
 })();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-// Save original console.error before any mocks
-const originalConsoleError = console.error;
+
 
 describe('auth.js', () => {
     let messagesSetLanguageSpy;
@@ -23,7 +22,6 @@ describe('auth.js', () => {
     let messagesGetSpy;
     let gameRenderHeaderSpy;
     let gameRenderMenuSpy;
-    let consoleErrorSpy; // Declare spy for console.error
 
     beforeEach(() => {
         // Reset DOM before each test
@@ -31,17 +29,6 @@ describe('auth.js', () => {
 
         // Clear all mocks
         localStorageMock.clear();
-
-        // Spy on console.error to suppress JSDOM warnings
-        consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation((message) => {
-            // Optionally, you can filter specific messages if you still want other errors to show
-            if (typeof message === 'string' && message.includes('Not implemented: navigation (except hash changes)')) {
-                // Suppress this specific error
-                return;
-            }
-            // For other errors, let the original console.error run
-            originalConsoleError(message);
-        });
 
         // Spy on MESSAGES methods
         messagesSetLanguageSpy = jest.spyOn(MESSAGES, 'setLanguage').mockImplementation(() => {});
@@ -66,8 +53,6 @@ describe('auth.js', () => {
 
     afterEach(() => {
         jest.restoreAllMocks();
-        // Restore console.error after each test
-        consoleErrorSpy.mockRestore();
     });
 
     describe('init()', () => {
@@ -82,6 +67,12 @@ describe('auth.js', () => {
             expect(messagesSetLanguageSpy).toHaveBeenCalledWith('en');
         });
 
+        test('should set default language to en if appLang is not in localStorage', () => {
+            localStorageMock.removeItem('appLang'); // Ensure appLang is not in localStorage
+            auth.init();
+            expect(messagesSetLanguageSpy).toHaveBeenCalledWith('en');
+        });
+
         test('should load user from localStorage', () => {
             const mockUser = { username: 'testuser', globalScore: { correct: 0, incorrect: 0 } };
             localStorageMock.setItem('user', JSON.stringify(mockUser));
@@ -92,6 +83,10 @@ describe('auth.js', () => {
         test('should call renderLogin if no user is found', () => {
             const renderLoginSpy = jest.spyOn(auth, 'renderLogin').mockImplementation(() => {});
             auth.init();
+            // Get the listener function that was added
+            const listenerCallback = messagesAddListenerSpy.mock.calls[0][0];
+            // Manually trigger the listener
+            listenerCallback();
             expect(renderLoginSpy).toHaveBeenCalled();
         });
 
@@ -103,9 +98,33 @@ describe('auth.js', () => {
             expect(renderLoginSpy).not.toHaveBeenCalled();
         });
 
+        test('should not call renderLogin if user is found in localStorage on init', () => {
+            const renderLoginSpy = jest.spyOn(auth, 'renderLogin').mockImplementation(() => {});
+            const mockUser = { username: 'existinguser', globalScore: { correct: 10, incorrect: 5 } };
+            localStorageMock.setItem('user', JSON.stringify(mockUser));
+            auth.init();
+            expect(renderLoginSpy).not.toHaveBeenCalled();
+            expect(auth.user).toEqual(mockUser);
+        });
+
         test('should add a MESSAGES listener', () => {
             auth.init();
             expect(messagesAddListenerSpy).toHaveBeenCalled();
+        });
+
+        test('should not call renderLogin if user exists when MESSAGES listener is triggered', () => {
+            const renderLoginSpy = jest.spyOn(auth, 'renderLogin').mockImplementation(() => {});
+            const mockUser = { username: 'testuser', globalScore: { correct: 0, incorrect: 0 } };
+            localStorageMock.setItem('user', JSON.stringify(mockUser)); // Simulate user exists
+            auth.init();
+
+            // Get the listener function that was added
+            const listenerCallback = messagesAddListenerSpy.mock.calls[0][0];
+            
+            // Manually trigger the listener
+            listenerCallback();
+
+            expect(renderLoginSpy).not.toHaveBeenCalled();
         });
     });
 
@@ -176,20 +195,30 @@ describe('auth.js', () => {
     });
 
     describe('logout()', () => {
-        test('should remove user from localStorage', () => {
-            localStorageMock.setItem('user', JSON.stringify({ username: 'testuser' }));
-            auth.logout();
-            expect(localStorageMock.removeItem).toHaveBeenCalledWith('user');
+        let reloadPageSpy;
+
+        beforeEach(() => {
+            reloadPageSpy = jest.spyOn(auth, '_reloadPage').mockImplementation(() => {});
         });
 
-        test('should hide game.hamburgerMenu if present', () => {
+        afterEach(() => {
+            reloadPageSpy.mockRestore();
+        });
+
+        test('should remove user from localStorage, reload and hide menu', () => {
+            localStorageMock.setItem('user', JSON.stringify({ username: 'testuser' }));
             game.hamburgerMenu = document.createElement('button');
             game.hamburgerMenu.classList.remove('hidden');
             auth.logout();
+            expect(localStorageMock.removeItem).toHaveBeenCalledWith('user');
+            expect(reloadPageSpy).toHaveBeenCalled();
             expect(game.hamburgerMenu.classList.contains('hidden')).toBe(true);
         });
 
-        // Removed test for location.reload() due to mocking difficulties
+        test('should not throw error if game.hamburgerMenu is null', () => {
+            game.hamburgerMenu = null; // Set hamburgerMenu to null
+            expect(() => auth.logout()).not.toThrow();
+        });
     });
 
     describe('getUser()', () => {
@@ -233,5 +262,29 @@ describe('auth.js', () => {
             auth.updateGlobalScore(sessionScore);
             expect(gameRenderHeaderSpy).toHaveBeenCalled();
         });
+    });
+
+    describe('_reloadPage()', () => {
+        test('should call the provided reload function', () => {
+            const mockReloadFn = jest.fn();
+            auth._reloadPage(mockReloadFn);
+            expect(mockReloadFn).toHaveBeenCalled();
+        });
+
+        test('should call _internalReloadPage() by default', () => {
+            const internalReloadSpy = jest.spyOn(auth, '_internalReloadPage').mockImplementation(() => {});
+            auth._reloadPage();
+            expect(internalReloadSpy).toHaveBeenCalled();
+            internalReloadSpy.mockRestore();
+        });
+    });
+
+    describe('_internalReloadPage()', () => {
+        // test('should call location.reload()', () => {
+        //     const reloadSpy = jest.spyOn(window.location, 'reload').mockImplementation(() => {});
+        //     auth._internalReloadPage();
+        //     expect(reloadSpy).toHaveBeenCalled();
+        //     reloadSpy.mockRestore();
+        // });
     });
 });

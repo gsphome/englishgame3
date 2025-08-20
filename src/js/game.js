@@ -50,7 +50,8 @@ export const game = {
         this.menuLogoutBtn = document.getElementById('menu-logout-btn');
         this.menuRandomModeBtn = document.getElementById('menu-random-mode-btn');
         this.menuDarkModeToggleBtn = document.getElementById('menu-dark-mode-toggle-btn');
-        this.randomMode = localStorage.getItem('randomMode') !== 'false'; // Initialize from localStorage, default to true
+        const savedRandomMode = localStorage.getItem('randomMode');
+        this.randomMode = savedRandomMode === 'true'; // Explicitly check for 'true' string
 
         // Dark Mode Initialization
         const savedDarkMode = localStorage.getItem('darkMode');

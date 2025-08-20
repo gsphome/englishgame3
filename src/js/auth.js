@@ -85,12 +85,20 @@ export const auth = {
         game.renderMenu(); // Render the menu after login
     },
 
+    _internalReloadPage() {
+        location.reload();
+    },
+
+    _reloadPage(reloadFn = this._internalReloadPage) {
+        reloadFn();
+    },
+
     logout() {
         localStorage.removeItem('user');
         if (game.hamburgerMenu) {
             game.hamburgerMenu.classList.add('hidden'); // Hide hamburger menu on logout
         }
-        location.reload();
+        this._reloadPage();
     },
 
     getUser() {

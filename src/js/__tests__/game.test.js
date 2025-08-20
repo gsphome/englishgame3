@@ -96,7 +96,6 @@ describe('game.js integration tests', () => {
 
         // Spy on game methods that are called during init or tested directly
         gameRenderMenuSpy = jest.spyOn(game, 'renderMenu');
-        gameInitSpy = jest.spyOn(game, 'init').mockImplementation(() => {}); // Mock game.init
 
         // Mock auth and MESSAGES methods that game.js directly calls or relies on
         authRenderLoginSpy = jest.spyOn(auth, 'renderLogin').mockImplementation(() => {});
@@ -199,35 +198,8 @@ describe('game.js integration tests', () => {
             json: () => Promise.resolve(mockedLearningModules),
         });
 
-        // Manually trigger the relevant parts of game.init
-        auth.user = JSON.parse(localStorage.getItem('user')); // Simulate auth.user initialization
-        game.renderHeader();
-        if (!auth.user) {
-            auth.renderLogin();
-        } else {
-            game.renderMenu();
-        }
-        // Also call updateMenuText as it's called in game.init
-        game.updateMenuText();
-
-        // Manually attach event listeners for elements that are clicked in tests
-        if (game.menuLogoutBtn) {
-            game.menuLogoutBtn.addEventListener('click', () => {
-                game.toggleHamburgerMenu(false);
-                game.showLogoutConfirmation();
-            });
-        }
-        if (game.yesButton) {
-            game.yesButton.addEventListener('click', () => {
-                auth.logout();
-                game.toggleModal(false);
-            });
-        }
-        if (game.noButton) {
-            game.noButton.addEventListener('click', () => {
-                game.toggleModal(false);
-            });
-        }
+        // Call game.init() directly
+        await game.init();
     };
 
     // Example test: Check if renderLogin is called when no user is logged in
@@ -384,7 +356,7 @@ describe('game.js integration tests', () => {
     // Test for updateMenuText
     test('should update menu button texts based on language and mode', async () => {
         jest.spyOn(MESSAGES, 'getLanguage').mockReturnValue('es'); // Simulate Spanish language
-        game.randomMode = false; // Simulate random mode off
+        localStorageMock.setItem('randomMode', 'false'); // Ensure random mode is off for this test
         document.body.classList.add('dark-mode'); // Simulate dark mode
 
         const user = { username: 'testuser', globalScore: { correct: 0, incorrect: 0 } };
