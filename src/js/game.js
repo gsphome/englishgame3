@@ -6,8 +6,11 @@ import MatchingModule from './modules/MatchingModule.js';
 import { auth } from './auth.js';
 import { MESSAGES } from './interface.js';
 import { learningModules } from '../assets/data/game-db.js';
+import { shuffleArray } from './utils.js';
 
 export const game = {
+    shuffleArray: shuffleArray, // Make shuffleArray accessible via game object
+
     modal: null,
     menuScrollPosition: 0,
     yesButton: null,
