@@ -120,7 +120,7 @@ class SortingModule {
                         <button id="undo-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${this.MESSAGES.get('undoButton')}</button>
                         <button id="check-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">${this.MESSAGES.get('checkButton')}</button>
                     </div>
-                    <button id="back-to-menu-sorting-btn" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg" onclick="game.renderMenu()">${this.MESSAGES.get('backToMenu')}</button>
+                    <button id="back-to-menu-sorting-btn" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">${this.MESSAGES.get('backToMenu')}</button>
 
                 </div>
             `;

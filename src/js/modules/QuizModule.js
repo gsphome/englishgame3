@@ -74,7 +74,7 @@ class QuizModule {
                             <button id="next-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-r md:py-2 md:px-4">${this.MESSAGES.get('nextButton')}</button>
                         </div>
                     </div>
-                     <button id="back-to-menu-quiz-btn" class="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:mt-4 md:py-2 md:px-4" onclick="this.game.renderMenu()">${this.MESSAGES.get('backToMenu')}</button>
+                     <button id="back-to-menu-quiz-btn" class="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:mt-4 md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
                 </div>
             `;
 
@@ -83,6 +83,7 @@ class QuizModule {
         document.getElementById('prev-btn').addEventListener('click', () => this.prev());
         document.getElementById('next-btn').addEventListener('click', () => this.next());
         document.getElementById('undo-btn').addEventListener('click', () => this.undo());
+        document.getElementById('back-to-menu-quiz-btn').addEventListener('click', () => this.game.renderMenu());
 
         this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         document.getElementById('quiz-question').innerHTML = questionData.sentence.replace('______', '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>');
@@ -276,9 +277,10 @@ class QuizModule {
                     <h1 id="quiz-summary-title" class="text-2xl font-bold mb-4">${this.MESSAGES.get('sessionScore')}</h1>
                     <p id="quiz-summary-correct" class="text-xl mb-2">${this.MESSAGES.get('correct')}: ${this.sessionScore.correct}</p>
                     <p id="quiz-summary-incorrect" class="text-xl mb-4">${this.MESSAGES.get('incorrect')}: ${this.sessionScore.incorrect}</p>
-                    <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4" onclick="this.game.renderMenu()">${this.MESSAGES.get('backToMenu')}</button>
+                    <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
                  </div>
             `;
+            document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.game.renderMenu());
         } else {
             document.getElementById('quiz-summary-title').textContent = this.MESSAGES.get('sessionScore');
             document.getElementById('quiz-summary-correct').textContent = `${this.MESSAGES.get('correct')}: ${this.sessionScore.correct}`;
