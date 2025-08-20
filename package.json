@@ -22,5 +22,9 @@
     "http-server": "^14.1.1",
     "jest": "^30.0.5",
     "playwright": "^1.54.2"
+  },
+  "dependencies": {
+    "@testing-library/jest-dom": "^6.7.0",
+    "jest-environment-jsdom": "^30.0.5"
   }
 }

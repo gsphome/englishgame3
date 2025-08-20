@@ -14,6 +14,9 @@ const config = {
 
   // A list of glob patterns indicating a set of files for which coverage information should be collected
   collectCoverageFrom: ['src/js/**/*.js'],
+
+  // Setup file for Jest DOM matchers
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 };
 
 module.exports = config;
