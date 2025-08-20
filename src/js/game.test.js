@@ -59,7 +59,7 @@ global.fetch = jest.fn();
 
 // Manually define the 'game' object with the necessary methods for testing
 // This is a mock of the global 'game' object.
-let game;
+let gameInstance;
 
 describe('game.js initial integration tests', () => {
     beforeEach(() => {
@@ -131,7 +131,7 @@ describe('game.js initial integration tests', () => {
 
         // Manually define the 'game' object with the necessary methods for testing
         // This is a mock of the global 'game' object.
-        game = {
+        gameInstance = {
             modal: null,
             menuScrollPosition: 0,
             yesButton: null,
@@ -254,7 +254,7 @@ describe('game.js initial integration tests', () => {
                 menuContent.getElementById('main-menu-title').textContent = MESSAGES.get('mainMenu');
 
                 const moduleButtonsContainer = menuContent.getElementById('module-buttons-container');
-                global.learningModules.forEach((module, index) => {
+                global.learningModules.forEach((module) => {
                     const buttonTemplate = document.getElementById('module-button-template');
                     if (!buttonTemplate) {
                         console.error("module-button-template not found in DOM");
@@ -289,12 +289,9 @@ describe('game.js initial integration tests', () => {
                     const response = await fetch(moduleMeta.dataPath);
                     const fetchedData = await response.json();
 
-                    let moduleWithData;
-                    if (Array.isArray(fetchedData)) {
-                        moduleWithData = { ...moduleMeta, data: fetchedData };
-                    } else {
-                        moduleWithData = { ...moduleMeta, ...fetchedData };
-                    }
+                    const moduleWithData = Array.isArray(fetchedData)
+                        ? { ...moduleMeta, data: fetchedData }
+                        : { ...moduleMeta, ...fetchedData };
 
                     this.currentModule = moduleWithData;
                     switch (moduleWithData.gameMode) {
@@ -530,7 +527,7 @@ describe('game.js initial integration tests', () => {
         };
 
         // Assign the mock game object to the global scope
-        global.game = game;
+        global.game = gameInstance;
     });
 
     // Test Case 1: Module Loading and Initial Rendering

@@ -1,4 +1,7 @@
-const auth = {
+import { MESSAGES } from './interface.js';
+import { game } from './game.js';
+
+export const auth = {
     user: null,
 
     init() {

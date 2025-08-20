@@ -1,4 +1,4 @@
-const learningModules = [
+export const learningModules = [
     {
         id: 'flashcard-ielts-home-daily-life',
         name: 'Flashcard: Home',

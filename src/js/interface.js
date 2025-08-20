@@ -1,4 +1,4 @@
-const MESSAGES = {
+export const MESSAGES = {
     _currentLanguage: 'en', // Default language
     _listeners: [],
 

@@ -4,7 +4,7 @@
   "description": "English learning web app with interactive exercises.",
   "main": "game.js",
   "scripts": {
-    "start": "http-server . -o",
+    "start": "http-server . -o -p 5500",
     "lint": "eslint .",
     "test": "jest"
   },
