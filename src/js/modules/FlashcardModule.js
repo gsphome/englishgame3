@@ -1,10 +1,10 @@
 // src/js/modules/FlashcardModule.js
 
 class FlashcardModule {
-    constructor(gameInstance, authInstance, messagesInstance) {
-        this.game = gameInstance; // Reference to the main game object for shared utilities
-        this.auth = authInstance; // Reference to auth for score updates
-        this.MESSAGES = messagesInstance; // Reference to MESSAGES for internationalization
+    constructor(authInstance, messagesInstance, gameCallbacks) {
+        this.auth = authInstance;
+        this.MESSAGES = messagesInstance;
+        this.gameCallbacks = gameCallbacks; // Object containing specific game functions
 
         this.currentIndex = 0;
         this.moduleData = null;
@@ -19,8 +19,8 @@ class FlashcardModule {
         this.appContainer = document.getElementById('app-container');
         this.isTransitioning = false;
         this.sessionScore = { correct: 0, incorrect: 0 }; // Initialize session score
-        if (this.game.randomMode && Array.isArray(this.moduleData.data)) {
-            this.moduleData.data = this.game.shuffleArray([...this.moduleData.data]);
+        if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
+            this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
         }
         this.render();
     }
@@ -28,7 +28,7 @@ class FlashcardModule {
     render() {
         if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
             console.error("Flashcard module data is invalid or empty.");
-            this.game.renderMenu();
+            this.gameCallbacks.renderMenu();
             return;
         }
         const cardData = this.moduleData.data[this.currentIndex];
@@ -69,7 +69,7 @@ class FlashcardModule {
 
             document.getElementById('prev-btn').addEventListener('click', () => this.prev());
             document.getElementById('next-btn').addEventListener('click', () => this.next());
-            document.getElementById('back-to-menu-flashcard-btn').addEventListener('click', () => this.game.renderMenu());
+            document.getElementById('back-to-menu-flashcard-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
 
             // Add event listener for flashcard flip
             const flashcardElement = document.querySelector('.flashcard');
@@ -101,7 +101,7 @@ class FlashcardModule {
             `;
         }
 
-        this.game.updateSessionScoreDisplay(0, 0, this.moduleData.data.length);
+        this.gameCallbacks.updateSessionScoreDisplay(0, 0, this.moduleData.data.length);
 
         // Update button texts regardless of whether the container was just created or already existed
         document.getElementById('prev-btn').textContent = this.MESSAGES.get('prevButton');
@@ -151,7 +151,7 @@ class FlashcardModule {
         if (this.isTransitioning) return;
 
         if (this.currentIndex >= this.moduleData.data.length - 1) {
-            this.game.showFlashcardSummary(this.moduleData.data.length);
+            this.gameCallbacks.showFlashcardSummary(this.moduleData.data.length);
             return;
         }
 
@@ -201,10 +201,10 @@ class FlashcardModule {
             this.sessionScore.incorrect++;
             this.auth.updateGlobalScore({ correct: 0, incorrect: 1 });
         }
-        this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
 
         if (this.currentIndex >= this.moduleData.data.length - 1) {
-            this.game.showFlashcardSummary(this.moduleData.data.length);
+            this.gameCallbacks.showFlashcardSummary(this.moduleData.data.length);
         } else {
             this.next();
         }

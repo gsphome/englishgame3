@@ -17,6 +17,11 @@ const config = {
 
   // Setup file for Jest DOM matchers
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+
+  // A map from regular expressions to paths to transformers
+  transform: {
+    '^.+\\.js$': 'babel-jest',
+  },
 };
 
-module.exports = config;
+export default config;

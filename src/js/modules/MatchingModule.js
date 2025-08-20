@@ -1,10 +1,10 @@
 // src/js/modules/MatchingModule.js
 
 class MatchingModule {
-    constructor(gameInstance, authInstance, messagesInstance) {
-        this.game = gameInstance; // Reference to the main game object for shared utilities
-        this.auth = authInstance; // Reference to auth for score updates
-        this.MESSAGES = messagesInstance; // Reference to MESSAGES for internationalization
+    constructor(authInstance, messagesInstance, gameCallbacks) {
+        this.auth = authInstance;
+        this.MESSAGES = messagesInstance;
+        this.gameCallbacks = gameCallbacks; // Object containing specific game functions
 
         this.currentIndex = 0;
         this.moduleData = null;
@@ -26,8 +26,8 @@ class MatchingModule {
         this.selectedDefinition = null;
         this.matchedPairs = [];
         this.feedbackActive = false;
-        if (this.game.randomMode && Array.isArray(this.moduleData.data)) {
-            this.moduleData.data = this.game.shuffleArray([...this.moduleData.data]);
+        if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
+            this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
         }
         this.moduleData.data = this.moduleData.data.slice(0, 5);
         this.render();
@@ -79,12 +79,12 @@ class MatchingModule {
 
             // Update score (optional, can be done on final check)
             this.sessionScore.correct++;
-            this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
 
         } else {
             // Incorrect match - provide temporary feedback
             this.sessionScore.incorrect++;
-            this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
 
             const termElement = this.selectedTerm.element;
             const defElement = this.selectedDefinition.element;
@@ -110,7 +110,7 @@ class MatchingModule {
             this.feedbackActive = true; // Disable further interaction
             // Show the matching summary modal
             setTimeout(() => {
-                this.game.showMatchingSummary();
+                this.gameCallbacks.showMatchingSummary();
             }, 500);
         }
     }
@@ -132,7 +132,7 @@ class MatchingModule {
                 defElement.addEventListener('click', (e) => this.handleItemClick(e.target));
             }
             this.sessionScore.correct--;
-            this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         }
     }
 
@@ -147,18 +147,18 @@ class MatchingModule {
             element.classList.add('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
             element.addEventListener('click', (e) => this.handleItemClick(e.target));
         });
-        this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
     }
 
     render() {
         if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
             console.error("Matching module data is invalid or empty.");
-            this.game.renderMenu();
+            this.gameCallbacks.renderMenu();
             return;
         }
         this.appContainer.classList.remove('main-menu-active');
-        const terms = this.game.shuffleArray(this.moduleData.data.map(item => ({ id: item.id, text: item.term, type: 'term' })));
-        const definitions = this.game.shuffleArray(this.moduleData.data.map(item => ({ id: item.id, text: item.definition, type: 'definition' })));
+        const terms = this.gameCallbacks.shuffleArray(this.moduleData.data.map(item => ({ id: item.id, text: item.term, type: 'term' })));
+        const definitions = this.gameCallbacks.shuffleArray(this.moduleData.data.map(item => ({ id: item.id, text: item.definition, type: 'definition' })));
 
         this.appContainer.innerHTML = `
             <div id="matching-container" class="max-w-4xl mx-auto p-2">
@@ -211,11 +211,11 @@ class MatchingModule {
         document.getElementById('undo-matching-btn').addEventListener('click', () => this.undo());
         document.getElementById('check-matching-btn').addEventListener('click', () => this.checkAnswers());
         document.getElementById('reset-matching-btn').addEventListener('click', () => this.resetGame());
-        document.getElementById('back-to-menu-matching-btn').addEventListener('click', () => this.game.renderMenu());
+        document.getElementById('back-to-menu-matching-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
         document.getElementById('back-to-menu-matching-btn').textContent = this.MESSAGES.get('backToMenu');
-        this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         document.getElementById('back-to-menu-matching-btn').textContent = this.MESSAGES.get('backToMenu');
-        this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
     }
 
     updateText() {

@@ -1,10 +1,10 @@
 // src/js/modules/CompletionModule.js
 
 class CompletionModule {
-    constructor(gameInstance, authInstance, messagesInstance) {
-        this.game = gameInstance;
+    constructor(authInstance, messagesInstance, gameCallbacks) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
+        this.gameCallbacks = gameCallbacks; // Object containing specific game functions
 
         this.currentIndex = 0;
         this.sessionScore = { correct: 0, incorrect: 0 };
@@ -18,8 +18,8 @@ class CompletionModule {
         this.sessionScore = { correct: 0, incorrect: 0 };
         this.moduleData = module;
         this.appContainer = document.getElementById('app-container');
-        if (this.game.randomMode && Array.isArray(this.moduleData.data)) {
-            this.moduleData.data = this.game.shuffleArray([...this.moduleData.data]);
+        if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
+            this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
         }
         this.render();
         const sessionScoreDisplay = document.getElementById('session-score-display');
@@ -31,7 +31,7 @@ class CompletionModule {
     render() {
         if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
             console.error("Completion module data is invalid or empty.");
-            this.game.renderMenu();
+            this.gameCallbacks.renderMenu();
             return;
         }
         const questionData = this.moduleData.data[this.currentIndex];
@@ -59,7 +59,7 @@ class CompletionModule {
             document.getElementById('prev-btn').addEventListener('click', () => this.prev());
             document.getElementById('next-btn').addEventListener('click', () => this.handleNextAction());
             document.getElementById('undo-btn').addEventListener('click', () => this.undo());
-            document.getElementById('back-to-menu-completion-btn').addEventListener('click', () => this.game.renderMenu());
+            document.getElementById('back-to-menu-completion-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
 
             // const inputElement = document.getElementById('completion-input'); // Moved outside
             // setTimeout(() => {
@@ -125,7 +125,7 @@ class CompletionModule {
             this.lastFeedback = { isCorrect: false, correct: questionData.correct, explanation: questionData.explanation, index: this.currentIndex, userAnswer: userAnswer };
         }
         inputElement.disabled = true;
-        this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
     }
 
     undo() {
@@ -140,7 +140,7 @@ class CompletionModule {
             }
             this.currentIndex = lastAction.index;
             this.render();
-            this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         }
     }
 
@@ -172,7 +172,7 @@ class CompletionModule {
 
     showFinalScore() {
         this.auth.updateGlobalScore(this.sessionScore);
-        this.game.renderHeader();
+        this.gameCallbacks.renderHeader();
 
         if (!document.getElementById('completion-summary-container')) {
             this.appContainer.innerHTML = `

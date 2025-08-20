@@ -1,10 +1,10 @@
 // src/js/modules/QuizModule.js
 
 class QuizModule {
-    constructor(gameInstance, authInstance, messagesInstance) {
-        this.game = gameInstance; // Reference to the main game object for shared utilities
-        this.auth = authInstance; // Reference to auth for score updates
-        this.MESSAGES = messagesInstance; // Reference to MESSAGES for internationalization
+    constructor(authInstance, messagesInstance, gameCallbacks) {
+        this.auth = authInstance;
+        this.MESSAGES = messagesInstance;
+        this.gameCallbacks = gameCallbacks; // Object containing specific game functions
 
         this.currentIndex = 0;
         this.sessionScore = { correct: 0, incorrect: 0 };
@@ -24,8 +24,8 @@ class QuizModule {
         this.appContainer = document.getElementById('app-container');
         this.scoreFrozen = false;
 
-        if (this.game.randomMode && Array.isArray(this.moduleData.data)) {
-            this.moduleData.data = this.game.shuffleArray([...this.moduleData.data]);
+        if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
+            this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
         }
         this.render();
     }
@@ -33,7 +33,7 @@ class QuizModule {
     render() {
         if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
             console.error("Quiz module data is invalid or empty.");
-            this.game.renderMenu();
+            this.gameCallbacks.renderMenu();
             return;
         }
         const questionData = this.moduleData.data[this.currentIndex];
@@ -43,8 +43,8 @@ class QuizModule {
         let optionsToRender = [...questionData.options];
 
         // Shuffle options if random mode is active
-        if (this.game.randomMode) {
-            optionsToRender = this.game.shuffleArray(optionsToRender);
+        if (this.gameCallbacks.randomMode) {
+            optionsToRender = this.gameCallbacks.shuffleArray(optionsToRender);
         }
 
         if (!document.getElementById('quiz-container')) {
@@ -74,7 +74,7 @@ class QuizModule {
                             <button id="next-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-r md:py-2 md:px-4">${this.MESSAGES.get('nextButton')}</button>
                         </div>
                     </div>
-                     <button id="back-to-menu-quiz-btn" class="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:mt-4 md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
+                                         <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4" onclick="this.gameCallbacks.renderMenu()">${this.MESSAGES.get('backToMenu')}</button>
                 </div>
             `;
 
@@ -83,9 +83,9 @@ class QuizModule {
         document.getElementById('prev-btn').addEventListener('click', () => this.prev());
         document.getElementById('next-btn').addEventListener('click', () => this.next());
         document.getElementById('undo-btn').addEventListener('click', () => this.undo());
-        document.getElementById('back-to-menu-quiz-btn').addEventListener('click', () => this.game.renderMenu());
+        document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
 
-        this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         document.getElementById('quiz-question').innerHTML = questionData.sentence.replace('______', '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>');
         const quizTipElement = document.getElementById('quiz-tip');
         if (questionData.tip) {
@@ -191,7 +191,7 @@ class QuizModule {
             b.classList.remove('hover:bg-gray-200');
         });
         if (!this.scoreFrozen) { // Only update score display if not frozen
-            this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         }
     }
 
@@ -263,13 +263,13 @@ class QuizModule {
             
 
             
-            this.game.updateSessionScoreDisplay(lastAction.sessionScoreBefore.correct, lastAction.sessionScoreBefore.incorrect, this.moduleData.data.length);
+            this.gameCallbacks.updateSessionScoreDisplay(lastAction.sessionScoreBefore.correct, lastAction.sessionScoreBefore.incorrect, this.moduleData.data.length);
         }
     }
 
     showFinalScore() {
         this.auth.updateGlobalScore(this.sessionScore);
-        this.game.renderHeader();
+        this.gameCallbacks.renderHeader();
 
         if (!document.getElementById('quiz-summary-container')) {
             this.appContainer.innerHTML = `
@@ -280,7 +280,7 @@ class QuizModule {
                     <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
                  </div>
             `;
-            document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.game.renderMenu());
+            document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
         } else {
             document.getElementById('quiz-summary-title').textContent = this.MESSAGES.get('sessionScore');
             document.getElementById('quiz-summary-correct').textContent = `${this.MESSAGES.get('correct')}: ${this.sessionScore.correct}`;
@@ -335,7 +335,7 @@ class QuizModule {
         document.getElementById('undo-btn').textContent = this.MESSAGES.get('undoButton');
         document.getElementById('prev-btn').textContent = this.MESSAGES.get('prevButton');
         document.getElementById('next-btn').textContent = this.MESSAGES.get('nextButton');
-        document.getElementById('back-to-menu-quiz-btn').textContent = this.MESSAGES.get('backToMenu');
+        document.getElementById('quiz-summary-back-to-menu-btn').textContent = this.MESSAGES.get('backToMenu');
 
         // Update feedback container if it has content
         const feedbackContainer = document.getElementById('feedback-container');

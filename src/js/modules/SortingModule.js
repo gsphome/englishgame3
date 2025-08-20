@@ -1,10 +1,10 @@
 // src/js/modules/SortingModule.js
 
 class SortingModule {
-    constructor(gameInstance, authInstance, messagesInstance) {
-        this.game = gameInstance;
+    constructor(authInstance, messagesInstance, gameCallbacks) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
+        this.gameCallbacks = gameCallbacks; // Object containing specific game functions
 
         this.moduleData = null;
         this.appContainer = null;
@@ -30,7 +30,7 @@ class SortingModule {
         this.appContainer = document.getElementById('app-container');
         // Determine the categories that will actually be rendered
         // this.categories now stores objects { category_id, category_show }
-        this.categories = this.game.shuffleArray([...module.categories]).slice(0, this.maxCategoriesToRender);
+        this.categories = this.gameCallbacks.shuffleArray([...module.categories]).slice(0, this.maxCategoriesToRender);
         this.userAnswers = {};
         this.originalWordPositions = {};
         this.sessionScore = { correct: 0, incorrect: 0 };
@@ -58,7 +58,7 @@ class SortingModule {
         });
 
         // Shuffle all words from the selected categories
-        allWordsFromSelectedCategories = this.game.shuffleArray(allWordsFromSelectedCategories);
+        allWordsFromSelectedCategories = this.gameCallbacks.shuffleArray(allWordsFromSelectedCategories);
 
         // Select a subset of these words for the game
         // Ensure at least one word from each *displayed* category if possible, then fill up to a total
@@ -87,7 +87,7 @@ class SortingModule {
         for (const categoryId in wordsPerCategory) { // Iterate over category_ids
             remainingWords = remainingWords.concat(wordsPerCategory[categoryId]);
         }
-        remainingWords = this.game.shuffleArray(remainingWords); // Shuffle remaining words
+        remainingWords = this.gameCallbacks.shuffleArray(remainingWords); // Shuffle remaining words
 
         let i = 0;
         while (selectedWords.length < 5 && i < remainingWords.length) {
@@ -98,7 +98,7 @@ class SortingModule {
             i++;
         }
 
-        this.words = this.game.shuffleArray(selectedWords); // Final shuffle of the words to be displayed
+        this.words = this.gameCallbacks.shuffleArray(selectedWords); // Final shuffle of the words to be displayed
         this.renderInitialView();
         this.render(); // Call the new render method after initial view is set up
     }
@@ -108,7 +108,7 @@ class SortingModule {
         this.appContainer.innerHTML = `
             <div id="sorting-container" class="max-w-2xl mx-auto p-4">
 
-                <div id="word-bank" class="bg-white p-4 rounded-lg shadow-md mb-6 min-h-[100px] border-2 border-gray-300 flex flex-wrap justify-center items-center" ondrop="game.sorting.drop(event)" ondragover="game.sorting.allowDrop(event)">
+                <div id="word-bank" class="bg-white p-4 rounded-lg shadow-md mb-6 min-h-[100px] border-2 border-gray-300 flex flex-wrap justify-center items-center" ondrop="game.sortingModule.drop(event)" ondragover="game.sortingModule.allowDrop(event)">
                     <!-- Words will be rendered here -->
                 </div>
 
@@ -128,7 +128,7 @@ class SortingModule {
         this.renderWords();
         this.renderCategories();
         this.addEventListeners();
-        this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
+        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
     }
 
     checkAnswers() {
@@ -162,11 +162,11 @@ class SortingModule {
         });
 
         if (allCorrect && this.sessionScore.correct === this.words.length) {
-            this.game.showSortingCompletionModal(this.moduleData);
+            this.gameCallbacks.showSortingCompletionModal(this.moduleData);
         }
         this.auth.updateGlobalScore(this.sessionScore); // Update global score on every check
         this.feedbackActive = true;
-        this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
+        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
     }
 
     undo() {
@@ -194,7 +194,7 @@ class SortingModule {
                 //     this.sessionScore.incorrect--;
                 //     auth.updateGlobalScore({ correct: 0, incorrect: -1 });
                 // }
-                this.game.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
+                this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
             }
         }
     }
@@ -371,7 +371,7 @@ class SortingModule {
         const categoriesContainer = document.getElementById('categories-container');
         categoriesContainer.innerHTML = ''; // Clear existing categories
         // Shuffle categories and then take the first 'maxCategoriesToRender'
-        const categoriesToRender = this.game.shuffleArray([...this.categories]).slice(0, this.maxCategoriesToRender);
+        const categoriesToRender = this.gameCallbacks.shuffleArray([...this.categories]).slice(0, this.maxCategoriesToRender);
         categoriesToRender.forEach(categoryObj => { // Changed 'category' to 'categoryObj'
             const categoryElem = document.createElement('div');
             categoryElem.id = 'category-' + categoryObj.category_id; // Use category_id for ID
@@ -386,7 +386,7 @@ class SortingModule {
     addEventListeners() {
         document.getElementById('check-btn').addEventListener('click', () => this.checkAnswers());
         document.getElementById('undo-btn').addEventListener('click', () => this.undo());
-        document.getElementById('back-to-menu-sorting-btn').addEventListener('click', () => this.game.renderMenu());
+        document.getElementById('back-to-menu-sorting-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
     }
 
     render() {

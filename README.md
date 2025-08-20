@@ -16,7 +16,7 @@ This is a web-based application designed for learning English, built with modern
 *   **Login System:** User progress and global scores are saved using `localStorage`.
 *   **Global Score:** Tracks the user's overall performance across all learning modules.
 *   **Keyboard Navigation:** Full control of the application using keyboard shortcuts for efficient learning.
-*   **Dynamic Content:** The application's learning content is generated dynamically from the `game-db.js` file, allowing for easy expansion.
+*   **Dynamic Content:** The application's learning content is generated dynamically from the `game-db.json` file, allowing for easy expansion.
 *   **Multiple Game Modes:** Includes flashcards, quizzes, sentence completion, and sorting exercises to cater to different learning styles.
 *   **Multi-language Support:** The interface supports both English and Spanish, with easy toggling.
 *   **Dark Mode:** A toggleable dark mode for improved readability and user comfort.
@@ -45,9 +45,9 @@ To get this application up and running on your local machine:
 
 ## How to Add New Learning Modules
 
-To add new content to the application, you need to modify the `game-db.js` file. This file contains an array called `learningModules`.
+To add new content to the application, you need to modify the `game-db.json` file. This file contains an array called `learningModules`.
 
-1.  **Open `game-db.js`:** Locate the `learningModules` array.
+1.  **Open `game-db.json`:** Locate the `learningModules` array.
 2.  **Add a New Module Object:** Add a new object to the array with the following structure:
 
     ```javascript

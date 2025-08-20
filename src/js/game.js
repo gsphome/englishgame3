@@ -5,8 +5,9 @@ import SortingModule from './modules/SortingModule.js';
 import MatchingModule from './modules/MatchingModule.js';
 import { auth } from './auth.js';
 import { MESSAGES } from './interface.js';
-import { learningModules } from '../assets/data/game-db.js';
+
 import { shuffleArray, getGameModeIconSvg } from './utils.js';
+import { fetchModuleData, fetchAllLearningModules } from './dataManager.js';
 
 export const game = {
     shuffleArray: shuffleArray, // Make shuffleArray accessible via game object
@@ -30,14 +31,15 @@ export const game = {
         }
     },
 
-    init() {
+    async init() {
         this.modal = document.getElementById('confirmation-modal');
         auth.init();
-        this.flashcardModule = new FlashcardModule(this, auth, MESSAGES);
-        this.quizModule = new QuizModule(this, auth, MESSAGES);
-        this.completionModule = new CompletionModule(this, auth, MESSAGES);
-        this.sortingModule = new SortingModule(this, auth, MESSAGES);
-        this.matchingModule = new MatchingModule(this, auth, MESSAGES);
+        this.allLearningModules = await fetchAllLearningModules();
+        this.flashcardModule = new FlashcardModule(auth, MESSAGES, this);
+        this.quizModule = new QuizModule(auth, MESSAGES, this);
+        this.completionModule = new CompletionModule(auth, MESSAGES, this);
+        this.sortingModule = new SortingModule(auth, MESSAGES, this);
+        this.matchingModule = new MatchingModule(auth, MESSAGES, this);
         this.yesButton = document.getElementById('confirm-yes');
         this.noButton = document.getElementById('confirm-no');
         this.messageElement = document.getElementById('confirmation-message');
@@ -359,7 +361,7 @@ export const game = {
         const moduleButtonsContainer = menuContent.getElementById('module-buttons-container');
         const colors = ['bg-indigo-600', 'bg-purple-600', 'bg-pink-600', 'bg-teal-600', 'bg-cyan-600', 'bg-emerald-600'];
 
-        learningModules.forEach((module, index) => {
+        this.allLearningModules.forEach((module, index) => {
             const colorClass = colors[index % colors.length];
             const icon = module.icon || '📚'; // Placeholder icon
             const description = module.description || ''; // Placeholder description
@@ -427,7 +429,7 @@ export const game = {
     },
 
     async startModule(moduleId) {
-        const moduleMeta = learningModules.find(m => m.id === moduleId);
+        const moduleMeta = this.allLearningModules.find(m => m.id === moduleId);
         if (!moduleMeta) return;
 
         try {

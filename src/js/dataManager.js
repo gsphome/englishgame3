@@ -1,7 +1,19 @@
-import { learningModules } from '../assets/data/game-db.js';
+export async function fetchAllLearningModules() {
+    try {
+        const response = await fetch('src/assets/data/game-db.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to load learning modules:', error);
+        return [];
+    }
+}
 
 export async function fetchModuleData(moduleId) {
-    const moduleMeta = learningModules.find(m => m.id === moduleId);
+    const allModules = await fetchAllLearningModules();
+    const moduleMeta = allModules.find(m => m.id === moduleId);
     if (!moduleMeta) {
         console.error(`Module with ID ${moduleId} not found.`);
         return null;
