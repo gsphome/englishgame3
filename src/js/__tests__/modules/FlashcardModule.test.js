@@ -320,6 +320,65 @@ describe('FlashcardModule', () => {
                 flashcardModule.flip();
                 expect(card.classList.toggle).toHaveBeenCalledWith('flipped');
             });
+
+            test('should not flip if transitioning', () => {
+                flashcardModule.isTransitioning = true;
+                flashcardModule.flip();
+                expect(card.classList.toggle).not.toHaveBeenCalled();
+            });
+
+            test('should not flip if card element is null', () => {
+                jest.spyOn(flashcardModule.appContainer, 'querySelector').mockReturnValueOnce(null);
+                flashcardModule.isTransitioning = false;
+                flashcardModule.flip();
+                expect(card.classList.toggle).not.toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('handleFlashcardAnswer', () => {
+        const mockModuleData = {
+            data: [
+                { en: "Q1", es: "A1", ipa: "/iː/", example: "Ex1", example_es: "Ej1" },
+                { en: "Q2", es: "A2", ipa: "/tuː/", example: "Ex2", example_es: "Ej2" },
+            ],
+        };
+
+        beforeEach(() => {
+            flashcardModule.moduleData = mockModuleData;
+            flashcardModule.currentIndex = 0;
+            flashcardModule.sessionScore = { correct: 0, incorrect: 0 };
+            jest.spyOn(flashcardModule, 'next').mockImplementation(() => {}); // Mock next to prevent actual navigation
+        });
+
+        test('should increment correct score and update global score if answer is correct', () => {
+            flashcardModule.handleFlashcardAnswer(true);
+            expect(flashcardModule.sessionScore).toEqual({ correct: 1, incorrect: 0 });
+            expect(mockAuth.updateGlobalScore).toHaveBeenCalledWith({ correct: 1, incorrect: 0 });
+            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(1, 0, mockModuleData.data.length);
+            expect(flashcardModule.next).toHaveBeenCalled();
+        });
+
+        test('should increment incorrect score and update global score if answer is incorrect', () => {
+            flashcardModule.handleFlashcardAnswer(false);
+            expect(flashcardModule.sessionScore).toEqual({ correct: 0, incorrect: 1 });
+            expect(mockAuth.updateGlobalScore).toHaveBeenCalledWith({ correct: 0, incorrect: 1 });
+            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 1, mockModuleData.data.length);
+            expect(flashcardModule.next).toHaveBeenCalled();
+        });
+
+        test('should show summary if it is the last card', () => {
+            flashcardModule.currentIndex = mockModuleData.data.length - 1;
+            flashcardModule.handleFlashcardAnswer(true);
+            expect(mockGameCallbacks.showFlashcardSummary).toHaveBeenCalledWith(mockModuleData.data.length);
+            expect(flashcardModule.next).not.toHaveBeenCalled();
+        });
+
+        test('should call next if not the last card', () => {
+            flashcardModule.currentIndex = 0;
+            flashcardModule.handleFlashcardAnswer(true);
+            expect(mockGameCallbacks.showFlashcardSummary).not.toHaveBeenCalled();
+            expect(flashcardModule.next).toHaveBeenCalled();
         });
     });
 });
