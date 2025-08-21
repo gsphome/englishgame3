@@ -174,21 +174,17 @@ class CompletionModule {
         this.auth.updateGlobalScore(this.sessionScore);
         this.gameCallbacks.renderHeader();
 
-        if (!document.getElementById('completion-summary-container')) {
-            this.appContainer.innerHTML = `
-                 <div id="completion-summary-container" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
-                    <h1 id="completion-summary-title" class="text-2xl font-bold mb-4">${this.MESSAGES.get('sessionScore')}</h1>
-                    <p id="completion-summary-correct" class="text-xl mb-2">${this.MESSAGES.get('correct')}: ${this.sessionScore.correct}</p>
-                    <p id="completion-summary-incorrect" class="text-xl mb-4">${this.MESSAGES.get('incorrect')}: ${this.sessionScore.incorrect}</p>
-                    <button id="completion-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
-                 </div>
-            `;
-            document.getElementById('completion-summary-back-to-menu-btn').addEventListener('click', () => this.game.renderMenu());
-        } else {
-            document.getElementById('completion-summary-title').textContent = this.MESSAGES.get('sessionScore');
-            document.getElementById('completion-summary-correct').textContent = `${this.MESSAGES.get('correct')}: ${this.sessionScore.correct}`;
-            document.getElementById('completion-summary-incorrect').textContent = `${this.MESSAGES.get('incorrect')}: ${this.sessionScore.incorrect}`;
-            document.getElementById('completion-summary-back-to-menu-btn').textContent = this.MESSAGES.get('backToMenu');
+        this.appContainer.innerHTML = `
+             <div id="completion-summary-container" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
+                <h1 id="completion-summary-title" class="text-2xl font-bold mb-4">${this.MESSAGES.get('sessionScore')}</h1>
+                <p id="completion-summary-correct" class="text-xl mb-2">${this.MESSAGES.get('correct')}: ${this.sessionScore.correct}</p>
+                <p id="completion-summary-incorrect" class="text-xl mb-4">${this.MESSAGES.get('incorrect')}: ${this.sessionScore.incorrect}</p>
+                <button id="completion-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
+             </div>
+        `;
+        const backToMenuButton = document.getElementById('completion-summary-back-to-menu-btn');
+        if (backToMenuButton) {
+            backToMenuButton.addEventListener('click', () => this.gameCallbacks.renderMenu());
         }
     }
 

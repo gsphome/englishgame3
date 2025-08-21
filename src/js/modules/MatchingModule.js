@@ -157,8 +157,13 @@ class MatchingModule {
             return;
         }
         this.appContainer.classList.remove('main-menu-active');
-        const terms = this.gameCallbacks.shuffleArray(this.moduleData.data.map(item => ({ id: item.id, text: item.term, type: 'term' })));
-        const definitions = this.gameCallbacks.shuffleArray(this.moduleData.data.map(item => ({ id: item.id, text: item.definition, type: 'definition' })));
+        let terms = this.moduleData.data.map(item => ({ id: item.id, text: item.term, type: 'term' }));
+        let definitions = this.moduleData.data.map(item => ({ id: item.id, text: item.definition, type: 'definition' }));
+
+        if (this.gameCallbacks.randomMode) {
+            terms = this.gameCallbacks.shuffleArray(terms);
+            definitions = this.gameCallbacks.shuffleArray(definitions);
+        }
 
         this.appContainer.innerHTML = `
             <div id="matching-container" class="max-w-4xl mx-auto p-2">

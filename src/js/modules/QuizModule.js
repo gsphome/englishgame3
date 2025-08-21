@@ -37,80 +37,39 @@ class QuizModule {
             return;
         }
         const questionData = this.moduleData.data[this.currentIndex];
+        
+        if (!document.getElementById('quiz-container')) {
+            this.appContainer.innerHTML = `
+                <div id="quiz-container" class="max-w-2xl mx-auto">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <p class="text-base mb-6 md:text-xl" id="quiz-question"></p>
+                        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <button id="undo-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4"></button>
+                        <div>
+                            <button id="prev-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-l md:py-2 md:px-4"></button>
+                            <button id="next-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-r md:py-2 md:px-4"></button>
+                        </div>
+                    </div>
+                    <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4"></button>
+                </div>
+            `;
+            document.getElementById('prev-btn').addEventListener('click', () => this.prev());
+            document.getElementById('next-btn').addEventListener('click', () => this.next());
+            document.getElementById('undo-btn').addEventListener('click', () => this.undo());
+            document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
+        }
+
         this.appContainer.classList.remove('main-menu-active');
-
-        // Create a copy of options to shuffle, so the original data is not permanently altered
+        document.getElementById('quiz-question').innerHTML = questionData.sentence.replace('______', '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>');
+        
         let optionsToRender = [...questionData.options];
-
-        // Shuffle options if random mode is active
         if (this.gameCallbacks.randomMode) {
             optionsToRender = this.gameCallbacks.shuffleArray(optionsToRender);
         }
 
-        if (!document.getElementById('quiz-container')) {
-            let optionsHtml = '';
-            const optionLetters = ['A', 'B', 'C', 'D'];
-            optionsToRender.forEach((option, index) => {
-                optionsHtml += `
-                        <button class="w-full text-left bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out flex items-center border border-gray-300" data-option="${option}">
-                        <span class="font-bold mr-4">${optionLetters[index]}</span>
-                        <span>${option}</span>
-                    </button>
-                `;
-            });
-
-            this.appContainer.innerHTML = `
-                <div id="quiz-container" class="max-w-2xl mx-auto">
-                    <div class="bg-white p-8 rounded-lg shadow-md">
-                        <p class="text-base mb-6 md:text-xl" id="quiz-question">${questionData.sentence.replace('______', '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>')}</p>
-                        ${questionData.tip ? `<p class="text-lg text-gray-500 mb-4" id="quiz-tip">Tip: ${questionData.tip}</p>` : ''}
-                        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">${optionsHtml}</div>
-                        <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
-                    </div>
-                    <div class="flex justify-between mt-4">
-                        <button id="undo-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('undoButton')}</button>
-                        <div>
-                            <button id="prev-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-l md:py-2 md:px-4">${this.MESSAGES.get('prevButton')}</button>
-                            <button id="next-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-r md:py-2 md:px-4">${this.MESSAGES.get('nextButton')}</button>
-                        </div>
-                    </div>
-                                         <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
-                </div>
-            `;
-
-        }
-
-        document.getElementById('prev-btn').addEventListener('click', () => this.prev());
-        document.getElementById('next-btn').addEventListener('click', () => this.next());
-        document.getElementById('undo-btn').addEventListener('click', () => this.undo());
-        document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
-
-        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
-        document.getElementById('quiz-question').innerHTML = questionData.sentence.replace('______', '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>');
-        const quizTipElement = document.getElementById('quiz-tip');
-        if (questionData.tip) {
-            if (quizTipElement) {
-                quizTipElement.textContent = `Tip: ${questionData.tip}`;
-                quizTipElement.classList.remove('hidden');
-            } else {
-                const feedbackContainer = document.getElementById('feedback-container');
-                const newTipElement = document.createElement('p');
-                newTipElement.id = 'quiz-tip';
-                newTipElement.className = 'text-lg text-gray-500 mb-4';
-                newTipElement.textContent = `Tip: ${questionData.tip}`;
-                feedbackContainer.parentNode.insertBefore(newTipElement, feedbackContainer);
-            }
-        } else {
-            if (quizTipElement) {
-                quizTipElement.classList.add('hidden');
-            }
-        }
-        document.getElementById('undo-btn').textContent = this.MESSAGES.get('undoButton');
-        document.getElementById('prev-btn').textContent = this.MESSAGES.get('prevButton');
-        document.getElementById('next-btn').textContent = this.MESSAGES.get('nextButton');
-        document.getElementById('quiz-summary-back-to-menu-btn').textContent = this.MESSAGES.get('backToMenu');
-
-        // Update options
         const optionsContainer = document.getElementById('options-container');
         optionsContainer.innerHTML = '';
         const optionLetters = ['A', 'B', 'C', 'D'];
@@ -122,7 +81,9 @@ class QuizModule {
             button.addEventListener('click', (e) => this.handleAnswer(e.target.closest('[data-option]').dataset.option));
             optionsContainer.appendChild(button);
         });
-        document.getElementById('feedback-container').innerHTML = ''; // Clear feedback
+
+        document.getElementById('feedback-container').innerHTML = '';
+        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
     }
 
     handleAnswer(selectedOption) {
@@ -154,7 +115,6 @@ class QuizModule {
         this.history.push(newAction);
         this.historyPointer = this.history.length - 1; // Update history pointer
 
-        console.log('quiz.handleAnswer(): sessionScore before update:', { ...this.sessionScore });
         if (!this.scoreFrozen) { // Only update score if not frozen
             if (isCorrect) {
                 this.sessionScore.correct++;
@@ -257,12 +217,6 @@ class QuizModule {
                 button.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
                 button.classList.add('bg-gray-100', 'hover:bg-gray-200'); // Restore default classes
             });
-
-            // Set current index to the question that was undone
-            // Restore the UI state for the undone question
-            
-
-            
             this.gameCallbacks.updateSessionScoreDisplay(lastAction.sessionScoreBefore.correct, lastAction.sessionScoreBefore.incorrect, this.moduleData.data.length);
         }
     }

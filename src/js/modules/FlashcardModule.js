@@ -35,6 +35,7 @@ class FlashcardModule {
         this.appContainer.classList.remove('main-menu-active');
 
         // Check if the flashcard view is already rendered
+        // Check if the flashcard view is already rendered
         if (!document.getElementById('flashcard-container')) { // Assuming a main container for flashcard view
             this.appContainer.innerHTML = `
                 <div id="flashcard-container" class="max-w-2xl mx-auto">
@@ -66,16 +67,6 @@ class FlashcardModule {
                      <button id="back-to-menu-flashcard-btn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">${this.MESSAGES.get('backToMenu')}</button>
                 </div>
             `;
-
-            document.getElementById('prev-btn').addEventListener('click', () => this.prev());
-            document.getElementById('next-btn').addEventListener('click', () => this.next());
-            document.getElementById('back-to-menu-flashcard-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
-
-            // Add event listener for flashcard flip
-            const flashcardElement = document.querySelector('.flashcard');
-            if (flashcardElement) {
-                flashcardElement.addEventListener('click', () => this.flip());
-            }
         }
         // Update existing text content by re-rendering innerHTML of front and back
         const flashcardFront = document.querySelector('.flashcard-front');
@@ -112,6 +103,16 @@ class FlashcardModule {
         const card = this.appContainer.querySelector('.flashcard');
         if (card) {
             card.classList.add('card-active');
+        }
+
+        // Event listeners should always be attached/re-attached
+        document.getElementById('prev-btn').addEventListener('click', () => this.prev());
+        document.getElementById('next-btn').addEventListener('click', () => this.next());
+        document.getElementById('back-to-menu-flashcard-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
+
+        const flashcardElement = document.querySelector('.flashcard');
+        if (flashcardElement) {
+            flashcardElement.addEventListener('click', () => this.flip());
         }
     }
 
