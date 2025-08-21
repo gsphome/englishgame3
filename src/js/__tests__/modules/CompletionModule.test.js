@@ -247,6 +247,36 @@ describe('CompletionModule', () => {
 
             addEventListenerSpy.mockRestore();
         });
+
+        test('should call prev() when prev-btn is clicked', () => {
+            const prevSpy = jest.spyOn(completionModule, 'prev').mockImplementation(() => {});
+            completionModule.render();
+            document.getElementById('prev-btn').click();
+            expect(prevSpy).toHaveBeenCalled();
+            prevSpy.mockRestore();
+        });
+
+        test('should call handleNextAction() when next-btn is clicked', () => {
+            const handleNextActionSpy = jest.spyOn(completionModule, 'handleNextAction').mockImplementation(() => {});
+            completionModule.render();
+            document.getElementById('next-btn').click();
+            expect(handleNextActionSpy).toHaveBeenCalled();
+            handleNextActionSpy.mockRestore();
+        });
+
+        test('should call undo() when undo-btn is clicked', () => {
+            const undoSpy = jest.spyOn(completionModule, 'undo').mockImplementation(() => {});
+            completionModule.render();
+            document.getElementById('undo-btn').click();
+            expect(undoSpy).toHaveBeenCalled();
+            undoSpy.mockRestore();
+        });
+
+        test('should call gameCallbacks.renderMenu() when back-to-menu-completion-btn is clicked', () => {
+            completionModule.render();
+            document.getElementById('back-to-menu-completion-btn').click();
+            expect(mockGameCallbacks.renderMenu).toHaveBeenCalled();
+        });
     });
 
     describe('handleAnswer', () => {

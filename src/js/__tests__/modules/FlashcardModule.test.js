@@ -381,4 +381,62 @@ describe('FlashcardModule', () => {
             expect(flashcardModule.next).toHaveBeenCalled();
         });
     });
+
+    describe('updateText', () => {
+        const mockModuleData = {
+            data: [
+                { en: "Updated Hello", es: "Updated Hola", ipa: "/uːpˈdeɪtɪd/", example: "Updated example", example_es: "Ejemplo actualizado" },
+            ],
+        };
+
+        beforeEach(() => {
+            // Render the initial flashcard container to ensure elements exist
+            flashcardModule.init(mockModuleData);
+            flashcardModule.moduleData = mockModuleData;
+            flashcardModule.currentIndex = 0;
+        });
+
+        test('should update flashcard front and back text content', () => {
+            flashcardModule.updateText();
+
+            expect(document.getElementById('flashcard-front-text')).toHaveTextContent('Updated Hello');
+            expect(document.getElementById('flashcard-front-ipa')).toHaveTextContent('/uːpˈdeɪtɪd/');
+            expect(document.getElementById('flashcard-example')).toHaveTextContent('"Updated example"');
+
+            expect(document.getElementById('flashcard-back-en-text')).toHaveTextContent('Updated Hello');
+            expect(document.getElementById('flashcard-back-ipa')).toHaveTextContent('/uːpˈdeɪtɪd/');
+            expect(document.getElementById('flashcard-back-text')).toHaveTextContent('Updated Hola');
+            expect(document.getElementById('flashcard-example')).toHaveTextContent('"Updated example"');
+            expect(document.getElementById('flashcard-example-es')).toHaveTextContent('"Ejemplo actualizado"');
+        });
+
+        test('should update button texts', () => {
+            flashcardModule.updateText();
+            expect(document.getElementById('prev-btn')).toHaveTextContent('prevButton');
+            expect(document.getElementById('next-btn')).toHaveTextContent('nextButton');
+            expect(document.getElementById('back-to-menu-flashcard-btn')).toHaveTextContent('backToMenu');
+        });
+
+        test('should handle null flashcardFront element gracefully', () => {
+            const originalQuerySelector = document.querySelector;
+            jest.spyOn(document, 'querySelector').mockImplementation((selector) => {
+                if (selector === '.flashcard-front') return null;
+                return originalQuerySelector.call(document, selector);
+            });
+            flashcardModule.updateText();
+            // Expect no errors and that other elements are still updated
+            expect(document.getElementById('next-btn')).toHaveTextContent('nextButton');
+        });
+
+        test('should handle null flashcardBack element gracefully', () => {
+            const originalQuerySelector = document.querySelector;
+            jest.spyOn(document, 'querySelector').mockImplementation((selector) => {
+                if (selector === '.flashcard-back') return null;
+                return originalQuerySelector.call(document, selector);
+            });
+            flashcardModule.updateText();
+            // Expect no errors and that other elements are still updated
+            expect(document.getElementById('prev-btn')).toHaveTextContent('prevButton');
+        });
+    });
 });
