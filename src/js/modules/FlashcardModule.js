@@ -67,6 +67,15 @@ class FlashcardModule {
                      <button id="back-to-menu-flashcard-btn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">${this.MESSAGES.get('backToMenu')}</button>
                 </div>
             `;
+            // Event listeners should be attached here, inside this if block
+            document.getElementById('prev-btn').addEventListener('click', () => this.prev());
+            document.getElementById('next-btn').addEventListener('click', () => this.next());
+            document.getElementById('back-to-menu-flashcard-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
+
+            const flashcardElement = document.querySelector('.flashcard');
+            if (flashcardElement) {
+                flashcardElement.addEventListener('click', () => this.flip());
+            }
         }
         // Update existing text content by re-rendering innerHTML of front and back
         const flashcardFront = document.querySelector('.flashcard-front');
@@ -103,16 +112,6 @@ class FlashcardModule {
         const card = this.appContainer.querySelector('.flashcard');
         if (card) {
             card.classList.add('card-active');
-        }
-
-        // Event listeners should always be attached/re-attached
-        document.getElementById('prev-btn').addEventListener('click', () => this.prev());
-        document.getElementById('next-btn').addEventListener('click', () => this.next());
-        document.getElementById('back-to-menu-flashcard-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
-
-        const flashcardElement = document.querySelector('.flashcard');
-        if (flashcardElement) {
-            flashcardElement.addEventListener('click', () => this.flip());
         }
     }
 

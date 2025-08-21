@@ -168,6 +168,18 @@ describe('FlashcardModule', () => {
             addEventListenerSpy.mockRestore();
         });
 
+        test('should not re-attach event listeners if container already exists', () => {
+            // First render to create the container and attach listeners
+            flashcardModule.render();
+            const addEventListenerSpy = jest.spyOn(Element.prototype, 'addEventListener');
+
+            // Second render, container already exists
+            flashcardModule.render();
+
+            expect(addEventListenerSpy).not.toHaveBeenCalled();
+            addEventListenerSpy.mockRestore();
+        });
+
         test('should update button texts', () => {
             flashcardModule.render();
             expect(document.getElementById('prev-btn')).toHaveTextContent('prevButton');
@@ -179,6 +191,11 @@ describe('FlashcardModule', () => {
             flashcardModule.render();
             const card = document.querySelector('.flashcard');
             expect(card).toHaveClass('card-active');
+        });
+
+        test('should call updateSessionScoreDisplay with initial values', () => {
+            flashcardModule.render();
+            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 0, mockModuleData.data.length);
         });
     });
 
@@ -256,12 +273,41 @@ describe('FlashcardModule', () => {
                 expect(flashcardModule.isTransitioning).toBe(false);
             });
 
+            test('should not go to previous card if currentIndex is 0', () => {
+                flashcardModule.currentIndex = 0;
+                flashcardModule.prev();
+                expect(flashcardModule.isTransitioning).toBe(false); // Should not start transition
+                expect(flashcardModule.currentIndex).toBe(0); // Should remain 0
+                expect(flashcardModule.render).not.toHaveBeenCalled();
+            });
+
+            test('should not go to previous card if transitioning', () => {
+                flashcardModule.currentIndex = 1;
+                flashcardModule.isTransitioning = true;
+                flashcardModule.prev();
+                expect(flashcardModule.currentIndex).toBe(1); // Should not change
+                expect(flashcardModule.render).not.toHaveBeenCalled();
+            });
+
             test('should remove flipped class if card is flipped', () => {
                 flashcardModule.currentIndex = 1;
                 card.classList.contains.mockReturnValueOnce(true);
                 flashcardModule.prev();
                 expect(card.classList.remove).toHaveBeenCalledWith('flipped');
                 jest.runAllTimers();
+            });
+
+            test('should handle null card element gracefully in prev', () => {
+                const querySelectorSpy = jest.spyOn(flashcardModule.appContainer, 'querySelector').mockReturnValue(null);
+                flashcardModule.currentIndex = 1;
+                flashcardModule.prev();
+                // Expect no errors and that isTransitioning is still set to false after timeout
+                jest.runAllTimers();
+                expect(flashcardModule.isTransitioning).toBe(false);
+                // Ensure classList methods are not called on a null card
+                expect(querySelectorSpy).toHaveBeenCalledWith('.flashcard');
+                expect(card.classList.add).not.toHaveBeenCalled();
+                expect(card.classList.remove).not.toHaveBeenCalled();
             });
         });
 
@@ -300,12 +346,40 @@ describe('FlashcardModule', () => {
                 expect(flashcardModule.isTransitioning).toBe(false);
             });
 
+            test('should show summary if it is the last card', () => {
+                flashcardModule.currentIndex = mockModuleData.data.length - 1;
+                flashcardModule.next();
+                expect(mockGameCallbacks.showFlashcardSummary).toHaveBeenCalledWith(mockModuleData.data.length);
+                expect(flashcardModule.isTransitioning).toBe(false); // Should not transition
+            });
+
+            test('should not go to next card if transitioning', () => {
+                flashcardModule.currentIndex = 0;
+                flashcardModule.isTransitioning = true;
+                flashcardModule.next();
+                expect(flashcardModule.currentIndex).toBe(0); // Should not change
+                expect(flashcardModule.render).not.toHaveBeenCalled();
+            });
+
             test('should remove flipped class if card is flipped', () => {
                 flashcardModule.currentIndex = 0;
                 card.classList.contains.mockReturnValueOnce(true);
                 flashcardModule.next();
                 expect(card.classList.remove).toHaveBeenCalledWith('flipped');
                 jest.runAllTimers();
+            });
+
+            test('should handle null card element gracefully in next', () => {
+                const querySelectorSpy = jest.spyOn(flashcardModule.appContainer, 'querySelector').mockReturnValue(null);
+                flashcardModule.currentIndex = 0;
+                flashcardModule.next();
+                // Expect no errors and that isTransitioning is still set to false after timeout
+                jest.runAllTimers();
+                expect(flashcardModule.isTransitioning).toBe(false);
+                // Ensure classList methods are not called on a null card
+                expect(querySelectorSpy).toHaveBeenCalledWith('.flashcard');
+                expect(card.classList.add).not.toHaveBeenCalled();
+                expect(card.classList.remove).not.toHaveBeenCalled();
             });
         });
 
