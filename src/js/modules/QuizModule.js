@@ -209,14 +209,10 @@ class QuizModule {
             const optionsContainer = document.getElementById('options-container');
             const feedbackContainer = document.getElementById('feedback-container');
 
-            feedbackContainer.innerHTML = '';
-
-            document.querySelectorAll('[data-option]').forEach(button => {
-                button.disabled = false;
-                button.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
-                button.classList.add('bg-gray-100', 'hover:bg-gray-200'); 
-            });
-            this.gameCallbacks.updateSessionScoreDisplay(lastAction.sessionScoreBefore.correct, lastAction.sessionScoreBefore.incorrect, this.moduleData.data.length);
+            this.sessionScore = { ...lastAction.sessionScoreBefore };
+            this.currentIndex = lastAction.index;
+            this.render();
+            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         }
     }
 

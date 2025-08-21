@@ -303,10 +303,8 @@ describe('QuizModule', () => {
             quizModule.handleAnswer('A'); // Answer correctly to create history
         });
 
-        test('should revert UI and session score if historyPointer is valid', () => {
-            const initialCorrect = quizModule.sessionScore.correct;
-            const initialIncorrect = quizModule.sessionScore.incorrect;
-
+        test('should revert UI, session score, current index, and re-render if historyPointer is valid', () => {
+            const renderSpy = jest.spyOn(quizModule, 'render');
             quizModule.undo();
 
             expect(quizModule.historyPointer).toBe(-1);
@@ -319,7 +317,12 @@ describe('QuizModule', () => {
                 expect(button).not.toHaveClass('bg-green-500', 'text-white', 'bg-red-500');
                 expect(button).toHaveClass('bg-gray-100', 'hover:bg-gray-200');
             });
+            expect(quizModule.sessionScore.correct).toBe(0);
+            expect(quizModule.sessionScore.incorrect).toBe(0);
+            expect(quizModule.currentIndex).toBe(0);
+            expect(renderSpy).toHaveBeenCalled();
             expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 0, mockModuleData.data.length);
+            renderSpy.mockRestore();
         });
 
         test('should do nothing if historyPointer is -1', () => {
