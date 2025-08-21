@@ -104,4 +104,10 @@ describe('QuizModule - Isolated handleAnswer tests', () => {
         expect(quizModule.history[0].selectedOption).toBe('A2');
         expect(quizModule.history[0].correctAnswer).toBe('A1');
     });
+
+    test('should set isViewingHistory to false when handleAnswer is called', () => {
+        quizModule.isViewingHistory = true; // Set to true to ensure it's reset
+        quizModule.handleAnswer('A1');
+        expect(quizModule.isViewingHistory).toBe(false);
+    });
 });

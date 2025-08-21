@@ -13,6 +13,7 @@ class QuizModule {
         this.appContainer = null;
         this.historyPointer = -1;
         this.scoreFrozen = false;
+        this.isViewingHistory = false; // New flag
     }
 
     init(module) {
@@ -23,14 +24,16 @@ class QuizModule {
         this.moduleData = module;
         this.appContainer = document.getElementById('app-container');
         this.scoreFrozen = false;
+        this.isViewingHistory = false; // Reset on init
 
         if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
             this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
         }
         this.render();
+        this.updateNavigationButtons(); // Update buttons after initial render
     }
 
-    render() {
+    render(historyEntry = null) {
         if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
             console.error("Quiz module data is invalid or empty.");
             this.gameCallbacks.renderMenu();
@@ -63,12 +66,16 @@ class QuizModule {
             document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
         }
 
-        this.appContainer.classList.remove('main-menu-active');
+    this.appContainer.classList.remove('main-menu-active');
         document.getElementById('quiz-question').innerHTML = questionData.sentence.replace('______', '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>');
         
         let optionsToRender = [...questionData.options];
-        if (this.gameCallbacks.randomMode) {
+        // Only shuffle if not viewing history AND not rendering a specific history entry
+        if (this.gameCallbacks.randomMode && !this.isViewingHistory && !historyEntry) {
             optionsToRender = this.gameCallbacks.shuffleArray(optionsToRender);
+        } else if (historyEntry && historyEntry.shuffledOptions) {
+            // If rendering a history entry, use its shuffled options to maintain order
+            optionsToRender = historyEntry.shuffledOptions.map(opt => opt.option);
         }
 
         const optionsContainer = document.getElementById('options-container');
@@ -76,21 +83,50 @@ class QuizModule {
         const optionLetters = ['A', 'B', 'C', 'D'];
         optionsToRender.forEach((option, index) => {
             const button = document.createElement('button');
-            button.className = "w-full text-left bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-5 rounded-lg shadow-md transition duration-300 flex items-center";
+            // Base class for all options
+            let classes = "w-full text-left text-gray-800 font-semibold py-3 px-5 rounded-lg shadow-md transition duration-300 flex items-center";
+            
+            if (historyEntry) {
+                // If rendering a history entry, apply specific styling and disable
+                button.disabled = true;
+                if (option === historyEntry.selectedOption) {
+                    if (historyEntry.isCorrect) {
+                        classes += ' bg-green-500 text-white';
+                    } else {
+                        classes += ' bg-red-500 text-white';
+                    }
+                } else if (option === historyEntry.correctAnswer) {
+                    classes += ' bg-green-500 text-white';
+                } else {
+                    classes += ' bg-white'; // Unselected options in history view are white
+                }
+            } else {
+                // Normal unanswered state
+                classes += ' bg-gray-100 hover:bg-gray-200';
+                button.disabled = false; // Ensure enabled for unanswered questions
+            }
+            button.className = classes;
+
             button.dataset.option = option;
             button.innerHTML = `<span class="font-bold mr-4">${optionLetters[index]}</span><span>${option}</span>`;
             button.addEventListener('click', (e) => this.handleAnswer(e.target.closest('[data-option]').dataset.option));
             optionsContainer.appendChild(button);
         });
 
-        const quizTipElement = document.getElementById('quiz-tip');
+        let quizTipElement = document.getElementById('quiz-tip');
         if (questionData.tip) {
-            if(quizTipElement) {
+            if (quizTipElement) {
                 quizTipElement.textContent = `Tip: ${questionData.tip}`;
                 quizTipElement.classList.remove('hidden');
+            } else {
+                quizTipElement = document.createElement('p');
+                quizTipElement.id = 'quiz-tip';
+                quizTipElement.className = 'text-lg text-gray-500 mb-4';
+                document.getElementById('quiz-question').after(quizTipElement);
+                quizTipElement.textContent = `Tip: ${questionData.tip}`;
             }
         } else {
-            if(quizTipElement) {
+            if (quizTipElement) {
                 quizTipElement.classList.add('hidden');
             }
         }
@@ -100,20 +136,29 @@ class QuizModule {
         document.getElementById('next-btn').textContent = this.MESSAGES.get('nextButton');
         document.getElementById('quiz-summary-back-to-menu-btn').textContent = this.MESSAGES.get('backToMenu');
 
-        document.getElementById('feedback-container').innerHTML = '';
-        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        const feedbackContainer = document.getElementById('feedback-container');
+        if (historyEntry) {
+            feedbackContainer.innerHTML = historyEntry.feedbackHtml;
+            this.gameCallbacks.updateSessionScoreDisplay(historyEntry.sessionScoreBefore.correct, historyEntry.sessionScoreBefore.incorrect, this.moduleData.data.length);
+        } else {
+            feedbackContainer.innerHTML = ''; // Clear feedback for normal unanswered state
+            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        }
+        this.updateNavigationButtons(); // Update buttons after render
     }
 
     handleAnswer(selectedOption) {
         const questionData = this.moduleData.data[this.currentIndex];
         const isCorrect = selectedOption === questionData.correct;
-        const feedbackHtml = document.getElementById('feedback-container').innerHTML;
+        const feedbackHtml = `<p class="text-lg">${questionData.explanation}</p>`; // Capture feedback HTML here
         const optionsContainer = document.getElementById('options-container');
         const currentOptions = Array.from(optionsContainer.children).map(button => ({
             option: button.dataset.option,
             className: button.className,
             disabled: button.disabled
         }));
+
+        this.isViewingHistory = false; // No longer viewing history when a new answer is given
 
         if (this.historyPointer < this.history.length - 1) {
             this.history.splice(this.historyPointer + 1);
@@ -144,16 +189,21 @@ class QuizModule {
         const selectedOptionElement = document.querySelector(`[data-option="${selectedOption}"]`);
         const correctOptionElement = document.querySelector(`[data-option="${questionData.correct}"]`);
 
-        document.querySelectorAll('[data-option]').forEach(b => {
-            b.disabled = true;
-            b.classList.remove('hover:bg-gray-200');
-            b.classList.add('bg-white');
-        });
+                        document.querySelectorAll('[data-option]').forEach(b => {
+                    b.disabled = true;
+                    // Remove all background-related classes before adding new ones
+                    b.classList.remove('bg-gray-100', 'hover:bg-gray-200', 'bg-white', 'bg-green-500', 'bg-red-500');
+                });
 
         if (isCorrect) {
             if (selectedOptionElement) {
                 selectedOptionElement.classList.add('bg-green-500', 'text-white');
             }
+            document.querySelectorAll('[data-option]').forEach(b => {
+                if (b !== correctOptionElement) {
+                    b.classList.add('bg-white');
+                }
+            });
         } else {
             if (selectedOptionElement) {
                 selectedOptionElement.classList.add('bg-red-500', 'text-white');
@@ -165,55 +215,168 @@ class QuizModule {
         }
         
 
-        document.getElementById('feedback-container').innerHTML = `<p class="text-lg">${questionData.explanation}</p>`;
+        document.getElementById('feedback-container').innerHTML = feedbackHtml;
         
         if (!this.scoreFrozen) { 
             this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         }
+        this.updateNavigationButtons(); // Update buttons after handling answer
     }
 
     prev() {
-        if (this.currentIndex > 0) {
+        if (this.isViewingHistory) {
+            if (this.historyPointer > 0) {
+                this.historyPointer--;
+                this.renderHistoryState();
+            } else {
+                // If we are at the beginning of history, go to the actual previous question
+                this.isViewingHistory = false;
+                this.scoreFrozen = false;
+                if (this.currentIndex > 0) {
+                    this.currentIndex--;
+                    this.render();
+                }
+            }
+        } else {
             const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
             if (optionsDisabled) {
-                this.undo();
-            } else {
-                this.scoreFrozen = false; 
+                // If current question is answered, and we are not viewing history,
+                // start viewing history from the current question's history entry
+                const currentQuestionHistoryEntry = this.history.find(entry => entry.index === this.currentIndex);
+                if (currentQuestionHistoryEntry) {
+                    this.historyPointer = this.history.indexOf(currentQuestionHistoryEntry);
+                    this.isViewingHistory = true;
+                    this.renderHistoryState();
+                } else if (this.currentIndex > 0) { // If no history for current, just go back to previous question
+                    this.currentIndex--;
+                    this.render();
+                }
+            } else if (this.currentIndex > 0) {
+                this.scoreFrozen = false;
                 this.currentIndex--;
                 this.render();
             }
         }
+        this.updateNavigationButtons(); // Update buttons after prev
     }
 
     next() {
-        const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
-        if (!optionsDisabled && this.moduleData.data[this.currentIndex].options) { 
-            return;
-        }
-
-        if (this.currentIndex < this.moduleData.data.length - 1) {
-            this.scoreFrozen = false; 
-            this.currentIndex++;
-            this.render();
+        if (this.isViewingHistory) {
+            if (this.historyPointer < this.history.length - 1) {
+                this.historyPointer++;
+                this.renderHistoryState();
+            } else {
+                // If we are at the end of history, go to the next actual question
+                this.isViewingHistory = false;
+                this.scoreFrozen = false;
+                if (this.currentIndex < this.moduleData.data.length - 1) {
+                    this.currentIndex++;
+                    this.render();
+                } else {
+                    this.showFinalScore();
+                }
+            }
         } else {
-            this.showFinalScore();
+            const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
+            if (!optionsDisabled && this.moduleData.data[this.currentIndex].options) { 
+                return; // Current question not answered yet
+            }
+
+            if (this.currentIndex < this.moduleData.data.length - 1) {
+                this.scoreFrozen = false; 
+                this.currentIndex++;
+                this.render();
+            } else {
+                this.showFinalScore();
+            }
         }
+        this.updateNavigationButtons(); // Update buttons after next
     }
 
     undo() {
+        if (this.isViewingHistory) {
+            // If viewing history, undo button should be disabled or have different behavior
+            // For now, let's just return if in history viewing mode
+            return;
+        }
+
         if (this.historyPointer >= 0) {
             const lastAction = this.history[this.historyPointer];
-            this.historyPointer--;
-            this.scoreFrozen = true;
+            this.history.pop(); // Remove the last action
+            this.historyPointer--; // Move pointer back
 
-            const optionsContainer = document.getElementById('options-container');
-            const feedbackContainer = document.getElementById('feedback-container');
+            this.scoreFrozen = false; // Allow score to be updated again after undo
 
+            // Revert score
             this.sessionScore = { ...lastAction.sessionScoreBefore };
+
+            // Re-render the question that was just undone
             this.currentIndex = lastAction.index;
-            this.render();
+            this.render(); // Render the question in its initial state (unanswered)
+
+            // Re-enable options and remove styling
+            document.querySelectorAll('[data-option]').forEach(button => {
+                button.disabled = false;
+                button.classList.remove('bg-green-500', 'text-white', 'bg-red-500', 'bg-white');
+                button.classList.add('bg-gray-100', 'hover:bg-gray-200');
+            });
+
+            document.getElementById('feedback-container').innerHTML = ''; // Clear feedback
+
             this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         }
+        this.updateNavigationButtons(); // Update buttons after undo
+    }
+
+    renderHistoryState() {
+        if (this.historyPointer < 0 || this.historyPointer >= this.history.length) {
+            console.error("Invalid history pointer for rendering history state.");
+            this.isViewingHistory = false;
+            this.render(); // Fallback to normal render
+            return;
+        }
+
+        const historyEntry = this.history[this.historyPointer];
+        this.currentIndex = historyEntry.index;
+        this.scoreFrozen = true; // Always freeze score when viewing history
+        this.isViewingHistory = true; // Ensure flag is set
+
+        // 1. Render the question in its default, unanswered state
+        this.render(); // This will create fresh buttons with default styling
+
+        // 2. Now, apply the historical selections and feedback
+        const optionsContainer = document.getElementById('options-container');
+        const allOptionButtons = optionsContainer.querySelectorAll('[data-option]');
+
+        // First, disable all and set to default background (bg-white)
+        allOptionButtons.forEach(b => {
+            b.disabled = true;
+            b.classList.remove('hover:bg-gray-200', 'bg-gray-100'); // Remove default background and hover
+            b.classList.add('bg-white'); // Set to white background
+        });
+
+        // Then, apply correct/incorrect styling
+        const reSelectedOptionElement = document.querySelector(`[data-option="${historyEntry.selectedOption}"]`);
+        const reCorrectOptionElement = document.querySelector(`[data-option="${historyEntry.correctAnswer}"]`);
+
+        if (reSelectedOptionElement) {
+            if (historyEntry.isCorrect) {
+                reSelectedOptionElement.classList.add('bg-green-500', 'text-white');
+            } else {
+                reSelectedOptionElement.classList.add('bg-red-500', 'text-white');
+            }
+        }
+
+        if (reCorrectOptionElement) {
+            reCorrectOptionElement.classList.add('bg-green-500', 'text-white');
+        }
+
+        document.getElementById('feedback-container').innerHTML = historyEntry.feedbackHtml;
+
+        // Update score display to reflect the score at the time of this history entry
+        this.gameCallbacks.updateSessionScoreDisplay(historyEntry.sessionScoreBefore.correct, historyEntry.sessionScoreBefore.incorrect, this.moduleData.data.length);
+
+        this.updateNavigationButtons(); // Update buttons after rendering history state
     }
 
     showFinalScore() {
@@ -241,18 +404,18 @@ class QuizModule {
     updateText() {
         const questionData = this.moduleData.data[this.currentIndex];
         document.getElementById('quiz-question').innerHTML = questionData.sentence.replace('______', '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>');
-        const quizTipElement = document.getElementById('quiz-tip');
+        let quizTipElement = document.getElementById('quiz-tip'); // Use let
         if (questionData.tip) {
             if (quizTipElement) {
                 quizTipElement.textContent = `Tip: ${questionData.tip}`;
                 quizTipElement.classList.remove('hidden');
             } else {
-                const feedbackContainer = document.getElementById('feedback-container');
-                const newTipElement = document.createElement('p');
-                newTipElement.id = 'quiz-tip';
-                newTipElement.className = 'text-lg text-gray-500 mb-4';
-                newTipElement.textContent = `Tip: ${questionData.tip}`;
-                feedbackContainer.parentNode.insertBefore(newTipElement, feedbackContainer);
+                // Create the tip element if it doesn't exist
+                quizTipElement = document.createElement('p'); // Assign to quizTipElement
+                quizTipElement.id = 'quiz-tip';
+                quizTipElement.className = 'text-lg text-gray-500 mb-4';
+                document.getElementById('quiz-question').after(quizTipElement); // Insert after question
+                quizTipElement.textContent = `Tip: ${questionData.tip}`;
             }
         } else {
             if (quizTipElement) {
@@ -280,14 +443,42 @@ class QuizModule {
         document.getElementById('quiz-summary-back-to-menu-btn').textContent = this.MESSAGES.get('backToMenu');
 
         const feedbackContainer = document.getElementById('feedback-container');
-        const isCorrect = this.history.length > 0 ? this.history[this.history.length - 1].isCorrect : null;
-        if (isCorrect !== null) {
+        // Only update feedback if not in history viewing mode, or if it's the current history entry's feedback
+        if (!this.isViewingHistory && this.history.length > 0 && this.historyPointer === this.history.length - 1) {
             const lastQuestionData = this.moduleData.data[this.history[this.history.length - 1].index];
-            if (isCorrect) {
-                feedbackContainer.innerHTML = `<p class="text-lg">${lastQuestionData.explanation}</p>`;
-            } else {
-                feedbackContainer.innerHTML = `<p class="text-lg">${lastQuestionData.explanation}</p>`;
-            }
+            feedbackContainer.innerHTML = `<p class="text-lg">${lastQuestionData.explanation}</p>`;
+        } else if (this.isViewingHistory && this.historyPointer >= 0) {
+            feedbackContainer.innerHTML = this.history[this.historyPointer].feedbackHtml;
+        } else {
+            feedbackContainer.innerHTML = ''; // Clear feedback if no relevant history or not viewing history
+        }
+    }
+
+    updateNavigationButtons() {
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const undoBtn = document.getElementById('undo-btn');
+
+        if (!prevBtn || !nextBtn || !undoBtn) {
+            // Buttons might not be rendered yet
+            return;
+        }
+
+        if (this.isViewingHistory) {
+            // In history viewing mode
+            prevBtn.disabled = this.historyPointer <= 0;
+            nextBtn.disabled = this.historyPointer >= this.history.length - 1;
+            undoBtn.disabled = true; // Undo is blocked in history view
+        } else {
+            // Normal quiz mode
+            const currentQuestionAnswered = document.querySelectorAll('[data-option][disabled]').length > 0;
+
+            prevBtn.disabled = this.currentIndex === 0 && !currentQuestionAnswered; // Disabled if at Q0 and not answered
+            nextBtn.disabled = !currentQuestionAnswered; // Disabled if not answered
+
+            // Undo is disabled if no history, or if the current question is not the one that was last answered
+            const lastAction = this.history[this.historyPointer];
+            undoBtn.disabled = this.history.length === 0 || this.historyPointer < 0 || (lastAction && lastAction.index !== this.currentIndex);
         }
     }
 }
