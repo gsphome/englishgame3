@@ -29,7 +29,7 @@ describe('getGameModeIconSvg', () => {
     });
 
     test('should return correct SVG for quiz', () => {
-        expect(getGameModeIconSvg('quiz')).toContain('<path fill-rule="evenodd" d="M18.685 19.02a1.75 1.75 0 0 0 1.75-1.75V4.75a1.75 1.75 0 0 0-1.75-1.75H5.315a1.75 1.75 0 0 0-1.75 1.75v12.52a1.75 1.75 0 0 0 1.75 1.75h13.37ZM12 10.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3a.75.75 0 0 1 .75-.75ZM12 7a.75.75 0 0 0-.75.75v.008a.75.75 0 0 0 1.5 0V7.75A.75.75 0 0 0 12 7Z" clip-rule="evenodd" />');
+        expect(getGameModeIconSvg('quiz')).toContain('<path d="M10.5 19.5h3V18h-3v1.5zm.75-11.25c0-1.036.84-1.875 1.875-1.875s1.875.84 1.875 1.875c0 .72-.387 1.39-.999 1.758-.482.29-.751.62-.751 1.017V15h-1.5v-3.75c0-.828.465-1.52 1.172-1.957.603-.373.928-.847.928-1.418z" />');
     });
 
     test('should return correct SVG for completion', () => {
