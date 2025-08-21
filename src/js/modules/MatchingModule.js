@@ -32,7 +32,7 @@ class MatchingModule {
         if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
             this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
         }
-        this.moduleData.data = this.moduleData.data.slice(0, 5);
+        this.moduleData.data = this.moduleData.data.slice(0, 3);
         this.render();
     }
 
@@ -127,12 +127,12 @@ class MatchingModule {
             if (termElement) {
                 termElement.classList.remove('matched', 'bg-green-200', 'cursor-default');
                 termElement.classList.add('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
-                termElement.addEventListener('click', this.handleItemClick);
+                termElement.addEventListener('click', (e) => this.handleItemClick(e.target));
             }
             if (defElement) {
                 defElement.classList.remove('matched', 'bg-green-200', 'cursor-default');
                 defElement.classList.add('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
-                defElement.addEventListener('click', this.handleItemClick);
+                defElement.addEventListener('click', (e) => this.handleItemClick(e.target));
             }
             this.sessionScore.correct--;
             this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
@@ -151,6 +151,15 @@ class MatchingModule {
             element.addEventListener('click', (e) => this.handleItemClick(e.target));
         });
         this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+    }
+
+    checkAnswers() {
+        if (this.matchedPairs.length === this.moduleData.data.length) {
+            this.gameCallbacks.showMatchingSummary();
+        } else {
+            // Optionally, provide feedback to the user that not all pairs are matched yet.
+            // For now, it will just do nothing if not all pairs are matched.
+        }
     }
 
     render() {
@@ -201,7 +210,7 @@ class MatchingModule {
             termElem.textContent = item.text;
             termElem.dataset.id = item.id;
             termElem.dataset.type = item.type;
-            termElem.addEventListener('click', this.handleItemClick);
+            termElem.addEventListener('click', (e) => this.handleItemClick(e.target));
             termsColumn.appendChild(termElem);
         });
 
@@ -212,7 +221,7 @@ class MatchingModule {
             defElem.textContent = item.text;
             defElem.dataset.id = item.id;
             defElem.dataset.type = item.type;
-            defElem.addEventListener('click', this.handleItemClick);
+            defElem.addEventListener('click', (e) => this.handleItemClick(e.target));
             definitionsColumn.appendChild(defElem);
         });
 

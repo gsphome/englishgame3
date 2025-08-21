@@ -763,8 +763,8 @@ export const game = {
         matchedPairsGrid.innerHTML = ''; // Clear previous pairs
 
         // Display matched pairs
-        game.matching.matchedPairs.forEach(pair => {
-            const termData = game.matching.moduleData.data.find(item => item.id === pair.termId);
+        game.matchingModule.matchedPairs.forEach(pair => {
+            const termData = game.matchingModule.moduleData.data.find(item => item.id === pair.termId);
             if (termData) {
                 const termSpan = document.createElement('span');
                 termSpan.className = 'font-semibold';
