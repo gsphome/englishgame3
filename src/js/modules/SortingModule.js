@@ -100,6 +100,14 @@ class SortingModule {
         this.words = this.gameCallbacks.shuffleArray(selectedWords); // Final shuffle of the words to be displayed
         this.renderInitialView();
         this.render(); // Call the new render method after initial view is set up
+
+        this.userAnswers = {};
+        this.originalWordPositions = {};
+        this.sessionScore = { correct: 0, incorrect: 0 };
+        this.history = [];
+        this.feedbackActive = false;
+        this.wordFeedbackStatus = {}; // Initialize word feedback status
+        this.clearFeedback(); // Clear any previous feedback colors
     }
 
     renderInitialView() {
