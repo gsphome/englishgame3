@@ -74,7 +74,7 @@ class QuizModule {
                             <button id="next-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-r md:py-2 md:px-4">${this.MESSAGES.get('nextButton')}</button>
                         </div>
                     </div>
-                                         <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4" onclick="this.gameCallbacks.renderMenu()">${this.MESSAGES.get('backToMenu')}</button>
+                                         <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
                 </div>
             `;
 
@@ -108,7 +108,7 @@ class QuizModule {
         document.getElementById('undo-btn').textContent = this.MESSAGES.get('undoButton');
         document.getElementById('prev-btn').textContent = this.MESSAGES.get('prevButton');
         document.getElementById('next-btn').textContent = this.MESSAGES.get('nextButton');
-        document.getElementById('back-to-menu-quiz-btn').textContent = this.MESSAGES.get('backToMenu');
+        document.getElementById('quiz-summary-back-to-menu-btn').textContent = this.MESSAGES.get('backToMenu');
 
         // Update options
         const optionsContainer = document.getElementById('options-container');

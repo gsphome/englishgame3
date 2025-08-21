@@ -1,4 +1,4 @@
-import {
+const {
     shuffleArray,
     getGameModeIconSvg,
     getGameModeTitle,
@@ -237,62 +237,10 @@ import {
     getElementOwnerDocument,
     getElementBaseURI,
     getElementNodeName,
-    getElementNodeType,
-    getElementNodeValue,
-    getElementTextContentByDataAttribute,
-    setElementTextContentByDataAttribute,
-    getElementHtmlContentByDataAttribute,
-    setElementHtmlContentByDataAttribute,
-    getElementValueByDataAttribute,
-    setElementValueByDataAttribute,
-    clearElementValueByDataAttribute,
-    getElementCheckedByDataAttribute,
-    setElementCheckedByDataAttribute,
-    toggleElementCheckedByDataAttribute,
-    getElementSelectedByDataAttribute,
-    setElementSelectedByDataAttribute,
-    getElementDisabledByDataAttribute,
-    setElementDisabledByDataAttribute,
-    getElementReadOnlyByDataAttribute,
-    setElementReadOnlyByDataAttribute,
-    getElementPlaceholderByDataAttribute,
-    setElementPlaceholderByDataAttribute,
-    getElementSrcByDataAttribute,
-    setElementSrcByDataAttribute,
-    getElementHrefByDataAttribute,
-    setElementHrefByDataAttribute,
-    getElementTitleByDataAttribute,
-    setElementTitleByDataAttribute,
-    getElementAltByDataAttribute,
-    setElementAltByDataAttribute,
-    getElementWidthByDataAttribute,
-    setElementWidthByDataAttribute,
-    getElementHeightByDataAttribute,
-    setElementHeightByDataAttribute,
-    getElementTabIndexByDataAttribute,
-    setElementTabIndexByDataAttribute,
-    getElementIdByDataAttribute,
-    setElementIdByDataAttribute,
-    getElementClassNameByDataAttribute,
-    setElementClassNameByDataAttribute,
-    getElementClientWidthByDataAttribute,
-    getElementClientHeightByDataAttribute,
-    getElementOffsetWidthByDataAttribute,
-    getElementOffsetHeightByDataAttribute,
-    getElementScrollWidthByDataAttribute,
-    getElementScrollHeightByDataAttribute,
-    getElementScrollLeftByDataAttribute,
-    setElementScrollLeftByDataAttribute,
-    getElementScrollTopByDataAttribute,
-    setElementScrollTopByDataAttribute,
-    getElementOffsetLeftByDataAttribute,
-    getElementOffsetTopByDataAttribute,
-    getElementClientLeftByDataAttribute,
-    getElementClientTopByDataAttribute,
-    getElementOwnerDocumentByDataAttribute,
-    getElementBaseURIByDataAttribute,
     getElementNodeNameByDataAttribute,
+    getElementNodeType,
     getElementNodeTypeByDataAttribute,
+    getElementNodeValue,
     getElementNodeValueByDataAttribute,
     getLocalStorageItem,
     setLocalStorageItem,
@@ -350,7 +298,7 @@ import {
     removeCustomEventListener,
     getStyleProperty,
     setStyleProperty,
-} from '../utils';
+} = require('../utils');
 
 // Mock DOM elements for testing
 document.body.innerHTML = `
@@ -455,26 +403,6 @@ Object.defineProperty(navigator, 'onLine', { writable: true, value: true });
 Object.defineProperty(navigator, 'language', { writable: true, value: 'en-US' });
 Object.defineProperty(navigator, 'devicePixelRatio', { writable: true, value: 2 });
 
-// Corrected window.location mocking
-const mockLocation = {
-    search: '',
-    pathname: '/test',
-    href: '',
-    replaceState: jest.fn(),
-    reload: jest.fn(),
-};
-
-Object.defineProperty(window, 'location', {
-    writable: true,
-    value: mockLocation,
-});
-
-Object.defineProperty(window, 'history', {
-    writable: true,
-    value: {
-        replaceState: jest.fn(), // This will be spied on later
-    }
-});
 Object.defineProperty(document, 'cookie', {
     writable: true,
     value: ''
@@ -707,7 +635,9 @@ describe('DOM Manipulation Functions', () => {
         });
 
         afterEach(() => {
-            document.body.removeChild(buttonElement);
+            if (document.body.contains(buttonElement)) {
+                document.body.removeChild(buttonElement);
+            }
         });
 
         test('should disable the element and add styling classes', () => {
@@ -733,7 +663,9 @@ describe('DOM Manipulation Functions', () => {
         });
 
         afterEach(() => {
-            document.body.removeChild(buttonElement);
+            if (document.body.contains(buttonElement)) {
+                document.body.removeChild(buttonElement);
+            }
         });
 
         test('should enable the element and remove styling classes', () => {
@@ -960,7 +892,9 @@ describe('DOM Manipulation Functions', () => {
         });
 
         afterEach(() => {
-            document.body.removeChild(tempDiv);
+            if (document.body.contains(tempDiv)) {
+                document.body.removeChild(tempDiv);
+            }
         });
 
         test('should remove an element from the DOM', () => {
@@ -1056,7 +990,9 @@ describe('DOM Manipulation Functions', () => {
         });
 
         afterEach(() => {
-            document.body.removeChild(input);
+            if (document.body.contains(input)) {
+                document.body.removeChild(input);
+            }
         });
 
         test('should set focus on the element', () => {
@@ -1121,7 +1057,9 @@ describe('DOM Manipulation Functions', () => {
         });
 
         afterEach(() => {
-            document.body.removeChild(elementToAnimate);
+            if (document.body.contains(elementToAnformed)) {
+                document.body.removeChild(elementToAnimate);
+            }
         });
 
         test('should call animate on the element', () => {
@@ -1154,7 +1092,9 @@ describe('DOM Manipulation Functions', () => {
         });
 
         afterEach(() => {
-            document.body.removeChild(elementInView);
+            if (document.body.contains(elementInView)) {
+                document.body.removeChild(elementInView);
+            }
         });
 
         test('should return true if element is in viewport', () => {
@@ -1183,7 +1123,9 @@ describe('DOM Manipulation Functions', () => {
         });
 
         afterEach(() => {
-            document.body.removeChild(elementToScroll);
+            if (document.body.contains(elementToScroll)) {
+                document.body.removeChild(elementToScroll);
+            }
         });
 
         test('should call scrollIntoView on the element', () => {
@@ -1367,8 +1309,19 @@ describe('DOM Manipulation Functions', () => {
     });
 
     describe('getQueryParams', () => {
+        let locationSearchSpy;
+
+        beforeEach(() => {
+            locationSearchSpy = jest.spyOn(window.location, 'search', 'get');
+            locationSearchSpy.mockReturnValue('');
+        });
+
+        afterEach(() => {
+            locationSearchSpy.mockRestore();
+        });
+
         test('should parse query parameters from the URL', () => {
-            window.location.search = '?param1=value1&param2=value2&param3';
+            locationSearchSpy.mockReturnValue('?param1=value1&param2=value2&param3');
             expect(getQueryParams()).toEqual({ param1: 'value1', param2: 'value2', param3: '' });
         });
 
@@ -1384,33 +1337,65 @@ describe('DOM Manipulation Functions', () => {
     });
 
     describe('setQueryParams', () => {
+        let replaceStateSpy;
+        let locationPathnameSpy;
+
+        beforeEach(() => {
+            replaceStateSpy = jest.spyOn(window.history, 'replaceState');
+            locationPathnameSpy = jest.spyOn(window.location, 'pathname', 'get');
+            locationPathnameSpy.mockReturnValue('/test');
+        });
+
+        afterEach(() => {
+            replaceStateSpy.mockRestore();
+            locationPathnameSpy.mockRestore();
+        });
+
         test('should set query parameters in the URL', () => {
             setQueryParams({ a: '1', b: '2' });
-            expect(window.history.replaceState).toHaveBeenCalledWith({}, '', '/test?a=1&b=2');
+            expect(replaceStateSpy).toHaveBeenCalledWith({}, '', '/test?a=1&b=2');
         });
 
         test('should handle empty parameters', () => {
             setQueryParams({});
-            expect(window.history.replaceState).toHaveBeenCalledWith({}, '', '/test?');
+            expect(replaceStateSpy).toHaveBeenCalledWith({}, '', '/test?');
         });
 
         test('should encode special characters', () => {
             setQueryParams({ name: 'John Doe', city: 'New York' });
-            expect(window.history.replaceState).toHaveBeenCalledWith({}, '', '/test?name=John%20Doe&city=New%20York');
+            expect(replaceStateSpy).toHaveBeenCalledWith({}, '', '/test?name=John%20Doe&city=New%20York');
         });
     });
 
     describe('removeQueryParams', () => {
+        let replaceStateSpy;
+        let locationSearchSpy;
+        let locationPathnameSpy;
+
+        beforeEach(() => {
+            replaceStateSpy = jest.spyOn(window.history, 'replaceState');
+            locationSearchSpy = jest.spyOn(window.location, 'search', 'get');
+            locationPathnameSpy = jest.spyOn(window.location, 'pathname', 'get');
+            locationSearchSpy.mockReturnValue('');
+            locationPathnameSpy.mockReturnValue('/test');
+        });
+
+        afterEach(() => {
+            replaceStateSpy.mockRestore();
+            locationSearchSpy.mockRestore();
+            locationPathnameSpy.mockRestore();
+        });
+
         test('should remove specified query parameters from the URL', () => {
-            window.location.search = '?param1=value1&param2=value2&param3=value3';
+            locationSearchSpy.mockReturnValue('?param1=value1&param2=value2&param3=value3');
             removeQueryParams(['param1', 'param3']);
-            expect(window.history.replaceState).toHaveBeenCalledWith({}, '', '/test?param2=value2');
+            expect(replaceStateSpy).toHaveBeenCalledWith({}, '', '/test?param2=value2');
         });
 
         test('should do nothing if keys are not present', () => {
             window.location.search = '?param1=value1';
             removeQueryParams(['nonExistent']);
-            expect(window.history.replaceState).toHaveBeenCalledWith({}, '', '/test?param1=value1');
+            expect(replaceStateSpy).toHaveBeenCalledWith({}, '', '/test?param1=value1');
         });
     });
 
@@ -1566,7 +1551,9 @@ describe('DOM Manipulation Functions', () => {
         });
 
         afterEach(() => {
-            document.body.removeChild(mockElement);
+            if (document.body.contains(mockElement)) {
+                document.body.removeChild(mockElement);
+            }
         });
 
         test('should return element coordinates relative to the document', () => {
@@ -1612,7 +1599,9 @@ describe('DOM Manipulation Functions', () => {
         });
 
         afterEach(() => {
-            document.body.removeChild(elementToAnimate);
+            if (document.body.contains(elementToAnimate)) {
+                document.body.removeChild(elementToAnimate);
+            }
         });
 
         test('should add and remove animation classes and call callback', () => {
@@ -1647,7 +1636,9 @@ describe('DOM Manipulation Functions', () => {
         });
 
         afterEach(() => {
-            document.body.removeChild(element);
+            if (document.body.contains(element)) {
+                document.body.removeChild(element);
+            }
         });
 
         test('should return true if element is hidden (offsetParent is null)', () => {
@@ -2317,7 +2308,9 @@ describe('DOM Manipulation Functions', () => {
             document.body.appendChild(input);
         });
         afterEach(() => {
-            document.body.removeChild(input);
+            if (document.body.contains(input)) {
+                document.body.removeChild(input);
+            }
         });
         test('should get input value by data attribute', () => {
             expect(getInputValueByDataAttribute('input', 'my-input')).toBe('data-input-value');
@@ -2332,7 +2325,9 @@ describe('DOM Manipulation Functions', () => {
             document.body.appendChild(input);
         });
         afterEach(() => {
-            document.body.removeChild(input);
+            if (document.body.contains(input)) {
+                document.body.removeChild(input);
+            }
         });
         test('should set input value by data attribute', () => {
             setInputValueByDataAttribute('input', 'my-input', 'new-data-value');
@@ -2349,7 +2344,9 @@ describe('DOM Manipulation Functions', () => {
             document.body.appendChild(input);
         });
         afterEach(() => {
-            document.body.removeChild(input);
+            if (document.body.contains(input)) {
+                document.body.removeChild(input);
+            }
         });
         test('should clear input value by data attribute', () => {
             clearInputValueByDataAttribute('input', 'my-input');
@@ -2492,7 +2489,9 @@ describe('DOM Manipulation Functions', () => {
             elementToAnimate.animate = jest.fn(() => ({}));
         });
         afterEach(() => {
-            document.body.removeChild(elementToAnimate);
+            if (document.body.contains(elementToAnimate)) {
+                document.body.removeChild(elementToAnimate);
+            }
         });
         test('should animate element by data attribute', () => {
             animateElementByDataAttribute('animate', 'true', [], {});
@@ -2508,7 +2507,9 @@ describe('DOM Manipulation Functions', () => {
             document.body.appendChild(elementToAnimate);
         });
         afterEach(() => {
-            document.body.removeChild(elementToAnimate);
+            if (document.body.contains(elementToAnimate)) {
+                document.body.removeChild(elementToAnimate);
+            }
         });
         test('should animate css by data attribute', () => {
             const callback = jest.fn();
@@ -4220,6 +4221,81 @@ describe('DOM Manipulation Functions', () => {
             document.body.appendChild(el);
             expect(getElementNodeValueByDataAttribute('node-value-prop', 'true')).toBeNull();
             document.body.removeChild(el);
+        });
+    });
+
+    describe('reloadPage', () => {
+        let reloadSpy;
+        let originalReload;
+
+        beforeEach(() => {
+            originalReload = window.location.reload;
+            Object.defineProperty(window.location, 'reload', {
+                configurable: true,
+                writable: true,
+                value: jest.fn(),
+            });
+            reloadSpy = window.location.reload; // Get the newly defined mock function
+        });
+
+        afterEach(() => {
+            Object.defineProperty(window.location, 'reload', {
+                configurable: true,
+                writable: true,
+                value: originalReload, // Restore original
+            });
+        });
+
+        test('should call window.location.reload', () => {
+            reloadPage();
+            expect(reloadSpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('navigateTo', () => {
+        let assignSpy;
+        let originalAssign;
+
+        beforeEach(() => {
+            originalAssign = window.location.assign;
+            Object.defineProperty(window.location, 'assign', {
+                configurable: true,
+                writable: true,
+                value: jest.fn(),
+            });
+            assignSpy = window.location.assign; // Get the newly defined mock function
+        });
+
+        afterEach(() => {
+            Object.defineProperty(window.location, 'assign', {
+                configurable: true,
+                writable: true,
+                value: originalAssign, // Restore original
+            });
+        });
+
+        test('should navigate to the specified URL', () => {
+            const url = 'http://example.com/new-page';
+            navigateTo(url);
+            expect(assignSpy).toHaveBeenCalledWith(url);
+        });
+    });
+
+    describe('openInNewTab', () => {
+        let windowOpenSpy;
+
+        beforeEach(() => {
+            windowOpenSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
+        });
+
+        afterEach(() => {
+            windowOpenSpy.mockRestore();
+        });
+
+        test('should open the specified URL in a new tab', () => {
+            const url = 'http://example.com/new-tab';
+            openInNewTab(url);
+            expect(windowOpenSpy).toHaveBeenCalledWith(url, '_blank');
         });
     });
 });
