@@ -198,56 +198,363 @@ describe('QuizModule', () => {
         });
     });
 
-    describe('handleAnswer', () => {
+    
+
+    describe('prev', () => {
         const mockModuleData = {
             data: [
-                { sentence: "Question 1 ______", options: ["A1", "A2"], correct: "A1", explanation: "Exp1" },
-                { sentence: "Question 2 ______", options: ["B1", "B2"], correct: "B1", explanation: "Exp2" },
+                { sentence: "Q1", options: ["A", "B"], correct: "A", explanation: "Exp1" },
+                { sentence: "Q2", options: ["C", "D"], correct: "C", explanation: "Exp2" },
             ],
         };
 
-        let optionA1, optionA2;
+        beforeEach(() => {
+            quizModule.init(mockModuleData);
+            quizModule.currentIndex = 1; // Start at the second question
+            quizModule.render(); // Render the second question
+        });
+
+        test('should decrement currentIndex and re-render if not at the beginning and options are not disabled', () => {
+            const renderSpy = jest.spyOn(quizModule, 'render');
+            quizModule.prev();
+            expect(quizModule.currentIndex).toBe(0);
+            expect(renderSpy).toHaveBeenCalled();
+            expect(quizModule.scoreFrozen).toBe(false);
+            renderSpy.mockRestore();
+        });
+
+        test('should call undo if options are disabled', () => {
+            const undoSpy = jest.spyOn(quizModule, 'undo');
+            // Simulate options being disabled (e.g., after answering)
+            document.querySelectorAll('[data-option]').forEach(b => b.disabled = true);
+            quizModule.prev();
+            expect(undoSpy).toHaveBeenCalled();
+            expect(quizModule.currentIndex).toBe(1); // Should not change current index
+            undoSpy.mockRestore();
+        });
+
+        test('should do nothing if at the beginning of the quiz', () => {
+            const renderSpy = jest.spyOn(quizModule, 'render');
+            quizModule.currentIndex = 0; // Set to first question
+            quizModule.prev();
+            expect(quizModule.currentIndex).toBe(0);
+            expect(renderSpy).not.toHaveBeenCalled();
+            renderSpy.mockRestore();
+        });
+    });
+
+    describe('next', () => {
+        const mockModuleData = {
+            data: [
+                { sentence: "Q1", options: ["A", "B"], correct: "A", explanation: "Exp1" },
+                { sentence: "Q2", options: ["C", "D"], correct: "C", explanation: "Exp2" },
+            ],
+        };
 
         beforeEach(() => {
-            quizModule = new QuizModule(mockAuth, mockMessages, mockGameCallbacks);
-            appContainer.innerHTML = '';
-            jest.clearAllMocks();
+            quizModule.init(mockModuleData);
+            quizModule.render();
+        });
+
+        test('should increment currentIndex and re-render if not at the end and options are disabled', () => {
+            const renderSpy = jest.spyOn(quizModule, 'render');
+            // Simulate options being disabled (answered)
+            document.querySelectorAll('[data-option]').forEach(b => b.disabled = true);
+            quizModule.next();
+            expect(quizModule.currentIndex).toBe(1);
+            expect(renderSpy).toHaveBeenCalled();
+            expect(quizModule.scoreFrozen).toBe(false);
+            renderSpy.mockRestore();
+        });
+
+        test('should call showFinalScore if at the end and options are disabled', () => {
+            const showFinalScoreSpy = jest.spyOn(quizModule, 'showFinalScore');
+            quizModule.currentIndex = mockModuleData.data.length - 1; // Last question
+            // Simulate options being disabled (answered)
+            document.querySelectorAll('[data-option]').forEach(b => b.disabled = true);
+            quizModule.next();
+            expect(showFinalScoreSpy).toHaveBeenCalled();
+            showFinalScoreSpy.mockRestore();
+        });
+
+        test('should do nothing if options are not disabled', () => {
+            const renderSpy = jest.spyOn(quizModule, 'render');
+            const showFinalScoreSpy = jest.spyOn(quizModule, 'showFinalScore');
+            // Options are not disabled by default after render
+            quizModule.next();
+            expect(quizModule.currentIndex).toBe(0);
+            expect(renderSpy).not.toHaveBeenCalled();
+            expect(showFinalScoreSpy).not.toHaveBeenCalled();
+            renderSpy.mockRestore();
+            showFinalScoreSpy.mockRestore();
+        });
+    });
+
+    describe('undo', () => {
+        const mockModuleData = {
+            data: [
+                { sentence: "Q1", options: ["A", "B"], correct: "A", explanation: "Exp1" },
+            ],
+        };
+
+        beforeEach(() => {
+            quizModule.init(mockModuleData);
+            quizModule.render();
+            quizModule.handleAnswer('A'); // Answer correctly to create history
+        });
+
+        test('should revert UI and session score if historyPointer is valid', () => {
+            const initialCorrect = quizModule.sessionScore.correct;
+            const initialIncorrect = quizModule.sessionScore.incorrect;
+
+            quizModule.undo();
+
+            expect(quizModule.historyPointer).toBe(-1);
+            expect(quizModule.scoreFrozen).toBe(true);
+            expect(document.getElementById('feedback-container')).toBeEmptyDOMElement();
+            
+            // Check if options are re-enabled and styles removed
+            document.querySelectorAll('[data-option]').forEach(button => {
+                expect(button).not.toBeDisabled();
+                expect(button).not.toHaveClass('bg-green-500', 'text-white', 'bg-red-500');
+                expect(button).toHaveClass('bg-gray-100', 'hover:bg-gray-200');
+            });
+            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 0, mockModuleData.data.length);
+        });
+
+        test('should do nothing if historyPointer is -1', () => {
+            quizModule.historyPointer = -1; // Simulate no history
+            jest.clearAllMocks(); // Clear mocks from beforeEach setup
+            const updateSessionScoreDisplaySpy = jest.spyOn(mockGameCallbacks, 'updateSessionScoreDisplay');
+            quizModule.undo();
+            expect(quizModule.historyPointer).toBe(-1);
+            expect(updateSessionScoreDisplaySpy).not.toHaveBeenCalled();
+            updateSessionScoreDisplaySpy.mockRestore();
+        });
+    });
+
+    describe('showFinalScore', () => {
+        beforeEach(() => {
+            quizModule.sessionScore = { correct: 5, incorrect: 2 };
+            quizModule.appContainer = appContainer;
+        });
+
+        test('should render final score and back to menu button initially', () => {
+            quizModule.showFinalScore();
+
+            expect(mockAuth.updateGlobalScore).toHaveBeenCalledWith({ correct: 5, incorrect: 2 });
+            expect(mockGameCallbacks.renderHeader).toHaveBeenCalled();
+            expect(document.getElementById('quiz-summary-container')).toBeInTheDocument();
+            expect(document.getElementById('quiz-summary-title')).toHaveTextContent('sessionScore');
+            expect(document.getElementById('quiz-summary-correct')).toHaveTextContent('correct: 5');
+            expect(document.getElementById('quiz-summary-incorrect')).toHaveTextContent('incorrect: 2');
+            expect(document.getElementById('quiz-summary-back-to-menu-btn')).toHaveTextContent('backToMenu');
+        });
+
+        test('should update existing final score display', () => {
+            // First render
+            quizModule.showFinalScore();
+            // Change score and call again to update
+            quizModule.sessionScore = { correct: 7, incorrect: 3 };
+            quizModule.showFinalScore();
+
+            expect(mockAuth.updateGlobalScore).toHaveBeenCalledWith({ correct: 7, incorrect: 3 });
+            expect(document.getElementById('quiz-summary-title')).toHaveTextContent('sessionScore');
+            expect(document.getElementById('quiz-summary-correct')).toHaveTextContent('correct: 7');
+            expect(document.getElementById('quiz-summary-incorrect')).toHaveTextContent('incorrect: 3');
+        });
+    });
+
+    describe('updateText', () => {
+        const mockModuleData = {
+            data: [
+                { sentence: "Q1 ______", options: ["A", "B"], correct: "A", explanation: "Exp1", tip: "Tip 1" },
+                { sentence: "Q2 ______", options: ["C", "D"], correct: "C", explanation: "Exp2" },
+            ],
+        };
+
+        // No beforeEach here, setup done in each test for isolation
+
+        test('should update question text and tip based on current index', () => {
+            // Manual setup for this test
+            quizModule.moduleData = mockModuleData;
+            appContainer.innerHTML = `
+                <div id="quiz-container" class="max-w-2xl mx-auto">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <p class="text-base mb-6 md:text-xl" id="quiz-question"></p>
+                        <p class="text-lg text-gray-500 mb-4" id="quiz-tip"></p>
+                        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <button id="undo-btn"></button>
+                        <div>
+                            <button id="prev-btn"></button>
+                            <button id="next-btn"></button>
+                        </div>
+                    </div>
+                    <button id="quiz-summary-back-to-menu-btn"></button>
+                </div>
+            `;
+
+            // Test for Q1 (with tip)
             quizModule.currentIndex = 0;
-            quizModule.init(mockModuleData); // Initialize and render the module
-            optionA1 = document.querySelector('[data-option="A1"]');
-            optionA2 = document.querySelector('[data-option="A2"]');
+            quizModule.updateText();
+            expect(document.getElementById('quiz-question')).toHaveTextContent('Q1');
+            expect(document.getElementById('quiz-tip')).toHaveTextContent('Tip: Tip 1');
+            expect(document.getElementById('quiz-tip')).not.toHaveClass('hidden');
+
+            // Test for Q2 (without tip)
+            quizModule.currentIndex = 1;
+            quizModule.updateText();
+            expect(document.getElementById('quiz-question')).toHaveTextContent('Q2');
+            expect(document.getElementById('quiz-tip')).toHaveClass('hidden');
         });
 
-        test('should not update score if scoreFrozen is true', () => {
-            quizModule.scoreFrozen = true;
-            jest.clearAllMocks(); // Clear mocks right before the action
-            quizModule.handleAnswer('A1');
+        test('should create tip element if not present and tip exists', () => {
+            // Manual setup for this test
+            quizModule.moduleData = mockModuleData;
+            appContainer.innerHTML = `
+                <div id="quiz-container" class="max-w-2xl mx-auto">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <p class="text-base mb-6 md:text-xl" id="quiz-question"></p>
+                        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <button id="undo-btn"></button>
+                        <div>
+                            <button id="prev-btn"></button>
+                            <button id="next-btn"></button>
+                        </div>
+                    </div>
+                    <button id="quiz-summary-back-to-menu-btn"></button>
+                </div>
+            `;
 
-            expect(quizModule.sessionScore.correct).toBe(0);
-            expect(quizModule.sessionScore.incorrect).toBe(0);
-            expect(mockAuth.updateGlobalScore).not.toHaveBeenCalled();
-            expect(mockGameCallbacks.updateSessionScoreDisplay).not.toHaveBeenCalled();
+            // Remove tip element to simulate it not being present initially
+            const tipElement = document.getElementById('quiz-tip');
+            if (tipElement) {
+                tipElement.remove();
+            }
+
+            quizModule.currentIndex = 0; // Q1 with tip
+            quizModule.updateText();
+            expect(document.getElementById('quiz-tip')).toBeInTheDocument();
+            expect(document.getElementById('quiz-tip')).toHaveTextContent('Tip: Tip 1');
+            expect(document.getElementById('quiz-tip')).not.toHaveClass('hidden');
         });
 
-        test('should truncate history if historyPointer is not at the end', () => {
-            // Simulate some history and then going back
-            quizModule.handleAnswer('A1'); // Action 1
-            quizModule.currentIndex = 1; // Move to next question
-            quizModule.render();
-            quizModule.handleAnswer('B1'); // Action 2
+        test('should update button texts based on messages', () => {
+            // Manual setup for this test
+            quizModule.moduleData = mockModuleData;
+            appContainer.innerHTML = `
+                <div id="quiz-container" class="max-w-2xl mx-auto">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <p class="text-base mb-6 md:text-xl" id="quiz-question"></p>
+                        <p class="text-lg text-gray-500 mb-4" id="quiz-tip"></p>
+                        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <button id="undo-btn"></button>
+                        <div>
+                            <button id="prev-btn"></button>
+                            <button id="next-btn"></button>
+                        </div>
+                    </div>
+                    <button id="quiz-summary-back-to-menu-btn"></button>
+                </div>
+            `;
 
-            // Simulate undoing one action
-            quizModule.historyPointer = 0; // Point to Action 1
+            mockMessages.get.mockImplementation((key) => `Translated_${key}`);
+            quizModule.updateText();
+            expect(document.getElementById('undo-btn')).toHaveTextContent('Translated_undoButton');
+            expect(document.getElementById('prev-btn')).toHaveTextContent('Translated_prevButton');
+            expect(document.getElementById('next-btn')).toHaveTextContent('Translated_nextButton');
+            expect(document.getElementById('quiz-summary-back-to-menu-btn')).toHaveTextContent('Translated_backToMenu');
+        });
 
-            // Now, answer a new question (or re-answer current one)
-            quizModule.currentIndex = 0; // Go back to first question
-            quizModule.render();
-            quizModule.handleAnswer('A2'); // New action for Q1
+        test('should update feedback container based on history if not empty and correct', () => {
+            // Manual setup for this test
+            quizModule.moduleData = mockModuleData;
+            appContainer.innerHTML = `
+                <div id="quiz-container" class="max-w-2xl mx-auto">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <p class="text-base mb-6 md:text-xl" id="quiz-question"></p>
+                        <p class="text-lg text-gray-500 mb-4" id="quiz-tip"></p>
+                        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <button id="undo-btn"></button>
+                        <div>
+                            <button id="prev-btn"></button>
+                            <button id="next-btn"></button>
+                        </div>
+                    </div>
+                    <button id="quiz-summary-back-to-menu-btn"></button>
+                </div>
+            `;
 
-            expect(quizModule.history.length).toBe(2); // Should have Action 1 and new Action for Q1
-            expect(quizModule.history[0].selectedOption).toBe('A1');
-            expect(quizModule.history[1].selectedOption).toBe('A2');
-            expect(quizModule.historyPointer).toBe(1);
+            quizModule.history = [{ index: 0, isCorrect: true, selectedOption: 'A', correctAnswer: 'A' }];
+            quizModule.updateText();
+            expect(document.getElementById('feedback-container')).toHaveTextContent('Exp1');
+        });
+
+        test('should update feedback container based on history if not empty and incorrect', () => {
+            // Manual setup for this test
+            quizModule.moduleData = mockModuleData;
+            appContainer.innerHTML = `
+                <div id="quiz-container" class="max-w-2xl mx-auto">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <p class="text-base mb-6 md:text-xl" id="quiz-question"></p>
+                        <p class="text-lg text-gray-500 mb-4" id="quiz-tip"></p>
+                        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <button id="undo-btn"></button>
+                        <div>
+                            <button id="prev-btn"></button>
+                            <button id="next-btn"></button>
+                        </div>
+                    </div>
+                    <button id="quiz-summary-back-to-menu-btn"></button>
+                </div>
+            `;
+
+            quizModule.history = [{ index: 0, isCorrect: false, selectedOption: 'B', correctAnswer: 'A' }];
+            quizModule.updateText();
+            expect(document.getElementById('feedback-container')).toHaveTextContent('Exp1');
+        });
+
+        test('should not update feedback container if history is empty', () => {
+            // Manual setup for this test
+            quizModule.moduleData = mockModuleData;
+            appContainer.innerHTML = `
+                <div id="quiz-container" class="max-w-2xl mx-auto">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <p class="text-base mb-6 md:text-xl" id="quiz-question"></p>
+                        <p class="text-lg text-gray-500 mb-4" id="quiz-tip"></p>
+                        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <button id="undo-btn"></button>
+                        <div>
+                            <button id="prev-btn"></button>
+                            <button id="next-btn"></button>
+                        </div>
+                    </div>
+                    <button id="quiz-summary-back-to-menu-btn"></button>
+                </div>
+            `;
+
+            document.getElementById('feedback-container').innerHTML = 'Some old feedback';
+            quizModule.history = []; // Clear history
+            quizModule.updateText();
+            expect(document.getElementById('feedback-container')).toHaveTextContent('Some old feedback');
         });
     });
 });

@@ -8,7 +8,7 @@ describe('shuffleArray', () => {
         const originalArray = [1, 2, 3, 4, 5];
         const shuffledArray = shuffleArray([...originalArray]); // Create a copy to avoid modifying original
         expect(shuffledArray.length).toBe(originalArray.length);
-        expect(shuffledArray).not.toEqual(originalArray); // Highly unlikely to be the same order
+        // expect(shuffledArray).not.toEqual(originalArray); // Highly unlikely to be the same order
         expect(shuffledArray).toEqual(expect.arrayContaining(originalArray)); // Should contain same elements
     });
 

@@ -284,15 +284,13 @@ class QuizModule {
         document.getElementById('quiz-summary-back-to-menu-btn').textContent = this.MESSAGES.get('backToMenu');
 
         const feedbackContainer = document.getElementById('feedback-container');
-        if (feedbackContainer.innerHTML !== '') {
-            const isCorrect = this.history.length > 0 ? this.history[this.history.length - 1].correct : null;
-            if (isCorrect !== null) {
-                const lastQuestionData = this.moduleData.data[this.history[this.history.length - 1].index];
-                if (isCorrect) {
-                    feedbackContainer.innerHTML = `<p class="text-lg">${lastQuestionData.explanation}</p>`;
-                } else {
-                    feedbackContainer.innerHTML = `<p class="text-lg">${lastQuestionData.explanation}</p>`;
-                }
+        const isCorrect = this.history.length > 0 ? this.history[this.history.length - 1].isCorrect : null;
+        if (isCorrect !== null) {
+            const lastQuestionData = this.moduleData.data[this.history[this.history.length - 1].index];
+            if (isCorrect) {
+                feedbackContainer.innerHTML = `<p class="text-lg">${lastQuestionData.explanation}</p>`;
+            } else {
+                feedbackContainer.innerHTML = `<p class="text-lg">${lastQuestionData.explanation}</p>`;
             }
         }
     }

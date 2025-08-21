@@ -253,7 +253,7 @@ class SortingModule {
                     isCorrectMove: isCorrectMove // Store correctness of the move
                 });
                 target.appendChild(wordElem);
-                this.userAnswers[wordElem.dataset.word] = newParentId.replace('category-', '').replace('word-', '');
+                this.userAnswers[wordElem.dataset.word] = newParentId === 'word-bank' ? '' : newParentId.replace('category-', '');
                 this.clearFeedback(); // Clear feedback on new move
             }
         }

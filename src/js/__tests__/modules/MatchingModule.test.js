@@ -254,4 +254,324 @@ describe('MatchingModule', () => {
             expect(matchingModule.attemptMatch).not.toHaveBeenCalled();
         });
     });
+
+    describe('attemptMatch', () => {
+        const mockModuleData = {
+            data: [
+                { id: '1', term: "Term 1", definition: "Definition 1" },
+                { id: '2', term: "Term 2", definition: "Definition 2" },
+            ],
+        };
+
+        let term1Element, definition1Element, term2Element, definition2Element;
+
+        // No beforeEach here, setup done in each test for isolation
+
+        test('should handle correct match', () => {
+            // Manual setup for this test
+            matchingModule.init(mockModuleData);
+            appContainer.innerHTML = `
+                <div id="matching-container">
+                    <div id="terms-column">
+                        <div id="term-1" class="matching-item term" data-id="1" data-type="term">Term 1</div>
+                        <div id="term-2" class="matching-item term" data-id="2" data-type="term">Term 2</div>
+                    </div>
+                    <div id="definitions-column">
+                        <div id="definition-1" class="matching-item definition" data-id="1" data-type="definition">Definition 1</div>
+                        <div id="definition-2" class="matching-item definition" data-id="2" data-type="definition">Definition 2</div>
+                    </div>
+                </div>
+            `;
+            term1Element = document.getElementById('term-1');
+            definition1Element = document.getElementById('definition-1');
+            term2Element = document.getElementById('term-2');
+            definition2Element = document.getElementById('definition-2');
+
+            matchingModule.selectedTerm = { id: '1', element: term1Element };
+            matchingModule.selectedDefinition = { id: '1', element: definition1Element };
+
+            matchingModule.attemptMatch();
+
+            expect(matchingModule.matchedPairs).toEqual([{ termId: '1', definitionId: '1' }]);
+            expect(term1Element).toHaveClass('matched', 'bg-green-200', 'cursor-default');
+            expect(term1Element).not.toHaveClass('selected', 'bg-gray-100', 'hover:bg-gray-200');
+            expect(definition1Element).toHaveClass('matched', 'bg-green-200', 'cursor-default');
+            expect(definition1Element).not.toHaveClass('selected', 'bg-gray-100', 'hover:bg-gray-200');
+            expect(matchingModule.sessionScore).toEqual({ correct: 1, incorrect: 0 });
+            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(1, 0, mockModuleData.data.length);
+            expect(matchingModule.selectedTerm).toBeNull();
+            expect(matchingModule.selectedDefinition).toBeNull();
+        });
+
+        test('should handle incorrect match', (done) => {
+            // Manual setup for this test
+            matchingModule.init(mockModuleData);
+            appContainer.innerHTML = `
+                <div id="matching-container">
+                    <div id="terms-column">
+                        <div id="term-1" class="matching-item term" data-id="1" data-type="term">Term 1</div>
+                        <div id="term-2" class="matching-item term" data-id="2" data-type="term">Term 2</div>
+                    </div>
+                    <div id="definitions-column">
+                        <div id="definition-1" class="matching-item definition" data-id="1" data-type="definition">Definition 1</div>
+                        <div id="definition-2" class="matching-item definition" data-id="2" data-type="definition">Definition 2</div>
+                    </div>
+                </div>
+            `;
+            term1Element = document.getElementById('term-1');
+            definition1Element = document.getElementById('definition-1');
+            term2Element = document.getElementById('term-2');
+            definition2Element = document.getElementById('definition-2');
+
+            matchingModule.selectedTerm = { id: '1', element: term1Element };
+            matchingModule.selectedDefinition = { id: '2', element: definition2Element }; // Incorrect match
+
+            matchingModule.attemptMatch();
+
+            expect(matchingModule.matchedPairs).toEqual([]);
+            expect(matchingModule.sessionScore).toEqual({ correct: 0, incorrect: 1 });
+            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 1, mockModuleData.data.length);
+
+            expect(term1Element).toHaveClass('incorrect');
+            expect(definition2Element).toHaveClass('incorrect');
+
+            // Expect classes to be removed after timeout
+            setTimeout(() => {
+                expect(term1Element).not.toHaveClass('incorrect');
+                expect(definition2Element).not.toHaveClass('incorrect');
+                done();
+            }, 500);
+
+            expect(matchingModule.selectedTerm).toBeNull();
+            expect(matchingModule.selectedDefinition).toBeNull();
+        });
+
+        test('should call showMatchingSummary when all pairs are matched', () => {
+            jest.useFakeTimers();
+            // Manual setup for this test
+            matchingModule.moduleData = {
+                data: [
+                    { id: '1', term: "Term 1", definition: "Definition 1" },
+                    { id: '2', term: "Term 2", definition: "Definition 2" },
+                ],
+            };
+            appContainer.innerHTML = `
+                <div id="matching-container">
+                    <div id="terms-column">
+                        <div id="term-1" class="matching-item term" data-id="1" data-type="term">Term 1</div>
+                        <div id="term-2" class="matching-item term" data-id="2" data-type="term">Term 2</div>
+                    </div>
+                    <div id="definitions-column">
+                        <div id="definition-1" class="matching-item definition" data-id="1" data-type="definition">Definition 1</div>
+                        <div id="definition-2" class="matching-item definition" data-id="2" data-type="definition">Definition 2</div>
+                    </div>
+                </div>
+            `;
+            term1Element = document.getElementById('term-1');
+            definition1Element = document.getElementById('definition-1');
+            term2Element = document.getElementById('term-2');
+            definition2Element = document.getElementById('definition-2');
+
+            // Simulate all but one pair matched
+            matchingModule.matchedPairs = [
+                { termId: '2', definitionId: '2' },
+            ];
+
+            matchingModule.selectedTerm = { id: '1', element: term1Element };
+            matchingModule.selectedDefinition = { id: '1', element: definition1Element };
+
+            matchingModule.attemptMatch();
+
+            expect(matchingModule.feedbackActive).toBe(true);
+            jest.runAllTimers(); // Advance timers
+            expect(mockGameCallbacks.showMatchingSummary).toHaveBeenCalled();
+            jest.useRealTimers();
+        });
+
+        test('should handle incorrect match', () => {
+            jest.useFakeTimers();
+            // Manual setup for this test
+            matchingModule.init(mockModuleData);
+            appContainer.innerHTML = `
+                <div id="matching-container">
+                    <div id="terms-column">
+                        <div id="term-1" class="matching-item term" data-id="1" data-type="term">Term 1</div>
+                        <div id="term-2" class="matching-item term" data-id="2" data-type="term">Term 2</div>
+                    </div>
+                    <div id="definitions-column">
+                        <div id="definition-1" class="matching-item definition" data-id="1" data-type="definition">Definition 1</div>
+                        <div id="definition-2" class="matching-item definition" data-id="2" data-type="definition">Definition 2</div>
+                    </div>
+                </div>
+            `;
+            term1Element = document.getElementById('term-1');
+            definition1Element = document.getElementById('definition-1');
+            term2Element = document.getElementById('term-2');
+            definition2Element = document.getElementById('definition-2');
+
+            matchingModule.selectedTerm = { id: '1', element: term1Element };
+            matchingModule.selectedDefinition = { id: '2', element: definition2Element }; // Incorrect match
+
+            matchingModule.attemptMatch();
+
+            expect(matchingModule.matchedPairs).toEqual([]);
+            expect(matchingModule.sessionScore).toEqual({ correct: 0, incorrect: 1 });
+            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 1, mockModuleData.data.length);
+
+            expect(term1Element).toHaveClass('incorrect');
+            expect(definition2Element).toHaveClass('incorrect');
+
+            jest.runAllTimers(); // Advance timers
+
+            // Expect classes to be removed after timeout
+            expect(term1Element).not.toHaveClass('incorrect');
+            expect(definition2Element).not.toHaveClass('incorrect');
+
+            expect(matchingModule.selectedTerm).toBeNull();
+            expect(matchingModule.selectedDefinition).toBeNull();
+            jest.useRealTimers();
+        });
+    });
+
+    describe('undo', () => {
+        const mockModuleData = {
+            data: [
+                { id: '1', term: "Term 1", definition: "Definition 1" },
+                { id: '2', term: "Term 2", definition: "Definition 2" },
+            ],
+        };
+
+        let term1Element, definition1Element;
+
+        beforeEach(() => {
+            matchingModule.init(mockModuleData);
+            appContainer.innerHTML = `
+                <div id="matching-container">
+                    <div id="terms-column">
+                        <div id="term-1" class="matching-item term" data-id="1" data-type="term">Term 1</div>
+                    </div>
+                    <div id="definitions-column">
+                        <div id="definition-1" class="matching-item definition" data-id="1" data-type="definition">Definition 1</div>
+                    </div>
+                </div>
+            `;
+            term1Element = document.getElementById('term-1');
+            definition1Element = document.getElementById('definition-1');
+            matchingModule.matchedPairs = [{ termId: '1', definitionId: '1' }];
+            matchingModule.sessionScore.correct = 1;
+            mockGameCallbacks.updateSessionScoreDisplay.mockClear(); // Clear calls from init
+        });
+
+        test('should undo the last match and restore elements', () => {
+            matchingModule.undo();
+
+            expect(matchingModule.matchedPairs).toEqual([]);
+            expect(matchingModule.sessionScore.correct).toBe(0);
+            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 0, mockModuleData.data.length);
+
+            expect(term1Element).not.toHaveClass('matched', 'bg-green-200', 'cursor-default');
+            expect(term1Element).toHaveClass('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
+            expect(definition1Element).not.toHaveClass('matched', 'bg-green-200', 'cursor-default');
+            expect(definition1Element).toHaveClass('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
+        });
+
+        test('should re-attach event listeners to undone elements', () => {
+            const addEventListenerSpy = jest.spyOn(term1Element, 'addEventListener');
+            const removeEventListenerSpy = jest.spyOn(term1Element, 'removeEventListener');
+
+            // Simulate a match and then undo
+            matchingModule.selectedTerm = { id: '1', element: term1Element };
+            matchingModule.selectedDefinition = { id: '1', element: definition1Element };
+            matchingModule.attemptMatch(); // This will remove the listener
+
+            expect(removeEventListenerSpy).toHaveBeenCalledWith('click', expect.any(Function));
+            removeEventListenerSpy.mockClear(); // Clear the spy for the next assertion
+
+            matchingModule.undo(); // This should re-attach the listener
+
+            expect(addEventListenerSpy).toHaveBeenCalledWith('click', expect.any(Function));
+            addEventListenerSpy.mockRestore();
+            removeEventListenerSpy.mockRestore();
+        });
+
+        test('should do nothing if no matched pairs', () => {
+            matchingModule.matchedPairs = [];
+            matchingModule.sessionScore.correct = 0;
+            matchingModule.undo();
+
+            expect(matchingModule.matchedPairs).toEqual([]);
+            expect(matchingModule.sessionScore.correct).toBe(0);
+            expect(mockGameCallbacks.updateSessionScoreDisplay).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('resetGame', () => {
+        const mockModuleData = {
+            data: [
+                { id: '1', term: "Term 1", definition: "Definition 1" },
+            ],
+        };
+
+        let term1Element, definition1Element;
+
+        beforeEach(() => {
+            matchingModule.init(mockModuleData);
+            appContainer.innerHTML = `
+                <div id="matching-container">
+                    <div id="terms-column">
+                        <div id="term-1" class="matching-item term matched" data-id="1" data-type="term">Term 1</div>
+                    </div>
+                    <div id="definitions-column">
+                        <div id="definition-1" class="matching-item definition matched" data-id="1" data-type="definition">Definition 1</div>
+                    </div>
+                </div>
+            `;
+            term1Element = document.getElementById('term-1');
+            definition1Element = document.getElementById('definition-1');
+            matchingModule.matchedPairs = [{ termId: '1', definitionId: '1' }];
+            matchingModule.sessionScore.correct = 1;
+            matchingModule.feedbackActive = true;
+            mockGameCallbacks.updateSessionScoreDisplay.mockClear(); // Clear calls from init
+        });
+
+        test('should reset game state and element classes', () => {
+            matchingModule.resetGame();
+
+            expect(matchingModule.matchedPairs).toEqual([]);
+            expect(matchingModule.sessionScore).toEqual({ correct: 0, incorrect: 0 });
+            expect(matchingModule.feedbackActive).toBe(false);
+
+            expect(term1Element).not.toHaveClass('matched', 'incorrect', 'cursor-default', 'selected');
+            expect(term1Element).toHaveClass('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
+            expect(definition1Element).not.toHaveClass('matched', 'incorrect', 'cursor-default', 'selected');
+            expect(definition1Element).toHaveClass('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
+            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 0, mockModuleData.data.length);
+        });
+    });
+
+    describe('updateText', () => {
+        beforeEach(() => {
+            // Mock the necessary DOM elements for updateText
+            document.body.innerHTML = `
+                <button id="back-to-menu-matching-btn"></button>
+                <button id="undo-matching-btn"></button>
+                <button id="check-matching-btn"></button>
+                <button id="reset-matching-btn"></button>
+                <div id="terms-column"><h3></h3></div>
+                <div id="definitions-column"><h3></h3></div>
+            `;
+            matchingModule.MESSAGES.get.mockImplementation((key) => `mock_${key}`);
+        });
+
+        test('should update text content of relevant elements', () => {
+            matchingModule.updateText();
+
+            expect(document.getElementById('back-to-menu-matching-btn')).toHaveTextContent('mock_backToMenu');
+            expect(document.getElementById('undo-matching-btn')).toHaveTextContent('mock_undoButton');
+            expect(document.getElementById('check-matching-btn')).toHaveTextContent('mock_checkAnswers');
+            expect(document.getElementById('reset-matching-btn')).toHaveTextContent('mock_resetButton');
+            expect(document.querySelector('#terms-column h3')).toHaveTextContent('mock_terms');
+            expect(document.querySelector('#definitions-column h3')).toHaveTextContent('mock_definitions');
+        });
+    });
 });

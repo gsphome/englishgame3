@@ -15,6 +15,9 @@ class MatchingModule {
         this.matchedPairs = []; // Stores { termId: 'id', definitionId: 'id' }
         this.allPairs = []; // Stores all possible pairs from moduleData
         this.feedbackActive = false;
+
+        // Bind event handlers
+        this.handleItemClick = this.handleItemClick.bind(this);
     }
 
     init(module) {
@@ -124,12 +127,12 @@ class MatchingModule {
             if (termElement) {
                 termElement.classList.remove('matched', 'bg-green-200', 'cursor-default');
                 termElement.classList.add('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
-                termElement.addEventListener('click', (e) => this.handleItemClick(e.target));
+                termElement.addEventListener('click', this.handleItemClick);
             }
             if (defElement) {
                 defElement.classList.remove('matched', 'bg-green-200', 'cursor-default');
                 defElement.classList.add('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
-                defElement.addEventListener('click', (e) => this.handleItemClick(e.target));
+                defElement.addEventListener('click', this.handleItemClick);
             }
             this.sessionScore.correct--;
             this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
@@ -198,7 +201,7 @@ class MatchingModule {
             termElem.textContent = item.text;
             termElem.dataset.id = item.id;
             termElem.dataset.type = item.type;
-            termElem.addEventListener('click', (e) => this.handleItemClick(e.target));
+            termElem.addEventListener('click', this.handleItemClick);
             termsColumn.appendChild(termElem);
         });
 
@@ -209,7 +212,7 @@ class MatchingModule {
             defElem.textContent = item.text;
             defElem.dataset.id = item.id;
             defElem.dataset.type = item.type;
-            defElem.addEventListener('click', (e) => this.handleItemClick(e.target));
+            defElem.addEventListener('click', this.handleItemClick);
             definitionsColumn.appendChild(defElem);
         });
 
@@ -217,9 +220,6 @@ class MatchingModule {
         document.getElementById('check-matching-btn').addEventListener('click', () => this.checkAnswers());
         document.getElementById('reset-matching-btn').addEventListener('click', () => this.resetGame());
         document.getElementById('back-to-menu-matching-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
-        document.getElementById('back-to-menu-matching-btn').textContent = this.MESSAGES.get('backToMenu');
-        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
-        document.getElementById('back-to-menu-matching-btn').textContent = this.MESSAGES.get('backToMenu');
         this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
     }
 
