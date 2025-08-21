@@ -338,6 +338,10 @@ describe('MatchingModule', () => {
             expect(matchingModule.selectedTerm).toBeNull();
             expect(matchingModule.selectedDefinition).toBeNull();
 
+            // Verify SVG is added
+            expect(term1Element.innerHTML).toContain('<svg');
+            expect(definition1Element.innerHTML).toContain('<svg');
+
             // Verify removeEventListener was called
             expect(removeEventListenerSpy).toHaveBeenCalledWith('click', expect.any(Function));
             expect(removeEventListenerSpy).toHaveBeenCalledTimes(2); // Once for term, once for definition
@@ -546,6 +550,29 @@ describe('MatchingModule', () => {
             expect(matchingModule.sessionScore.correct).toBe(0);
             expect(mockGameCallbacks.updateSessionScoreDisplay).not.toHaveBeenCalled();
         });
+
+        test('should handle cases where termElement or defElement are null', () => {
+            // Mock document.getElementById to return null for specific IDs
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn((id) => {
+                if (id === 'term-1') return null;
+                if (id === 'definition-1') return null;
+                return originalGetElementById(id);
+            });
+
+            matchingModule.matchedPairs = [{ termId: '1', definitionId: '1' }];
+            matchingModule.sessionScore.correct = 1;
+            mockGameCallbacks.updateSessionScoreDisplay.mockClear();
+
+            matchingModule.undo();
+
+            expect(matchingModule.matchedPairs).toEqual([]);
+            expect(matchingModule.sessionScore.correct).toBe(0);
+            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 0, mockModuleData.data.length);
+
+            // Restore original document.getElementById
+            document.getElementById = originalGetElementById;
+        });
     });
 
     describe('resetGame', () => {
@@ -589,6 +616,12 @@ describe('MatchingModule', () => {
             expect(definition1Element).not.toHaveClass('matched', 'incorrect', 'cursor-default', 'selected');
             expect(definition1Element).toHaveClass('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
             expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 0, mockModuleData.data.length);
+
+            // Verify event listeners are re-attached
+            const addEventListenerSpy = jest.spyOn(term1Element, 'addEventListener');
+            matchingModule.resetGame(); // Call again to trigger re-attachment if not already
+            expect(addEventListenerSpy).toHaveBeenCalledWith('click', expect.any(Function));
+            addEventListenerSpy.mockRestore();
         });
     });
 
@@ -646,6 +679,13 @@ describe('MatchingModule', () => {
             expect(document.getElementById('reset-matching-btn')).toHaveTextContent('mock_resetButton');
             expect(document.querySelector('#terms-column h3')).toHaveTextContent('mock_terms');
             expect(document.querySelector('#definitions-column h3')).toHaveTextContent('mock_definitions');
+
+            expect(matchingModule.MESSAGES.get).toHaveBeenCalledWith('backToMenu');
+            expect(matchingModule.MESSAGES.get).toHaveBeenCalledWith('undoButton');
+            expect(matchingModule.MESSAGES.get).toHaveBeenCalledWith('checkAnswers');
+            expect(matchingModule.MESSAGES.get).toHaveBeenCalledWith('resetButton');
+            expect(matchingModule.MESSAGES.get).toHaveBeenCalledWith('terms');
+            expect(matchingModule.MESSAGES.get).toHaveBeenCalledWith('definitions');
         });
     });
 });
