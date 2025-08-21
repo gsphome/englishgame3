@@ -721,12 +721,11 @@ export const game = {
                     <h2 id="matching-completion-title" class="text-2xl font-bold mb-4">${MESSAGES.get('sessionScore')}</h2>
                     <p id="matching-completion-message" class="text-xl mb-4">${MESSAGES.get('matchingCompletionMessage')}</p>
                     <div class="mb-4 text-left max-h-60 overflow-y-auto pr-2">
-                        <div class="grid grid-cols-3 gap-2 font-bold border-b-2 border-gray-300 pb-2 mb-2">
+                        <div class="grid grid-cols-2 gap-2 font-bold border-b-2 border-gray-300 pb-2 mb-2">
                             <span>${MESSAGES.get('terms')}</span>
-                            <span>${MESSAGES.get('definitions')}</span>
-                            <span></span>
+                            <span>${MESSAGES.get('translationLabel')}</span>
                         </div>
-                        <div id="matched-pairs-grid" class="grid grid-cols-3 gap-2">
+                        <div id="matched-pairs-grid" class="grid grid-cols-2 gap-2">
                             <!-- Matched pairs and explanation buttons will be listed here -->
                         </div>
                     </div>
@@ -771,9 +770,12 @@ export const game = {
                 termSpan.textContent = termData.term;
                 matchedPairsGrid.appendChild(termSpan);
 
-                const definitionSpan = document.createElement('span');
-                definitionSpan.textContent = termData.definition;
-                matchedPairsGrid.appendChild(definitionSpan);
+                const translationContainer = document.createElement('div');
+                translationContainer.className = 'flex items-center justify-between'; // To align translation and button
+
+                const translationSpan = document.createElement('span');
+                translationSpan.textContent = termData.term_es; // Use term_es for translation
+                translationContainer.appendChild(translationSpan);
 
                 // Add explanation button
                 const explanationButton = document.createElement('button');
@@ -789,7 +791,8 @@ export const game = {
                         example_es: termData.explanation_es
                     });
                 });
-                matchedPairsGrid.appendChild(explanationButton);
+                translationContainer.appendChild(explanationButton);
+                matchedPairsGrid.appendChild(translationContainer);
             }
         });
 

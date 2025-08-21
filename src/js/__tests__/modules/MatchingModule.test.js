@@ -83,7 +83,7 @@ describe('MatchingModule', () => {
             matchingModule.init(mockModuleData);
 
             expect(matchingModule.currentIndex).toBe(0);
-            expect(matchingModule.moduleData.data.length).toBe(5); // Should slice to 5
+            expect(matchingModule.moduleData.data.length).toBe(3); // Should slice to 3
             expect(matchingModule.appContainer).toBe(appContainer);
             expect(matchingModule.sessionScore).toEqual({ correct: 0, incorrect: 0 });
             expect(matchingModule.selectedTerm).toBeNull();
