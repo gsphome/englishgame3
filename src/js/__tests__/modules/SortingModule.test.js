@@ -17,6 +17,10 @@ const gameCallbacks = {
     renderMenu: jest.fn(),
 };
 
+// Store the original document.getElementById
+const originalGetElementById = document.getElementById;
+const originalAppendChildOfElement = Element.prototype.appendChild;
+
 // Mock module data
 const moduleData = {
     categories: [
@@ -35,10 +39,10 @@ describe('SortingModule', () => {
     let sortingModule;
 
     beforeEach(() => {
-        // Set up our document body
+        // Set up our document body and ensure a clean state for each test
         document.body.innerHTML = '<div id="app-container"></div>';
         sortingModule = new SortingModule(authInstance, messagesInstance, gameCallbacks);
-        sortingModule.init(moduleData);
+        // Do NOT call sortingModule.init(moduleData) here. Each test will call it explicitly.
         jest.clearAllMocks(); // Clear mocks before each test
     });
 
@@ -57,7 +61,70 @@ describe('SortingModule', () => {
         expect(gameCallbacks.shuffleArray).toHaveBeenCalled(); // Verify shuffleArray is called
     });
 
+    test('init should select a limited number of categories based on maxCategoriesToRender', () => {
+        sortingModule = new SortingModule(authInstance, messagesInstance, gameCallbacks);
+        sortingModule.maxCategoriesToRender = 1; // Set limit
+        sortingModule.init(moduleData);
+        expect(sortingModule.categories.length).toBe(1);
+        expect(gameCallbacks.shuffleArray).toHaveBeenCalledWith(expect.arrayContaining(moduleData.categories));
+    });
+
+    test('init should select words ensuring representation from displayed categories and total count', () => {
+        const customModuleData = {
+            categories: [
+                { category_id: 'colors', category_show: 'Colors' },
+                { category_id: 'shapes', category_show: 'Shapes' },
+                { category_id: 'animals', category_show: 'Animals' },
+            ],
+            data: [
+                { word: 'red', category: 'colors' },
+                { word: 'blue', category: 'colors' },
+                { word: 'circle', category: 'shapes' },
+                { word: 'square', category: 'shapes' },
+                { word: 'dog', category: 'animals' },
+                { word: 'cat', category: 'animals' },
+                { word: 'green', category: 'colors' },
+                { word: 'triangle', category: 'shapes' },
+            ],
+        };
+        sortingModule = new SortingModule(authInstance, messagesInstance, gameCallbacks);
+        sortingModule.maxCategoriesToRender = 2; // Will select 2 categories
+        gameCallbacks.shuffleArray.mockImplementationOnce(arr => [customModuleData.categories[0], customModuleData.categories[1]]); // Mock categories shuffle
+        gameCallbacks.shuffleArray.mockImplementation(arr => arr); // Keep words unshuffled for predictable testing
+
+        sortingModule.init(customModuleData);
+
+        // Expect 2 categories to be selected
+        expect(sortingModule.categories.length).toBe(2);
+        expect(sortingModule.categories).toEqual(expect.arrayContaining([
+            expect.objectContaining({ category_id: 'colors' }),
+            expect.objectContaining({ category_id: 'shapes' }),
+        ]));
+
+        // Expect words to be selected from these categories, up to 5 words
+        expect(sortingModule.words.length).toBeLessThanOrEqual(5);
+        expect(sortingModule.words.length).toBeGreaterThanOrEqual(2); // At least one from each selected category
+
+        // Ensure at least one word from 'colors' and 'shapes' is present
+        const wordsFromColors = customModuleData.data.filter(item => item.category === 'colors').map(item => item.word);
+        const wordsFromShapes = customModuleData.data.filter(item => item.category === 'shapes').map(item => item.word);
+
+        const hasColorWord = sortingModule.words.some(word => wordsFromColors.includes(word));
+        const hasShapeWord = sortingModule.words.some(word => wordsFromShapes.includes(word));
+
+        expect(hasColorWord).toBe(true);
+        expect(hasShapeWord).toBe(true);
+        expect(sortingModule.words.some(word => ['dog', 'cat'].includes(word))).toBe(false); // Should not include words from 'animals'
+    });
+
+    test('init should call clearFeedback', () => {
+        jest.spyOn(sortingModule, 'clearFeedback');
+        sortingModule.init(moduleData);
+        expect(sortingModule.clearFeedback).toHaveBeenCalled();
+    });
+
     test('renderInitialView', () => {
+        sortingModule.init(moduleData);
         const sortingContainer = document.getElementById('sorting-container');
         expect(sortingContainer).not.toBeNull();
 
@@ -78,6 +145,7 @@ describe('SortingModule', () => {
     });
 
     test('checkAnswers should correctly identify correct and incorrect answers', () => {
+        sortingModule.init(moduleData);
         // Move 'apple' to fruits, 'banana' to vegetables (incorrect)
         const appleWordElem = document.getElementById('word-apple');
         const bananaWordElem = document.getElementById('word-banana');
@@ -98,7 +166,76 @@ describe('SortingModule', () => {
         expect(bananaWordElem.classList.contains('bg-red-500')).toBe(true);
     });
 
+    test('checkAnswers should handle wordElem not found gracefully', () => {
+        // Set up sortingModule.words to only include words that will be scored
+        sortingModule.words = ['banana', 'carrot', 'broccoli'];
+        sortingModule.moduleData = moduleData; // Set moduleData for this test
+
+        // Manually create and append elements for these words to the DOM
+        const appContainer = document.getElementById('app-container');
+        const wordBank = document.createElement('div');
+        wordBank.id = 'word-bank';
+        appContainer.appendChild(wordBank);
+
+        const fruitsCategoryElem = document.createElement('div');
+        fruitsCategoryElem.id = 'category-fruits';
+        appContainer.appendChild(fruitsCategoryElem);
+
+        const vegetablesCategoryElem = document.createElement('div');
+        vegetablesCategoryElem.id = 'category-vegetables';
+        appContainer.appendChild(vegetablesCategoryElem);
+
+        const bananaWordElem = document.createElement('div');
+        bananaWordElem.id = 'word-banana';
+        bananaWordElem.dataset.word = 'banana';
+        wordBank.appendChild(bananaWordElem);
+
+        const carrotWordElem = document.createElement('div');
+        carrotWordElem.id = 'word-carrot';
+        carrotWordElem.dataset.word = 'carrot';
+        wordBank.appendChild(carrotWordElem);
+
+        const broccoliWordElem = document.createElement('div');
+        broccoliWordElem.id = 'word-broccoli';
+        broccoliWordElem.dataset.word = 'broccoli';
+        wordBank.appendChild(broccoliWordElem);
+
+        // Place words for scoring
+        fruitsCategoryElem.appendChild(bananaWordElem); // Incorrect
+        vegetablesCategoryElem.appendChild(carrotWordElem); // Correct
+        vegetablesCategoryElem.appendChild(broccoliWordElem); // Correct
+
+        sortingModule.checkAnswers();
+
+        // Expect scores based on the remaining words
+        expect(sortingModule.sessionScore.correct).toBe(3);
+        expect(sortingModule.sessionScore.incorrect).toBe(0);
+        expect(authInstance.updateGlobalScore).toHaveBeenCalledWith({ correct: 3, incorrect: 0 });
+        expect(gameCallbacks.updateSessionScoreDisplay).toHaveBeenCalled();
+    });
+
+    test('checkAnswers should handle originalWordData not found gracefully', () => {
+        sortingModule.init(moduleData);
+        // Add a word to sortingModule.words that is not in moduleData.data
+        sortingModule.words.push('unknown-word');
+        // Manually create a dummy element for it
+        const unknownWordElem = document.createElement('div');
+        unknownWordElem.id = 'word-unknown-word';
+        unknownWordElem.dataset.word = 'unknown-word';
+        document.getElementById('word-bank').appendChild(unknownWordElem);
+
+        const initialCorrect = sortingModule.sessionScore.correct;
+        const initialIncorrect = sortingModule.sessionScore.incorrect;
+
+        sortingModule.checkAnswers();
+
+        // The unknown word should be treated as incorrect if its data is not found
+        expect(sortingModule.sessionScore.incorrect).toBeGreaterThan(initialIncorrect);
+        expect(unknownWordElem.classList.contains('bg-red-500')).toBe(true);
+    });
+
     test('checkAnswers should call showSortingCompletionModal when all answers are correct', () => {
+        sortingModule.init(moduleData);
         const fruitsCategoryElem = document.getElementById('category-fruits');
         const vegetablesCategoryElem = document.getElementById('category-vegetables');
 
@@ -120,6 +257,7 @@ describe('SortingModule', () => {
     });
 
     test('undo should move the last moved word back to its previous container', () => {
+        sortingModule.init(moduleData);
         const word = sortingModule.words[0];
         const wordElem = document.getElementById('word-' + word.replace(/\s+/g, '-').toLowerCase());
         const wordBank = document.getElementById('word-bank');
@@ -143,7 +281,38 @@ describe('SortingModule', () => {
         expect(gameCallbacks.updateSessionScoreDisplay).toHaveBeenCalled();
     });
 
+    test('undo should do nothing if history is empty', () => {
+        sortingModule.init(moduleData);
+        jest.clearAllMocks(); // Clear mocks after init
+        sortingModule.history = [];
+        const initialScore = { ...sortingModule.sessionScore };
+        sortingModule.undo();
+        expect(sortingModule.history.length).toBe(0);
+        expect(sortingModule.sessionScore).toEqual(initialScore);
+        expect(gameCallbacks.updateSessionScoreDisplay).not.toHaveBeenCalled();
+    });
+
+    test('undo should do nothing if wordElem or previousParent is not found', () => {
+        sortingModule.init(moduleData);
+        jest.clearAllMocks(); // Clear mocks after init
+        sortingModule.history.push({
+            wordId: 'non-existent-word',
+            from: 'non-existent-parent',
+            to: 'some-category',
+            isCorrectMove: true
+        });
+        const initialHistoryLength = sortingModule.history.length;
+        const initialScore = { ...sortingModule.sessionScore };
+
+        sortingModule.undo();
+
+        expect(sortingModule.history.length).toBe(initialHistoryLength - 1);
+        expect(sortingModule.sessionScore).toEqual(initialScore);
+        expect(gameCallbacks.updateSessionScoreDisplay).not.toHaveBeenCalled(); // Should not be called if no actual DOM manipulation happens
+    });
+
     test('undo should clear feedback if feedback is active', () => {
+        sortingModule.init(moduleData);
         const word = sortingModule.words[0];
         const wordElem = document.getElementById('word-' + word.replace(/\s+/g, '-').toLowerCase());
         wordElem.classList.add('bg-green-500');
@@ -155,6 +324,7 @@ describe('SortingModule', () => {
     });
 
     test('clearFeedback should remove feedback classes from words', () => {
+        sortingModule.init(moduleData);
         const word = sortingModule.words[0];
         const wordElem = document.getElementById('word-' + word.replace(/\s+/g, '-').toLowerCase());
 
@@ -167,7 +337,35 @@ describe('SortingModule', () => {
         expect(wordElem.classList.contains('bg-gray-100')).toBe(true);
     });
 
+    test('shuffleArray should shuffle the array', () => {
+        sortingModule.init(moduleData);
+        const originalArray = [1, 2, 3, 4, 5];
+        const shuffledArray = sortingModule.shuffleArray([...originalArray]); // Pass a copy
+
+        // It should contain the same elements
+        expect(shuffledArray).toHaveLength(originalArray.length);
+        expect(shuffledArray).toEqual(expect.arrayContaining(originalArray));
+
+        // It should be a different order (this might fail rarely, but is generally good enough)
+        expect(shuffledArray).not.toEqual(originalArray);
+    });
+
+    test('shuffleArray should handle empty array', () => {
+        sortingModule.init(moduleData);
+        const originalArray = [];
+        const shuffledArray = sortingModule.shuffleArray(originalArray);
+        expect(shuffledArray).toEqual([]);
+    });
+
+    test('shuffleArray should handle single element array', () => {
+        sortingModule.init(moduleData);
+        const originalArray = [1];
+        const shuffledArray = sortingModule.shuffleArray(originalArray);
+        expect(shuffledArray).toEqual([1]);
+    });
+
     test('drag should set draggedElementId', () => {
+        sortingModule.init(moduleData);
         const word = sortingModule.words[0];
         const wordElem = document.getElementById('word-' + word.replace(/\s+/g, '-').toLowerCase());
         const mockEvent = { target: wordElem };
@@ -176,6 +374,7 @@ describe('SortingModule', () => {
     });
 
     test('allowDrop should prevent default', () => {
+        sortingModule.init(moduleData);
         const mockEvent = { preventDefault: jest.fn() };
         sortingModule.allowDrop(mockEvent);
         expect(mockEvent.preventDefault).toHaveBeenCalled();
@@ -187,6 +386,7 @@ describe('SortingModule', () => {
         let categoryElem;
 
         beforeEach(() => {
+            sortingModule.init(moduleData);
             wordElem = document.getElementById('word-apple');
             wordBank = document.getElementById('word-bank');
             categoryElem = document.getElementById('category-fruits');
@@ -238,6 +438,25 @@ describe('SortingModule', () => {
             expect(sortingModule.history[1].to).toBe(wordBank.id);
             expect(sortingModule.history[1].isCorrectMove).toBe(false); // Moving back to word-bank is not "correct" in terms of final placement
             expect(sortingModule.userAnswers['apple']).toBe(''); // Should clear answer if moved back to word-bank
+        });
+
+        test('should set isCorrectMove to false when moving a word from a correct category back to word-bank', () => {
+            const word = sortingModule.words[0]; // Assuming 'apple'
+            const wordElem = document.getElementById('word-' + word.replace(/\s+/g, '-').toLowerCase());
+            const fruitsCategoryElem = document.getElementById('category-fruits');
+            const wordBank = document.getElementById('word-bank');
+
+            // Simulate 'apple' being correctly in 'fruits' category
+            fruitsCategoryElem.appendChild(wordElem);
+            sortingModule.userAnswers[word] = 'fruits';
+
+            // Now, drag it back to word-bank
+            sortingModule.draggedElementId = wordElem.id;
+            const mockEvent = { preventDefault: jest.fn(), target: wordBank };
+            sortingModule.drop(mockEvent);
+
+            expect(wordBank.contains(wordElem)).toBe(true);
+            expect(sortingModule.history[sortingModule.history.length - 1].isCorrectMove).toBe(false);
         });
 
         test('should not move word if target is same as current parent', () => {
@@ -309,6 +528,7 @@ describe('SortingModule', () => {
 
     describe('render', () => {
         test('should move words to their assigned containers and re-apply feedback', () => {
+            sortingModule.init(moduleData);
             const appleWordElem = document.getElementById('word-apple');
             const fruitsCategoryElem = document.getElementById('category-fruits');
             const wordBank = document.getElementById('word-bank');
@@ -349,6 +569,20 @@ describe('SortingModule', () => {
     });
 
     describe('updateText', () => {
+        let scoreDisplay;
+
+        beforeEach(() => {
+            // Ensure a clean app-container for each updateText test
+            document.body.innerHTML = '<div id="app-container"></div>';
+            sortingModule = new SortingModule(authInstance, messagesInstance, gameCallbacks);
+            sortingModule.init(moduleData);
+
+            // Add a score display element for testing
+            scoreDisplay = document.createElement('div');
+            scoreDisplay.id = 'score-display';
+            document.getElementById('app-container').appendChild(scoreDisplay);
+        });
+
         test('should update button texts and category titles', () => {
             // Set up initial texts (they are mocked to return key, so this is fine)
             document.getElementById('undo-btn').textContent = 'Old Undo';
@@ -358,11 +592,6 @@ describe('SortingModule', () => {
                 <div id="category-fruits"><h3 class="text-l font-bold mb-2 capitalize">Old Fruits</h3></div>
                 <div id="category-vegetables"><h3 class="text-l font-bold mb-2 capitalize">Old Vegetables</h3></div>
             `;
-            // Add a score display element for testing
-            const scoreDisplay = document.createElement('div');
-            scoreDisplay.id = 'score-display';
-            document.getElementById('app-container').appendChild(scoreDisplay);
-
 
             sortingModule.updateText();
 
@@ -374,10 +603,6 @@ describe('SortingModule', () => {
         });
 
         test('should update score display when all correct', () => {
-            const scoreDisplay = document.createElement('div');
-            scoreDisplay.id = 'score-display';
-            document.getElementById('app-container').appendChild(scoreDisplay);
-
             sortingModule.sessionScore.correct = 4;
             sortingModule.words = ['apple', 'banana', 'carrot', 'broccoli']; // Ensure words array matches correct score
             sortingModule.updateText();
@@ -385,10 +610,6 @@ describe('SortingModule', () => {
         });
 
         test('should clear score display when not all correct', () => {
-            const scoreDisplay = document.createElement('div');
-            scoreDisplay.id = 'score-display';
-            document.getElementById('app-container').appendChild(scoreDisplay);
-
             sortingModule.sessionScore.correct = 2;
             sortingModule.words = ['apple', 'banana', 'carrot', 'broccoli'];
             sortingModule.updateText();
@@ -402,6 +623,11 @@ describe('SortingModule', () => {
         let categoryElem;
 
         beforeEach(() => {
+            // Re-initialize the DOM for each touch event test to ensure clean state
+            document.body.innerHTML = '<div id="app-container"></div>';
+            sortingModule = new SortingModule(authInstance, messagesInstance, gameCallbacks);
+            sortingModule.init(moduleData);
+
             wordElem = document.getElementById('word-apple');
             wordBank = document.getElementById('word-bank');
             categoryElem = document.getElementById('category-fruits');
