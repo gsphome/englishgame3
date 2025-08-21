@@ -33,7 +33,7 @@ describe('getGameModeIconSvg', () => {
     });
 
     test('should return correct SVG for completion', () => {
-        expect(getGameModeIconSvg('completion')).toContain('<path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />');
+        expect(getGameModeIconSvg('completion')).toContain('<path d="M2.25 3.75a.75.75 0 00-.75.75v15a.75.75 0 00.75.75h19.5a.75.75 0 00.75-.75V4.5a.75.75 0 00-.75-.75H2.25zM9 12.75L11.25 15 15 9.75" />');
     });
 
     test('should return correct SVG for sorting', () => {

@@ -15,7 +15,7 @@ export function getGameModeIconSvg(gameMode) {
         case 'quiz':
             return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 inline-block align-middle mr-1"><path d="M10.5 19.5h3V18h-3v1.5zm.75-11.25c0-1.036.84-1.875 1.875-1.875s1.875.84 1.875 1.875c0 .72-.387 1.39-.999 1.758-.482.29-.751.62-.751 1.017V15h-1.5v-3.75c0-.828.465-1.52 1.172-1.957.603-.373.928-.847.928-1.418z" /></svg>`;
         case 'completion':
-            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 inline-block align-middle mr-1"><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" /></svg>`;
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 inline-block align-middle mr-1"><path d="M2.25 3.75a.75.75 0 00-.75.75v15a.75.75 0 00.75.75h19.5a.75.75 0 00.75-.75V4.5a.75.75 0 00-.75-.75H2.25zM9 12.75L11.25 15 15 9.75" /></svg>`;
         case 'sorting':
             return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 inline-block align-middle mr-1"><path fill-rule="evenodd" d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.795 0 5.562.16 8.208.438.896.09 1.378 1.102.722 1.807l-4.75 5.109a.75.75 0 0 1-1.124.077L12 6.66l-2.556 2.666a.75.75 0 0 1-1.124-.077L3.07 4.745a1.5 1.5 0 0 1 .722-1.807ZM12 12.75a.75.75 0 0 1 .75.75v6.75a.75.75 0 0 1-1.5 0v-6.75a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" /></svg>`;
         case 'matching':
