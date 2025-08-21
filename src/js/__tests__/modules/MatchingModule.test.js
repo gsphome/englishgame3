@@ -191,6 +191,27 @@ describe('MatchingModule', () => {
             matchingModule.render();
             expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 0, mockModuleData.data.length);
         });
+
+        test('should shuffle terms and definitions if randomMode is true', () => {
+            mockGameCallbacks.randomMode = true;
+            mockGameCallbacks.shuffleArray.mockImplementation((arr) => [...arr].reverse()); // Mock shuffle behavior
+
+            matchingModule.render();
+
+            const termsColumn = document.getElementById('terms-column');
+            const definitionsColumn = document.getElementById('definitions-column');
+
+            // Check if terms are rendered in reversed order
+            expect(termsColumn.children[1]).toHaveTextContent('Term 2'); // First term after title
+            expect(termsColumn.children[2]).toHaveTextContent('Term 1'); // Second term after title
+
+            // Check if definitions are rendered in reversed order
+            expect(definitionsColumn.children[1]).toHaveTextContent('Definition 2'); // First definition after title
+            expect(definitionsColumn.children[2]).toHaveTextContent('Definition 1'); // Second definition after title
+
+            expect(mockGameCallbacks.shuffleArray).toHaveBeenCalledTimes(2); // Once for terms, once for definitions
+            mockGameCallbacks.randomMode = false; // Reset for other tests
+        });
     });
 
     describe('handleItemClick', () => {
@@ -238,6 +259,19 @@ describe('MatchingModule', () => {
             expect(term1Element).not.toHaveClass('selected');
             expect(term2Element).toHaveClass('selected');
             expect(matchingModule.selectedTerm).toEqual({ id: '2', element: term2Element });
+            expect(matchingModule.selectedDefinition).toBeNull(); // Ensure definition remains null
+        });
+
+        test('should deselect previous definition when a new definition is selected', () => {
+            matchingModule.handleItemClick(definition1Element); // Select definition 1
+            expect(definition1Element).toHaveClass('selected');
+
+            const definition2Element = document.getElementById('definition-2');
+            matchingModule.handleItemClick(definition2Element); // Select definition 2
+            expect(definition1Element).not.toHaveClass('selected');
+            expect(definition2Element).toHaveClass('selected');
+            expect(matchingModule.selectedDefinition).toEqual({ id: '2', element: definition2Element });
+            expect(matchingModule.selectedTerm).toBeNull(); // Ensure term remains null
         });
 
         test('should call attemptMatch when both term and definition are selected', () => {
@@ -290,6 +324,8 @@ describe('MatchingModule', () => {
             matchingModule.selectedTerm = { id: '1', element: term1Element };
             matchingModule.selectedDefinition = { id: '1', element: definition1Element };
 
+            const removeEventListenerSpy = jest.spyOn(Element.prototype, 'removeEventListener');
+
             matchingModule.attemptMatch();
 
             expect(matchingModule.matchedPairs).toEqual([{ termId: '1', definitionId: '1' }]);
@@ -301,6 +337,11 @@ describe('MatchingModule', () => {
             expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(1, 0, mockModuleData.data.length);
             expect(matchingModule.selectedTerm).toBeNull();
             expect(matchingModule.selectedDefinition).toBeNull();
+
+            // Verify removeEventListener was called
+            expect(removeEventListenerSpy).toHaveBeenCalledWith('click', expect.any(Function));
+            expect(removeEventListenerSpy).toHaveBeenCalledTimes(2); // Once for term, once for definition
+            removeEventListenerSpy.mockRestore();
         });
 
         test('should handle incorrect match', (done) => {
@@ -448,10 +489,10 @@ describe('MatchingModule', () => {
             appContainer.innerHTML = `
                 <div id="matching-container">
                     <div id="terms-column">
-                        <div id="term-1" class="matching-item term" data-id="1" data-type="term">Term 1</div>
+                        <div id="term-1" class="matching-item term" data-id="1" data-type="term">Term 1<svg></svg></div>
                     </div>
                     <div id="definitions-column">
-                        <div id="definition-1" class="matching-item definition" data-id="1" data-type="definition">Definition 1</div>
+                        <div id="definition-1" class="matching-item definition" data-id="1" data-type="definition">Definition 1<svg></svg></div>
                     </div>
                 </div>
             `;
@@ -471,8 +512,10 @@ describe('MatchingModule', () => {
 
             expect(term1Element).not.toHaveClass('matched', 'bg-green-200', 'cursor-default');
             expect(term1Element).toHaveClass('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
+            expect(term1Element.innerHTML).not.toContain('<svg'); // Check SVG removal
             expect(definition1Element).not.toHaveClass('matched', 'bg-green-200', 'cursor-default');
             expect(definition1Element).toHaveClass('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
+            expect(definition1Element.innerHTML).not.toContain('<svg'); // Check SVG removal
         });
 
         test('should re-attach event listeners to undone elements', () => {
