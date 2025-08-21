@@ -187,6 +187,37 @@ describe('FlashcardModule', () => {
             expect(document.getElementById('back-to-menu-flashcard-btn')).toHaveTextContent('backToMenu');
         });
 
+        test('should update button texts', () => {
+            flashcardModule.render();
+            expect(document.getElementById('prev-btn')).toHaveTextContent('prevButton');
+            expect(document.getElementById('next-btn')).toHaveTextContent('nextButton');
+            expect(document.getElementById('back-to-menu-flashcard-btn')).toHaveTextContent('backToMenu');
+        });
+
+        test('should handle null flashcard front/back elements gracefully during re-render', () => {
+            // Initial render to create the container
+            flashcardModule.render();
+
+            // Mock querySelector to return null for flashcard-front and flashcard-back
+            const originalQuerySelector = document.querySelector;
+            jest.spyOn(document, 'querySelector').mockImplementation((selector) => {
+                if (selector === '.flashcard-front' || selector === '.flashcard-back') {
+                    return null;
+                }
+                return originalQuerySelector.call(document, selector);
+            });
+
+            // Change current index and re-render
+            flashcardModule.currentIndex = 1;
+            flashcardModule.render();
+
+            // Expect no errors and that other parts of render still execute
+            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 0, mockModuleData.data.length);
+            expect(document.getElementById('prev-btn')).toHaveTextContent('prevButton');
+
+            jest.restoreAllMocks(); // Restore querySelector mock
+        });
+
         test('should add card-active class to flashcard', () => {
             flashcardModule.render();
             const card = document.querySelector('.flashcard');

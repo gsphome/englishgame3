@@ -125,5 +125,34 @@ describe('dataManager.js', () => {
             expect(result).toBeNull();
             expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to load module data:', expect.any(Error));
         });
+
+        test('should return combined module metadata and non-array data on successful fetch', async () => {
+            const mockModuleData = { title: 'Test Module', content: 'Some content' };
+
+            // Mock fetchAllLearningModules first
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve(mockAllModules),
+            });
+
+            // Mock fetch for the specific module data
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve(mockModuleData),
+            });
+
+            const result = await fetchModuleData('quiz-1'); // Using quiz-1 as it's available in mockAllModules
+            expect(result).toEqual({
+                id: 'quiz-1',
+                name: 'Quiz 1',
+                gameMode: 'quiz',
+                dataPath: './assets/data/quiz-1.json',
+                title: 'Test Module',
+                content: 'Some content',
+            });
+            expect(global.fetch).toHaveBeenCalledWith('src/assets/data/game-db.json');
+            expect(global.fetch).toHaveBeenCalledWith('./assets/data/quiz-1.json');
+            expect(consoleErrorSpy).not.toHaveBeenCalled();
+        });
     });
 });

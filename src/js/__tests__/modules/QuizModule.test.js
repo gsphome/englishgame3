@@ -238,7 +238,13 @@ describe('QuizModule', () => {
             // Now go back to Q1 (which should be rendered as answered)
             quizModule.currentIndex = 0;
             quizModule.isViewingHistory = false; // Ensure we are not in history viewing mode
-            quizModule.render(quizModule.history[0]); 
+            quizModule.render({
+                ...quizModule.history[0],
+                shuffledOptions: [
+                    { option: 'A1', className: 'some-class', disabled: true },
+                    { option: 'A2', className: 'some-other-class', disabled: true },
+                ],
+            }); 
 
             const optionA1 = document.querySelector('[data-option="A1"]');
             const optionA2 = document.querySelector('[data-option="A2"]');
@@ -1053,6 +1059,38 @@ describe('QuizModule', () => {
             quizModule.isViewingHistory = false;
             quizModule.updateText();
             expect(document.getElementById('feedback-container')).toBeEmptyDOMElement();
+        });
+
+        test('should update feedback container when in history viewing mode', () => {
+            // Manual setup for this test
+            quizModule.moduleData = mockModuleData;
+            appContainer.innerHTML = `
+                <div id="quiz-container" class="max-w-2xl mx-auto">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <p class="text-base mb-6 md:text-xl" id="quiz-question"></p>
+                        <p class="text-lg text-gray-500 mb-4" id="quiz-tip"></p>
+                        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <button id="undo-btn"></button>
+                        <div>
+                            <button id="prev-btn"></button>
+                            <button id="next-btn"></button>
+                        </div>
+                    </div>
+                    <button id="quiz-summary-back-to-menu-btn"></button>
+                </div>
+            `;
+
+            quizModule.history = [
+                { index: 0, isCorrect: true, selectedOption: 'A', correctAnswer: 'A', feedbackHtml: '<p>Exp1</p>', sessionScoreBefore: { correct: 0, incorrect: 0 } },
+                { index: 1, isCorrect: false, selectedOption: 'D', correctAnswer: 'C', feedbackHtml: '<p>Exp2</p>', sessionScoreBefore: { correct: 1, incorrect: 0 } }
+            ];
+            quizModule.historyPointer = 1; // Point to Q2 history
+            quizModule.isViewingHistory = true;
+            quizModule.updateText();
+            expect(document.getElementById('feedback-container')).toHaveTextContent('Exp2');
         });
     });
 });

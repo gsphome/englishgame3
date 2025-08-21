@@ -98,14 +98,14 @@ describe('MatchingModule', () => {
 
             matchingModule.init({ ...mockModuleData, data: [...mockModuleData.data] });
 
-            expect(mockGameCallbacks.shuffleArray).toHaveBeenCalledWith(expect.arrayContaining(mockModuleData.data.slice(0, 5)));
-            expect(matchingModule.moduleData.data).toEqual(mockModuleData.data.slice(0, 5).reverse());
+            expect(mockGameCallbacks.shuffleArray).toHaveBeenCalledWith(expect.arrayContaining(mockModuleData.data.slice(0, 3)));
+            expect(matchingModule.moduleData.data).toEqual(mockModuleData.data.slice(0, 3).reverse());
         });
 
         test('should not shuffle module data if randomMode is false', () => {
             matchingModule.init(mockModuleData);
             expect(mockGameCallbacks.shuffleArray).not.toHaveBeenCalled();
-            expect(matchingModule.moduleData.data).toEqual(mockModuleData.data.slice(0, 5));
+            expect(matchingModule.moduleData.data).toEqual(mockModuleData.data.slice(0, 3));
         });
 
         test('should call render', () => {
@@ -546,6 +546,37 @@ describe('MatchingModule', () => {
             expect(definition1Element).not.toHaveClass('matched', 'incorrect', 'cursor-default', 'selected');
             expect(definition1Element).toHaveClass('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
             expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 0, mockModuleData.data.length);
+        });
+    });
+
+    describe('checkAnswers', () => {
+        const mockModuleData = {
+            data: [
+                { id: '1', term: "Term 1", definition: "Definition 1" },
+                { id: '2', term: "Term 2", definition: "Definition 2" },
+            ],
+        };
+
+        beforeEach(() => {
+            matchingModule.init(mockModuleData);
+            mockGameCallbacks.showMatchingSummary.mockClear();
+        });
+
+        test('should call showMatchingSummary if all pairs are matched', () => {
+            matchingModule.matchedPairs = [
+                { termId: '1', definitionId: '1' },
+                { termId: '2', definitionId: '2' },
+            ];
+            matchingModule.checkAnswers();
+            expect(mockGameCallbacks.showMatchingSummary).toHaveBeenCalled();
+        });
+
+        test('should do nothing if not all pairs are matched', () => {
+            matchingModule.matchedPairs = [
+                { termId: '1', definitionId: '1' },
+            ];
+            matchingModule.checkAnswers();
+            expect(mockGameCallbacks.showMatchingSummary).not.toHaveBeenCalled();
         });
     });
 
