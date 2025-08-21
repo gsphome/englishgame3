@@ -75,10 +75,12 @@ class MatchingModule {
             this.selectedTerm.element.classList.remove('selected', 'bg-gray-100', 'hover:bg-gray-200');
             this.selectedTerm.element.classList.add('matched', 'bg-green-200', 'cursor-default');
             this.selectedTerm.element.removeEventListener('click', this.handleItemClick);
+            this.selectedTerm.element.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 inline-block ml-2 match-icon"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9.5 14.25a.75.75 0 0 1-1.172.036L3.25 12.25a.75.75 0 0 1 1.06-1.06l5.353 5.353 9.006-13.509a.75.75 0 0 1 1.04-.208Z" clip-rule="evenodd" /></svg>';
 
             this.selectedDefinition.element.classList.remove('selected', 'bg-gray-100', 'hover:bg-gray-200');
             this.selectedDefinition.element.classList.add('matched', 'bg-green-200', 'cursor-default');
             this.selectedDefinition.element.removeEventListener('click', this.handleItemClick);
+            this.selectedDefinition.element.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 inline-block ml-2 match-icon"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9.5 14.25a.75.75 0 0 1-1.172.036L3.25 12.25a.75.75 0 0 1 1.06-1.06l5.353 5.353 9.006-13.509a.75.75 0 0 1 1.04-.208Z" clip-rule="evenodd" /></svg>';
 
             // Update score (optional, can be done on final check)
             this.sessionScore.correct++;
@@ -127,11 +129,13 @@ class MatchingModule {
             if (termElement) {
                 termElement.classList.remove('matched', 'bg-green-200', 'cursor-default');
                 termElement.classList.add('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
+                termElement.innerHTML = termElement.textContent; // Remove SVG
                 termElement.addEventListener('click', (e) => this.handleItemClick(e.target));
             }
             if (defElement) {
                 defElement.classList.remove('matched', 'bg-green-200', 'cursor-default');
                 defElement.classList.add('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
+                defElement.innerHTML = defElement.textContent; // Remove SVG
                 defElement.addEventListener('click', (e) => this.handleItemClick(e.target));
             }
             this.sessionScore.correct--;
@@ -148,6 +152,7 @@ class MatchingModule {
         document.querySelectorAll('.matching-item').forEach(element => {
             element.classList.remove('matched', 'bg-green-200', 'incorrect', 'bg-red-200', 'cursor-default', 'selected');
             element.classList.add('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
+            element.innerHTML = element.textContent; // Remove SVG
             element.addEventListener('click', (e) => this.handleItemClick(e.target));
         });
         this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
