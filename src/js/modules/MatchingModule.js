@@ -13,7 +13,6 @@ class MatchingModule {
         this.selectedTerm = null;
         this.selectedDefinition = null;
         this.matchedPairs = []; // Stores { termId: 'id', definitionId: 'id' }
-        this.allPairs = []; // Stores all possible pairs from moduleData
         this.feedbackActive = false;
 
         // Bind event handlers

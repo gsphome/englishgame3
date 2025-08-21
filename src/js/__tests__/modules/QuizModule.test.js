@@ -255,6 +255,73 @@ describe('QuizModule', () => {
             expect(optionA2).toBeDisabled();
             expect(document.getElementById('feedback-container')).toHaveTextContent('Exp1');
         });
+
+        test('should use shuffledOptions from historyEntry if provided', () => {
+            const mockModuleData = {
+                data: [
+                    { sentence: "Q1 ______", options: ["A", "B", "C"], correct: "A", explanation: "Exp1" },
+                ],
+            };
+            quizModule.moduleData = mockModuleData;
+            quizModule.currentIndex = 0;
+
+            const historyEntryWithShuffledOptions = {
+                index: 0,
+                selectedOption: 'B',
+                correctAnswer: 'A',
+                isCorrect: false,
+                // Simulate options being shuffled to a specific order in history
+                shuffledOptions: [
+                    { option: 'C' },
+                    { option: 'A' },
+                    { option: 'B' },
+                ],
+                feedbackHtml: '<p>Test Feedback</p>',
+                sessionScoreBefore: { correct: 0, incorrect: 0 }
+            };
+
+            quizModule.render(historyEntryWithShuffledOptions);
+
+            const options = document.querySelectorAll('#options-container button');
+            expect(options.length).toBe(3);
+            expect(options[0].innerHTML).toContain('<span>C</span>');
+            expect(options[1].innerHTML).toContain('<span>A</span>');
+            expect(options[2].innerHTML).toContain('<span>B</span>');
+        });
+
+        test('should apply bg-white to unselected options that are not the correct answer when rendering a history entry', () => {
+            const mockModuleDataWithThreeOptions = {
+                data: [
+                    { sentence: "Q1 ______", options: ["A1", "A2", "A3"], correct: "A1", explanation: "Exp1" },
+                ],
+            };
+            quizModule.moduleData = mockModuleDataWithThreeOptions;
+            quizModule.currentIndex = 0;
+
+            // Simulate a history entry where A2 was selected (incorrect), A1 is correct. A3 is neither.
+            const historyEntry = {
+                index: 0,
+                selectedOption: 'A2',
+                correctAnswer: 'A1',
+                isCorrect: false,
+                shuffledOptions: [{ option: 'A1' }, { option: 'A2' }, { option: 'A3' }],
+                feedbackHtml: '<p>Test Feedback</p>',
+                sessionScoreBefore: { correct: 0, incorrect: 0 }
+            };
+
+            quizModule.render(historyEntry);
+
+            const optionA1 = document.querySelector('[data-option="A1"]');
+            const optionA2 = document.querySelector('[data-option="A2"]');
+            const optionA3 = document.querySelector('[data-option="A3"]');
+
+            expect(optionA1).toHaveClass('bg-green-500', 'text-white'); // Correct answer
+            expect(optionA2).toHaveClass('bg-red-500', 'text-white');   // Selected incorrect
+            expect(optionA3).toHaveClass('bg-white');                   // Unselected, not correct
+            expect(optionA1).toBeDisabled();
+            expect(optionA2).toBeDisabled();
+            expect(optionA3).toBeDisabled();
+        });
     });
 
     describe('handleAnswer', () => {
@@ -707,6 +774,27 @@ describe('QuizModule', () => {
             jest.clearAllMocks();
         });
 
+        test('should return early if navigation buttons are not in the DOM', () => {
+            // Remove buttons from DOM to simulate them not being rendered
+            document.getElementById('prev-btn').remove();
+            document.getElementById('next-btn').remove();
+            document.getElementById('undo-btn').remove();
+
+            // Spy on console.error to ensure no unexpected errors, though it shouldn't error
+            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+            // Call the function
+            quizModule.updateNavigationButtons();
+
+            // Assert that no errors were logged and no other button-related logic was executed
+            expect(consoleErrorSpy).not.toHaveBeenCalled();
+            // We can't directly assert that it returned early, but we can assert side effects didn't happen.
+            // For example, if it tried to access properties of null, it would throw.
+            // Since it doesn't throw, and no other button-related logic is expected, this is sufficient.
+
+            consoleErrorSpy.mockRestore();
+        });
+
         test('should disable prev and undo buttons at start of quiz (normal mode)', () => {
             quizModule.currentIndex = 0;
             quizModule.isViewingHistory = false;
@@ -796,6 +884,25 @@ describe('QuizModule', () => {
             quizModule.updateNavigationButtons();
             expect(document.getElementById('prev-btn')).not.toBeDisabled();
             expect(document.getElementById('next-btn')).not.toBeDisabled();
+        });
+
+        test('should disable undo button if current question is not the one that was last answered', () => {
+            const mockModuleData = {
+                data: [
+                    { sentence: "Q1", options: ["A", "B"], correct: "A", explanation: "Exp1" },
+                    { sentence: "Q2", options: ["C", "D"], correct: "C", explanation: "Exp2" },
+                ],
+            };
+            quizModule.init(mockModuleData);
+            quizModule.render();
+
+            quizModule.handleAnswer('A'); // Answer Q1
+            // Now manually change currentIndex to Q2 without answering it
+            quizModule.currentIndex = 1;
+            quizModule.render(); // Re-render for Q2
+
+            quizModule.updateNavigationButtons();
+            expect(document.getElementById('undo-btn')).toBeDisabled();
         });
     });
 

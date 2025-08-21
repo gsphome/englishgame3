@@ -59,7 +59,6 @@ describe('MatchingModule', () => {
         expect(matchingModule.selectedTerm).toBeNull();
         expect(matchingModule.selectedDefinition).toBeNull();
         expect(matchingModule.matchedPairs).toEqual([]);
-        expect(matchingModule.allPairs).toEqual([]);
         expect(matchingModule.feedbackActive).toBe(false);
     });
 
