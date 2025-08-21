@@ -1,4 +1,4 @@
-import CompletionModule from '../modules/CompletionModule';
+import CompletionModule from '../../modules/CompletionModule.js';
 import '@testing-library/jest-dom';
 
 // Mock dependencies

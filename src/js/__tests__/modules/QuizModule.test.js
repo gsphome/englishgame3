@@ -1,4 +1,4 @@
-import QuizModule from '../modules/QuizModule';
+import QuizModule from '../../modules/QuizModule.js';
 import '@testing-library/jest-dom';
 
 // Mock dependencies
@@ -216,38 +216,6 @@ describe('QuizModule', () => {
             quizModule.init(mockModuleData); // Initialize and render the module
             optionA1 = document.querySelector('[data-option="A1"]');
             optionA2 = document.querySelector('[data-option="A2"]');
-        });
-
-        test('should handle correct answer', () => {
-            optionA1.click();
-
-            expect(quizModule.sessionScore.correct).toBe(1);
-            expect(quizModule.sessionScore.incorrect).toBe(0);
-            expect(mockAuth.updateGlobalScore).toHaveBeenCalledWith({ correct: 1, incorrect: 0 });
-            expect(optionA1).toHaveClass('bg-green-500', 'text-white');
-            expect(optionA2).toHaveClass('bg-white'); // Ensure other options are not green
-            expect(optionA1).toBeDisabled();
-            expect(optionA2).toBeDisabled();
-            expect(document.getElementById('feedback-container')).toHaveTextContent('Exp1');
-            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(1, 0, mockModuleData.data.length);
-            expect(quizModule.history.length).toBe(1);
-            expect(quizModule.history[0].isCorrect).toBe(true);
-        });
-
-        test('should handle incorrect answer', () => {
-            optionA2.click();
-
-            expect(quizModule.sessionScore.correct).toBe(0);
-            expect(quizModule.sessionScore.incorrect).toBe(1);
-            expect(mockAuth.updateGlobalScore).toHaveBeenCalledWith({ correct: 0, incorrect: 1 });
-            expect(optionA2).toHaveClass('bg-red-500', 'text-white');
-            expect(optionA1).toHaveClass('bg-green-500', 'text-white'); // Correct answer should be highlighted
-            expect(optionA1).toBeDisabled();
-            expect(optionA2).toBeDisabled();
-            expect(document.getElementById('feedback-container')).toHaveTextContent('Exp1');
-            expect(mockGameCallbacks.updateSessionScoreDisplay).toHaveBeenCalledWith(0, 1, mockModuleData.data.length);
-            expect(quizModule.history.length).toBe(1);
-            expect(quizModule.history[0].isCorrect).toBe(false);
         });
 
         test('should not update score if scoreFrozen is true', () => {

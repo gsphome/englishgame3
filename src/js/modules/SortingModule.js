@@ -25,7 +25,6 @@ class SortingModule {
     }
 
     init(module) {
-        console.log("Current module data:", this.moduleData);
         this.moduleData = module;
         this.appContainer = document.getElementById('app-container');
         // Determine the categories that will actually be rendered

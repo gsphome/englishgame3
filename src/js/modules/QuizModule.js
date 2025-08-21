@@ -43,6 +43,7 @@ class QuizModule {
                 <div id="quiz-container" class="max-w-2xl mx-auto">
                     <div class="bg-white p-8 rounded-lg shadow-md">
                         <p class="text-base mb-6 md:text-xl" id="quiz-question"></p>
+                        ${questionData.tip ? `<p class="text-lg text-gray-500 mb-4" id="quiz-tip">Tip: ${questionData.tip}</p>` : ''}
                         <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                         <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
                     </div>
@@ -75,12 +76,29 @@ class QuizModule {
         const optionLetters = ['A', 'B', 'C', 'D'];
         optionsToRender.forEach((option, index) => {
             const button = document.createElement('button');
-            button.className = "w-full text-left bg-white hover:bg-gray-200 text-gray-800 font-semibold py-3 px-5 rounded-lg shadow-md transition duration-300 flex items-center";
+            button.className = "w-full text-left bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-5 rounded-lg shadow-md transition duration-300 flex items-center";
             button.dataset.option = option;
             button.innerHTML = `<span class="font-bold mr-4">${optionLetters[index]}</span><span>${option}</span>`;
             button.addEventListener('click', (e) => this.handleAnswer(e.target.closest('[data-option]').dataset.option));
             optionsContainer.appendChild(button);
         });
+
+        const quizTipElement = document.getElementById('quiz-tip');
+        if (questionData.tip) {
+            if(quizTipElement) {
+                quizTipElement.textContent = `Tip: ${questionData.tip}`;
+                quizTipElement.classList.remove('hidden');
+            }
+        } else {
+            if(quizTipElement) {
+                quizTipElement.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('undo-btn').textContent = this.MESSAGES.get('undoButton');
+        document.getElementById('prev-btn').textContent = this.MESSAGES.get('prevButton');
+        document.getElementById('next-btn').textContent = this.MESSAGES.get('nextButton');
+        document.getElementById('quiz-summary-back-to-menu-btn').textContent = this.MESSAGES.get('backToMenu');
 
         document.getElementById('feedback-container').innerHTML = '';
         this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
@@ -97,8 +115,6 @@ class QuizModule {
             disabled: button.disabled
         }));
 
-        // If we are not at the end of history (i.e., user has undone some actions),
-        // truncate history from historyPointer + 1 onwards.
         if (this.historyPointer < this.history.length - 1) {
             this.history.splice(this.historyPointer + 1);
         }
@@ -108,14 +124,14 @@ class QuizModule {
             selectedOption: selectedOption,
             correctAnswer: questionData.correct,
             isCorrect: isCorrect,
-            shuffledOptions: currentOptions, // Store the state of the options as they were rendered
-            feedbackHtml: feedbackHtml, // Store the feedback HTML
-            sessionScoreBefore: { ...this.sessionScore } // Store the session score before this action
+            shuffledOptions: currentOptions, 
+            feedbackHtml: feedbackHtml, 
+            sessionScoreBefore: { ...this.sessionScore } 
         };
         this.history.push(newAction);
-        this.historyPointer = this.history.length - 1; // Update history pointer
+        this.historyPointer = this.history.length - 1; 
 
-        if (!this.scoreFrozen) { // Only update score if not frozen
+        if (!this.scoreFrozen) { 
             if (isCorrect) {
                 this.sessionScore.correct++;
                 this.auth.updateGlobalScore({ correct: 1, incorrect: 0 });
@@ -125,9 +141,14 @@ class QuizModule {
             }
         }
 
-        // Visual feedback (always apply)
         const selectedOptionElement = document.querySelector(`[data-option="${selectedOption}"]`);
         const correctOptionElement = document.querySelector(`[data-option="${questionData.correct}"]`);
+
+        document.querySelectorAll('[data-option]').forEach(b => {
+            b.disabled = true;
+            b.classList.remove('hover:bg-gray-200');
+            b.classList.add('bg-white');
+        });
 
         if (isCorrect) {
             if (selectedOptionElement) {
@@ -139,18 +160,14 @@ class QuizModule {
             }
         }
 
-        // Always highlight the correct answer in green
         if (correctOptionElement) {
             correctOptionElement.classList.add('bg-green-500', 'text-white');
         }
         
 
         document.getElementById('feedback-container').innerHTML = `<p class="text-lg">${questionData.explanation}</p>`;
-        document.querySelectorAll('[data-option]').forEach(b => {
-            b.disabled = true;
-            b.classList.remove('hover:bg-gray-200');
-        });
-        if (!this.scoreFrozen) { // Only update score display if not frozen
+        
+        if (!this.scoreFrozen) { 
             this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         }
     }
@@ -159,11 +176,9 @@ class QuizModule {
         if (this.currentIndex > 0) {
             const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
             if (optionsDisabled) {
-                // If the current question has been answered, undo it
                 this.undo();
             } else {
-                // If not answered, just go back to the previous question
-                this.scoreFrozen = false; // Reset scoreFrozen when moving to a new question
+                this.scoreFrozen = false; 
                 this.currentIndex--;
                 this.render();
             }
@@ -171,16 +186,13 @@ class QuizModule {
     }
 
     next() {
-        // Prevent advancing if no option has been selected for the current question
         const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
-        if (!optionsDisabled && this.moduleData.data[this.currentIndex].options) { // Check if it's a quiz question and no option is selected
-            // Optionally, provide feedback to the user that an option must be selected
-            // For now, just prevent advancement
+        if (!optionsDisabled && this.moduleData.data[this.currentIndex].options) { 
             return;
         }
 
         if (this.currentIndex < this.moduleData.data.length - 1) {
-            this.scoreFrozen = false; // Reset scoreFrozen when moving to a new question
+            this.scoreFrozen = false; 
             this.currentIndex++;
             this.render();
         } else {
@@ -194,28 +206,15 @@ class QuizModule {
             this.historyPointer--;
             this.scoreFrozen = true;
 
-            // Do not revert scores on undo, as per new logic.
-            // Scores are only updated when a new answer is submitted.
-            // if (lastAction.isCorrect) {
-            //     this.sessionScore.correct--;
-            //     auth.updateGlobalScore({ correct: -1, incorrect: 0 });
-            // } else {
-            //     this.sessionScore.incorrect--;
-            //     auth.updateGlobalScore({ correct: 0, incorrect: -1 });
-            // }
-
-            // Restore the UI state for the undone question
             const optionsContainer = document.getElementById('options-container');
             const feedbackContainer = document.getElementById('feedback-container');
 
-            // Clear feedback
             feedbackContainer.innerHTML = '';
 
-            // Re-enable all options and remove color classes
             document.querySelectorAll('[data-option]').forEach(button => {
                 button.disabled = false;
                 button.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
-                button.classList.add('bg-gray-100', 'hover:bg-gray-200'); // Restore default classes
+                button.classList.add('bg-gray-100', 'hover:bg-gray-200'); 
             });
             this.gameCallbacks.updateSessionScoreDisplay(lastAction.sessionScoreBefore.correct, lastAction.sessionScoreBefore.incorrect, this.moduleData.data.length);
         }
@@ -265,19 +264,13 @@ class QuizModule {
             }
         }
 
-        // Update option texts
         const optionsContainer = document.getElementById('options-container');
         const optionButtons = optionsContainer.querySelectorAll('[data-option]');
         const optionLetters = ['A', 'B', 'C', 'D'];
-        // Assuming optionsToRender is still available or can be re-derived if needed
-        // For now, let's assume the options are in the same order as they were rendered
         optionButtons.forEach((button, index) => {
             const optionTextSpan = button.querySelector('span:last-child');
             if (optionTextSpan) {
-                // This is a bit tricky without knowing the exact order of optionsToRender
-                // For simplicity, we'll just update the letter, assuming the text content is static for the current question
-                // A more robust solution would involve re-creating the buttons or mapping them to the shuffled options
-                optionTextSpan.textContent = button.dataset.option; // Re-set the text content from data-option
+                optionTextSpan.textContent = button.dataset.option; 
             }
             const optionLetterSpan = button.querySelector('span:first-child');
             if (optionLetterSpan) {
@@ -285,18 +278,13 @@ class QuizModule {
             }
         });
 
-        // Update button texts
         document.getElementById('undo-btn').textContent = this.MESSAGES.get('undoButton');
         document.getElementById('prev-btn').textContent = this.MESSAGES.get('prevButton');
         document.getElementById('next-btn').textContent = this.MESSAGES.get('nextButton');
         document.getElementById('quiz-summary-back-to-menu-btn').textContent = this.MESSAGES.get('backToMenu');
 
-        // Update feedback container if it has content
         const feedbackContainer = document.getElementById('feedback-container');
         if (feedbackContainer.innerHTML !== '') {
-            // If there's feedback, re-render it based on the current language
-            // This assumes the feedback message is simple and can be re-generated
-            // For more complex feedback, we might need to store the feedback type
             const isCorrect = this.history.length > 0 ? this.history[this.history.length - 1].correct : null;
             if (isCorrect !== null) {
                 const lastQuestionData = this.moduleData.data[this.history[this.history.length - 1].index];

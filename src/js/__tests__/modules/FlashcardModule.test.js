@@ -1,4 +1,4 @@
-import FlashcardModule from '../modules/FlashcardModule';
+import FlashcardModule from '../../modules/FlashcardModule.js';
 import '@testing-library/jest-dom';
 
 // Mock dependencies

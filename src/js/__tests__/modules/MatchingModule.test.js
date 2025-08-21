@@ -1,4 +1,4 @@
-import MatchingModule from '../modules/MatchingModule';
+import MatchingModule from '../../modules/MatchingModule.js';
 import '@testing-library/jest-dom';
 
 // Mock dependencies

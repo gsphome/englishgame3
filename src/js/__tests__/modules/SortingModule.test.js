@@ -1,5 +1,5 @@
 
-import SortingModule from '../modules/SortingModule';
+import SortingModule from '../../modules/SortingModule.js';
 
 // Mock dependencies
 const authInstance = {
