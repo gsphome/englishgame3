@@ -75,8 +75,11 @@ export const game = {
             const newLang = MESSAGES.getLanguage() === 'en' ? 'es' : 'en';
             MESSAGES.setLanguage(newLang);
             localStorage.setItem('appLang', newLang);
-            // Removed this.renderCurrentView() as it causes module to advance
             this.updateMenuText(); // Explicitly call to update menu buttons
+            if (this.currentView === 'menu') { // Only re-render menu if currently on main menu
+                this.renderMenu();
+            }
+            this.updateFooterVisibility(); // Always update footer
         });
 
         this.menuLogoutBtn.addEventListener('click', () => {
