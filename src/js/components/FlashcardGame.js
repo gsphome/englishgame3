@@ -1,6 +1,6 @@
 // src/js/modules/FlashcardModule.js
 
-class FlashcardModule {
+class FlashcardGame {
     constructor(authInstance, messagesInstance, gameCallbacks) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
@@ -13,6 +13,10 @@ class FlashcardModule {
         this.sessionScore = { correct: 0, incorrect: 0 };
     }
 
+    /**
+     * Initializes the Flashcard module with the given module data.
+     * @param {object} module - The module data containing flashcards.
+     */
     init(module) {
         this.currentIndex = 0;
         this.moduleData = module;
@@ -289,4 +293,4 @@ class FlashcardModule {
     }
 }
 
-export default FlashcardModule;
+export default FlashcardGame;

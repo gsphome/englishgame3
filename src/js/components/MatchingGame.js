@@ -1,6 +1,6 @@
 // src/js/modules/MatchingModule.js
 
-class MatchingModule {
+class MatchingGame {
     constructor(authInstance, messagesInstance, gameCallbacks) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
@@ -19,6 +19,10 @@ class MatchingModule {
         this.handleItemClick = this.handleItemClick.bind(this);
     }
 
+    /**
+     * Initializes the Matching module with the given module data.
+     * @param {object} module - The module data containing matching exercises.
+     */
     init(module) {
         this.currentIndex = 0;
         this.moduleData = module;
@@ -274,4 +278,4 @@ class MatchingModule {
     }
 }
 
-export default MatchingModule;
+export default MatchingGame;

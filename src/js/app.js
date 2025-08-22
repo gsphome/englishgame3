@@ -1,15 +1,19 @@
-import FlashcardModule from './modules/FlashcardModule.js';
-import QuizModule from './modules/QuizModule.js';
-import CompletionModule from './modules/CompletionModule.js';
-import SortingModule from './modules/SortingModule.js';
-import MatchingModule from './modules/MatchingModule.js';
+import FlashcardModule from './components/FlashcardGame.js';
+import QuizModule from './components/QuizGame.js';
+import CompletionModule from './components/CompletionGame.js';
+import SortingModule from './components/SortingGame.js';
+import MatchingModule from './components/MatchingGame.js';
 import { auth } from './auth.js';
 import { MESSAGES } from './interface.js';
 
-import { shuffleArray, getGameModeIconSvg, toggleModal, showExplanationModal, toggleHamburgerMenu, updateSessionScoreDisplay, updateFooterVisibility, renderHeader as renderHeaderUtil } from './utils.js';
+import { shuffleArray, getGameModeIconSvg, toggleModal, showExplanationModal, toggleHamburgerMenu, updateSessionScoreDisplay, updateFooterVisibility, renderHeader as renderHeaderUtil, isMobile } from './utils.js';
 import { fetchModuleData, fetchAllLearningModules } from './dataManager.js';
 
-export const game = {
+/**
+ * @file Manages the main application flow, module initialization, and global state.
+ * @namespace app
+ */
+export const app = {
     shuffleArray: shuffleArray, // Make shuffleArray accessible via game object
 
     modal: null,
@@ -24,13 +28,12 @@ export const game = {
     startY: 0,
     flashcardModule: null,
 
-    toggleModal(show) {
-        toggleModal(this.modal, show);
-        if (show) {
-            this.messageElement.textContent = MESSAGES.get('confirmLogoutMessage');
-        }
-    },
+    
 
+    /**
+     * Initializes the main application, setting up modals, authentication, learning modules, and event listeners.
+     * @returns {Promise<void>}
+     */
     async init() {
         this.modal = document.getElementById('confirmation-modal');
         auth.init();
@@ -96,7 +99,7 @@ export const game = {
 
         this.menuLogoutBtn.addEventListener('click', () => {
             toggleHamburgerMenu(false); // Use imported toggleHamburgerMenu
-            game.showLogoutConfirmation();
+            toggleModal(this.modal, true);
         });
 
         this.menuRandomModeBtn.addEventListener('click', () => {
@@ -160,9 +163,7 @@ export const game = {
         }
     },
 
-    showExplanationModal(wordData) {
-        showExplanationModal(this.explanationModal, wordData); // Use imported showExplanationModal
-    },
+    
 
     renderHeader() {
         const user = auth.getUser();
@@ -183,9 +184,7 @@ export const game = {
         }
     },
 
-    updateFooterVisibility() { // This is a method of game, so keep this.
-        updateFooterVisibility(this.currentView, MESSAGES); // Use imported updateFooterVisibility
-    },
+    
 
     updateMenuText() { // This is a method of game, so keep this.
         if (this.menuLangToggleBtn) {
@@ -323,7 +322,7 @@ export const game = {
 
     getMenuMaxWidth() { // This is a method of game, so keep this.
         const width = window.innerWidth;
-        if (this.isMobile()) { // Use this.isMobile()
+        if (isMobile()) { // Use isMobile()
             return '300px'; // Ancho para móviles
         }
         // Si el ancho es para 4 columnas (entre 768px y 1024px)
@@ -523,7 +522,7 @@ export const game = {
                 <div id="flashcard-summary-container" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
                     <h1 id="flashcard-summary-title" class="text-2xl font-bold mb-4">${MESSAGES.get('sessionScore')}</h1>
                     <p id="flashcard-summary-message" class="text-xl mb-4">${MESSAGES.get('flashcardSummaryMessage').replace('{count}', totalCards)}</p>
-                    <button id="flashcard-summary-back-to-menu-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out" onclick="game.renderMenu()">${MESSAGES.get('backToMenu')}</button>
+                    <button id="flashcard-summary-back-to-menu-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out" onclick="app.renderMenu()">${MESSAGES.get('backToMenu')}</button>
                 </div>
             `;
         } else {
@@ -572,12 +571,12 @@ export const game = {
             document.getElementById('matching-completion-replay-btn').addEventListener('click', () => {
                 
                 modal.classList.add('hidden');
-                game.renderMatching(game.currentModule); // This is a method of game, so keep this.
+                app.renderMatching(app.currentModule);
             });
             document.getElementById('matching-completion-back-to-menu-btn').addEventListener('click', () => {
                 
                 modal.classList.add('hidden');
-                game.renderMenu(); // This is a method of game, so keep this.
+                app.renderMenu();
             });
         }
 
@@ -629,9 +628,7 @@ export const game = {
         modal.classList.remove('hidden'); // Show the modal
     },
 
-    showLogoutConfirmation() { // This is a method of game, so keep this.
-        toggleModal(this.modal, true); // Use imported toggleModal
-    },
+    
 
     renderQuiz(module) { // This is a method of game, so keep this.
         this.currentView = 'quiz';
@@ -714,9 +711,7 @@ export const game = {
         });
     },
 
-    isMobile() { // Added isMobile function
-        return window.innerWidth <= 768; // Example breakpoint for mobile
-    },
+    
 
     removeCurrentModuleKeyboardListeners() {
         switch (this.currentView) {
@@ -750,7 +745,7 @@ export const game = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    game.init();
+    app.init();
 });
 
-window.game = game;
+window.app = app;

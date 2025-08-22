@@ -1,6 +1,6 @@
 // src/js/modules/CompletionModule.js
 
-class CompletionModule {
+class CompletionGame {
     constructor(authInstance, messagesInstance, gameCallbacks) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
@@ -13,6 +13,10 @@ class CompletionModule {
         this.appContainer = null;
     }
 
+    /**
+     * Initializes the Completion module with the given module data.
+     * @param {object} module - The module data containing completion exercises.
+     */
     init(module) {
         this.currentIndex = 0;
         this.sessionScore = { correct: 0, incorrect: 0 };
@@ -264,4 +268,4 @@ class CompletionModule {
     }
 }
 
-export default CompletionModule;
+export default CompletionGame;

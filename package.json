@@ -2,7 +2,7 @@
   "name": "english-learning-app",
   "version": "1.0.0",
   "description": "English learning web app with interactive exercises.",
-  "main": "game.js",
+  "main": "src/js/app.js",
   "type": "module",
   "scripts": {
     "start": "http-server . -o -p 5500",

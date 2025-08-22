@@ -1,5 +1,10 @@
 // src/js/utils.js
 
+/**
+ * Shuffles the elements of an array randomly.
+ * @param {Array} array - The array to shuffle.
+ * @returns {Array} The shuffled array.
+ */
 export function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -8,6 +13,11 @@ export function shuffleArray(array) {
     return array;
 }
 
+/**
+ * Returns the SVG icon string for a given game mode.
+ * @param {string} gameMode - The game mode (e.g., 'flashcard', 'quiz').
+ * @returns {string} The SVG string for the icon.
+ */
 export function getGameModeIconSvg(gameMode) {
     switch (gameMode) {
         case 'flashcard':
@@ -25,10 +35,24 @@ export function getGameModeIconSvg(gameMode) {
     }
 }
 
+/**
+ * Toggles the visibility of a modal element.
+ * @param {HTMLElement} modalElement - The modal DOM element.
+ * @param {boolean} show - True to show the modal, false to hide.
+ */
 export function toggleModal(modalElement, show) {
     modalElement.classList.toggle('hidden', !show);
 }
 
+/**
+ * Displays an explanation modal with provided word data.
+ * @param {HTMLElement} modalElement - The explanation modal DOM element.
+ * @param {object} wordData - The data for the word to explain.
+ * @param {string} wordData.word - The word itself.
+ * @param {string} wordData.translation_es - The Spanish translation of the word.
+ * @param {string} wordData.example - An example sentence in English.
+ * @param {string} wordData.example_es - The Spanish translation of the example sentence.
+ */
 export function showExplanationModal(modalElement, wordData) {
     document.getElementById('explanation-word').textContent = wordData.word;
     document.getElementById('explanation-word-translation').textContent = wordData.translation_es;
@@ -38,10 +62,21 @@ export function showExplanationModal(modalElement, wordData) {
     modalElement.classList.remove('hidden');
 }
 
+/**
+ * Toggles the visibility of the hamburger menu.
+ * @param {boolean} show - True to show the menu, false to hide.
+ */
 export function toggleHamburgerMenu(show) {
     document.body.classList.toggle('hamburger-menu-open', show);
 }
 
+/**
+ * Updates the display of the session score.
+ * @param {number} correct - The number of correct answers.
+ * @param {number} incorrect - The number of incorrect answers.
+ * @param {number} total - The total number of items.
+ * @param {object} MESSAGES - The MESSAGES object for localization.
+ */
 export function updateSessionScoreDisplay(correct, incorrect, total, MESSAGES) {
     const sessionScoreDisplay = document.getElementById('session-score-display');
     if (sessionScoreDisplay) {
@@ -60,6 +95,12 @@ export function updateSessionScoreDisplay(correct, incorrect, total, MESSAGES) {
     }
 }
 
+/**
+ * Renders the application header, including user information and global score.
+ * @param {object} auth - The authentication object.
+ * @param {object} MESSAGES - The MESSAGES object for localization.
+ * @param {function} toggleHamburgerMenu - Function to toggle the hamburger menu.
+ */
 export function renderHeader(auth, MESSAGES, toggleHamburgerMenu) {
     const user = auth.getUser();
     if (!user) return;
@@ -83,6 +124,11 @@ export function renderHeader(auth, MESSAGES, toggleHamburgerMenu) {
     }
 }
 
+/**
+ * Updates the visibility of the application footer based on the current view.
+ * @param {string} currentView - The current active view of the application.
+ * @param {object} MESSAGES - The MESSAGES object for localization.
+ */
 export function updateFooterVisibility(currentView, MESSAGES) {
     const footer = document.getElementById('main-footer-copyright');
     const footerWebText = document.getElementById('footer-web-text');
@@ -97,5 +143,13 @@ export function updateFooterVisibility(currentView, MESSAGES) {
             footer.style.display = 'none';
         }
     }
+}
+
+/**
+ * Checks if the current device is a mobile device based on screen width.
+ * @returns {boolean} True if it's a mobile device, false otherwise.
+ */
+export function isMobile() {
+    return window.innerWidth <= 768; // Example breakpoint for mobile
 }
 

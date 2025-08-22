@@ -1,3 +1,7 @@
+/**
+ * Fetches all learning modules from the game database JSON file.
+ * @returns {Promise<Array>} A promise that resolves to an array of learning module metadata.
+ */
 export async function fetchAllLearningModules() {
     try {
         const response = await fetch('src/assets/data/game-db.json');
@@ -11,6 +15,11 @@ export async function fetchAllLearningModules() {
     }
 }
 
+/**
+ * Fetches the detailed data for a specific learning module.
+ * @param {string} moduleId - The ID of the module to fetch data for.
+ * @returns {Promise<object|null>} A promise that resolves to the module object with its data, or null if not found or an error occurs.
+ */
 export async function fetchModuleData(moduleId) {
     const allModules = await fetchAllLearningModules();
     const moduleMeta = allModules.find(m => m.id === moduleId);

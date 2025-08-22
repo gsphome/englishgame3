@@ -1,6 +1,6 @@
 // src/js/modules/SortingModule.js
 
-class SortingModule {
+class SortingGame {
     constructor(authInstance, messagesInstance, gameCallbacks) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
@@ -24,6 +24,10 @@ class SortingModule {
         this.maxCategoriesToRender = 3; // Global variable to limit categories
     }
 
+    /**
+     * Initializes the Sorting module with the given module data.
+     * @param {object} module - The module data containing sorting exercises.
+     */
     init(module) {
         this.moduleData = module;
         this.appContainer = document.getElementById('app-container');
@@ -490,4 +494,4 @@ class SortingModule {
     }
 }
 
-export default SortingModule;
+export default SortingGame;

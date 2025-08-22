@@ -1,5 +1,5 @@
 import { MESSAGES } from './interface.js';
-import { game } from './game.js';
+import { app } from './app.js';
 import { renderHeader } from './utils.js';
 
 export const auth = {
@@ -81,9 +81,9 @@ export const auth = {
             globalScore: { correct: 0, incorrect: 0 }
         };
         localStorage.setItem('user', JSON.stringify(this.user));
-        renderHeader(this, MESSAGES, game.toggleHamburgerMenu); // Update header with logged-in user info
+        renderHeader(this, MESSAGES, app.toggleHamburgerMenu); // Update header with logged-in user info
         // game.init(); // Removed: game.init() is now called directly in game.js after DOMContentLoaded
-        game.renderMenu(); // Render the menu after login
+        app.renderMenu(); // Render the menu after login
     },
 
     _internalReloadPage() {
@@ -96,7 +96,7 @@ export const auth = {
 
     logout() {
         localStorage.removeItem('user');
-        if (game.hamburgerMenu) {
+        if (app.hamburgerMenu) {
             game.hamburgerMenu.classList.add('hidden'); // Hide hamburger menu on logout
         }
         this._reloadPage();
@@ -110,6 +110,6 @@ export const auth = {
         this.user.globalScore.correct += sessionScore.correct;
         this.user.globalScore.incorrect += sessionScore.incorrect;
         localStorage.setItem('user', JSON.stringify(this.user));
-        renderHeader(this, MESSAGES, game.toggleHamburgerMenu);
+        renderHeader(this, MESSAGES, app.toggleHamburgerMenu);
     }
 };

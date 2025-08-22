@@ -1,6 +1,6 @@
 // src/js/modules/QuizModule.js
 
-class QuizModule {
+class QuizGame {
     constructor(authInstance, messagesInstance, gameCallbacks) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
@@ -16,6 +16,10 @@ class QuizModule {
         this.isViewingHistory = false; // New flag
     }
 
+    /**
+     * Initializes the Quiz module with the given module data.
+     * @param {object} module - The module data containing quiz questions.
+     */
     init(module) {
         this.currentIndex = 0;
         this.sessionScore = { correct: 0, incorrect: 0 };
@@ -529,4 +533,4 @@ class QuizModule {
     }
 }
 
-export default QuizModule;
+export default QuizGame;
