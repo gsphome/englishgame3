@@ -93,7 +93,7 @@ class SortingGame {
         remainingWords = this.gameCallbacks.shuffleArray(remainingWords); // Shuffle remaining words
 
         let i = 0;
-        while (selectedWords.length < 5 && i < remainingWords.length) {
+        while (selectedWords.length < 4 && i < remainingWords.length) {
             const wordToAdd = remainingWords[i];
             if (!selectedWords.includes(wordToAdd)) { // Avoid duplicates
                 selectedWords.push(wordToAdd);
@@ -120,7 +120,7 @@ class SortingGame {
         this.appContainer.innerHTML = `
             <div id="sorting-container" class="max-w-2xl mx-auto p-4">
 
-                <div id="word-bank" class="bg-white p-4 rounded-lg shadow-md mb-6 min-h-[100px] border-2 border-gray-300 flex flex-wrap justify-center items-center" ondrop="game.sortingModule.drop(event)" ondragover="game.sortingModule.allowDrop(event)">
+                <div id="word-bank" class="bg-white p-4 rounded-lg shadow-md mb-6 min-h-[100px] border-2 border-gray-300 flex flex-wrap justify-center items-center">
                     <!-- Words will be rendered here -->
                 </div>
 
@@ -399,6 +399,13 @@ class SortingGame {
         document.getElementById('check-btn').addEventListener('click', () => this.checkAnswers());
         document.getElementById('undo-btn').addEventListener('click', () => this.undo());
         document.getElementById('back-to-menu-sorting-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
+
+        // Add event listeners for word-bank
+        const wordBank = document.getElementById('word-bank');
+        if (wordBank) {
+            wordBank.addEventListener('drop', (e) => this.drop(e));
+            wordBank.addEventListener('dragover', (e) => this.allowDrop(e));
+        }
     }
 
     render() {

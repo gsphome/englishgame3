@@ -1,6 +1,7 @@
 // src/js/ui.js
 import { MESSAGES } from './i18n.js'; // Assuming i18n.js is the new name for messages
 import { auth } from './auth.js'; // For renderHeader and logout
+import { gameManager } from './gameManager.js'; // Import gameManager module
 
 export const ui = {
     // Properties (will be initialized in init)
@@ -220,7 +221,7 @@ export const ui = {
         if (this.sortingCompletionReplayBtn) {
             this.sortingCompletionReplayBtn.addEventListener('click', () => {
                 this.sortingCompletionModal.classList.add('hidden');
-                this.app.renderSorting(this.app.currentModule);
+                gameManager.startModule(this.app.currentModule.id);
             });
         }
         if (this.sortingCompletionBackToMenuBtn) {
@@ -319,11 +320,11 @@ export const ui = {
         // This part needs access to app.sortingModule, which is in app.js.
         // We need to pass app.sortingModule or the relevant data to ui.js
         // For now, I'll assume app.sortingModule is accessible via this.app
-        const presentedWords = this.app.sortingModule.words;
+        const presentedWords = gameManager.sortingModule.words;
         const wordsToExplain = moduleData.data.filter(item => presentedWords.includes(item.word));
 
         const categoryMap = new Map();
-        this.app.sortingModule.categories.forEach(cat => {
+        gameManager.sortingModule.categories.forEach(cat => {
             categoryMap.set(cat.category_id, cat.category_show);
         });
 
