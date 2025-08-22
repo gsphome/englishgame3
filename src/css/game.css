@@ -1062,6 +1062,13 @@ body.dark-mode .text-gray-600 {
     40%, 80% { transform: translateX(5px); }
 }
 
+/* Styles for answered completion input */
+.answered-input {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: default;
+}
+
 /* Dark Mode for Matching Game */
 body.dark-mode .matching-item {
     background-color: #4a5568; /* Darker gray for items */

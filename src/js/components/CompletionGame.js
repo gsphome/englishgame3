@@ -124,7 +124,6 @@ class CompletionGame {
                 correctAnswer: questionData.correct,
                 explanation: questionData.explanation
             });
-            this.lastFeedback = { isCorrect: true, correct: questionData.correct, explanation: questionData.explanation, index: this.currentIndex, userAnswer: userAnswer };
         } else {
             this.sessionScore.incorrect++;
             this.auth.updateGlobalScore({ correct: 0, incorrect: 1 });
@@ -137,9 +136,9 @@ class CompletionGame {
                 correctAnswer: questionData.correct,
                 explanation: questionData.explanation
             });
-            this.lastFeedback = { isCorrect: false, correct: questionData.correct, explanation: questionData.explanation, index: this.currentIndex, userAnswer: userAnswer };
         }
         inputElement.disabled = true;
+        inputElement.classList.add('answered-input'); // Add this line
         this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
     }
 
@@ -156,7 +155,6 @@ class CompletionGame {
             }
             this.currentIndex = lastAction.index;
             this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
-            this.lastFeedback = lastAction; // Restore lastFeedback to the undone action
             this.render(true); // Re-render the UI for the undone question
         }
     }
@@ -168,7 +166,7 @@ class CompletionGame {
         }
     }
 
-    next() {
+    advanceQuestion() {
         if (this.currentIndex < this.moduleData.data.length - 1) {
             this.currentIndex++;
             this.render();
@@ -178,12 +176,19 @@ class CompletionGame {
         }
     }
 
+    next() {
+        this.advanceQuestion();
+    }
+
     handleNextAction() {
         const inputElement = document.getElementById('completion-input');
         if (inputElement && !inputElement.disabled) {
             this.handleAnswer();
+            // After handling the answer, immediately proceed to the next question
+            // This makes the "Next" button (and Enter) work in one press
+            this.advanceQuestion();
         } else {
-            this.next();
+            this.advanceQuestion();
         }
     }
 
@@ -210,13 +215,16 @@ class CompletionGame {
         document.getElementById('completion-question').innerHTML = questionData.sentence.replace('______', '<input type="text" id="completion-input" class="border-b-2 border-gray-400 focus:border-blue-500 outline-none text-left w-[20px] bg-transparent" autocomplete="off" />');
         let inputElement = document.getElementById('completion-input'); // Re-get the element after innerHTML update
 
+        const currentQuestionFeedback = this.lastFeedbackForCurrentQuestion(); // Get feedback for current question
+
         // Restore feedback if available for the current question
-        if (this.lastFeedback && this.lastFeedback.index === this.currentIndex) {
-            const feedbackHtml = `<p class="text-lg">Correct Answer: <strong>${this.lastFeedback.correctAnswer}</strong></p><p class="text-lg">${this.lastFeedback.explanation}</p>`;
+        if (currentQuestionFeedback) {
+            const feedbackHtml = `<p class="text-lg">Correct Answer: <strong>${currentQuestionFeedback.correctAnswer}</strong></p><p class="text-lg">${currentQuestionFeedback.explanation}</p>`;
             document.getElementById('feedback-container').innerHTML = feedbackHtml;
-            inputElement.value = this.lastFeedback.userAnswer; // Set the input value from lastFeedback
+            inputElement.value = currentQuestionFeedback.userAnswer;
             inputElement.disabled = true; // Keep disabled
-            if (this.lastFeedback.isCorrect) {
+            inputElement.classList.add('answered-input'); // Add this line
+            if (currentQuestionFeedback.isCorrect) {
                 inputElement.classList.add('text-green-500');
             } else {
                 inputElement.classList.add('text-red-500');
@@ -225,7 +233,7 @@ class CompletionGame {
             document.getElementById('feedback-container').innerHTML = ''; // Clear feedback if no relevant feedback is stored
             inputElement.value = ''; // Clear the input field if no feedback
             inputElement.disabled = false; // Enable if no feedback
-            inputElement.classList.remove('text-green-500', 'text-red-500'); // Remove colors if no feedback
+            inputElement.classList.remove('text-green-500', 'text-red-500', 'answered-input'); // Remove colors and answered-input class if no feedback
         }
         inputElement.focus(); // Focus after setting value and state
     }
@@ -261,6 +269,11 @@ class CompletionGame {
     addKeyboardListeners() {
         this._boundHandleKeyboardEvent = this._handleKeyboardEvent.bind(this);
         document.addEventListener('keydown', this._boundHandleKeyboardEvent);
+    }
+
+    lastFeedbackForCurrentQuestion() {
+        // Search history for feedback related to the current question index
+        return this.history.find(action => action.index === this.currentIndex);
     }
 
     removeKeyboardListeners() {
