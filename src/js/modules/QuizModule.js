@@ -31,6 +31,7 @@ class QuizModule {
         }
         this.render();
         this.updateNavigationButtons(); // Update buttons after initial render
+        this.addKeyboardListeners();
     }
 
     render(historyEntry = null) {
@@ -482,42 +483,49 @@ class QuizModule {
         }
     }
 
+    _handleKeyboardEvent(e) {
+        // Only handle keyboard events if the quiz container is visible
+        const quizContainer = document.getElementById('quiz-container');
+        if (!quizContainer || quizContainer.closest('.hidden')) {
+            return;
+        }
+
+        const quizSummaryContainer = document.getElementById('quiz-summary-container');
+        if (quizSummaryContainer && !quizSummaryContainer.classList.contains('hidden')) {
+            if (e.key === 'Enter') {
+                this.gameCallbacks.renderMenu(); // Go back to menu from summary
+            }
+            return; // Exit early if summary handled
+        }
+
+        const feedbackContainer = document.getElementById('feedback-container');
+        const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
+
+        if (e.key === 'Enter' && optionsDisabled) {
+            this.next();
+        } else if (e.key === 'Backspace') {
+            e.preventDefault();
+            this.prev();
+        } else {
+            const pressedKey = e.key.toUpperCase();
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            const optionIndex = optionLetters.indexOf(pressedKey);
+            if (optionIndex !== -1) {
+                const options = document.querySelectorAll('[data-option]');
+                if (options[optionIndex]) {
+                    options[optionIndex].click();
+                }
+            }
+        }
+    }
+
     addKeyboardListeners() {
-        document.addEventListener('keydown', (e) => {
-            // Only handle keyboard events if the quiz container is visible
-            const quizContainer = document.getElementById('quiz-container');
-            if (!quizContainer || quizContainer.closest('.hidden')) {
-                return;
-            }
+        this._boundHandleKeyboardEvent = this._handleKeyboardEvent.bind(this);
+        document.addEventListener('keydown', this._boundHandleKeyboardEvent);
+    }
 
-            const quizSummaryContainer = document.getElementById('quiz-summary-container');
-            if (quizSummaryContainer && !quizSummaryContainer.classList.contains('hidden')) {
-                if (e.key === 'Enter') {
-                    this.gameCallbacks.renderMenu(); // Go back to menu from summary
-                }
-                return; // Exit early if summary handled
-            }
-
-            const feedbackContainer = document.getElementById('feedback-container');
-            const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
-
-            if (e.key === 'Enter' && optionsDisabled) {
-                this.next();
-            } else if (e.key === 'Backspace') {
-                e.preventDefault();
-                this.prev();
-            } else {
-                const pressedKey = e.key.toUpperCase();
-                const optionLetters = ['A', 'B', 'C', 'D'];
-                const optionIndex = optionLetters.indexOf(pressedKey);
-                if (optionIndex !== -1) {
-                    const options = document.querySelectorAll('[data-option]');
-                    if (options[optionIndex]) {
-                        options[optionIndex].click();
-                    }
-                }
-            }
-        });
+    removeKeyboardListeners() {
+        document.removeEventListener('keydown', this._boundHandleKeyboardEvent);
     }
 }
 

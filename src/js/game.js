@@ -241,11 +241,14 @@ export const game = {
         this.currentView = 'flashcard';
         document.body.classList.add('module-active');
         document.getElementById('app-container').classList.remove('main-menu-active');
+        // Clear app-container before rendering flashcard module
+        document.getElementById('app-container').innerHTML = '';
         this.flashcardModule.init(module);
         updateFooterVisibility(this.currentView, MESSAGES); // Use imported updateFooterVisibility
     },
 
     renderMenu() { // This is a method of game, so keep this.
+        this.removeCurrentModuleKeyboardListeners(); // Remove listeners from previous module
         document.body.classList.remove('module-active');
         this.currentView = 'menu';
         const sessionScoreDisplay = document.getElementById('session-score-display');
@@ -332,6 +335,7 @@ export const game = {
     },
 
     async startModule(moduleId) { // This is a method of game, so keep this.
+        this.removeCurrentModuleKeyboardListeners(); // Remove listeners from previous module
         const moduleMeta = this.allLearningModules.find(m => m.id === moduleId);
         if (!moduleMeta) return;
 
@@ -712,6 +716,36 @@ export const game = {
 
     isMobile() { // Added isMobile function
         return window.innerWidth <= 768; // Example breakpoint for mobile
+    },
+
+    removeCurrentModuleKeyboardListeners() {
+        switch (this.currentView) {
+            case 'flashcard':
+                if (this.flashcardModule && typeof this.flashcardModule.removeKeyboardListeners === 'function') {
+                    this.flashcardModule.removeKeyboardListeners();
+                }
+                break;
+            case 'quiz':
+                if (this.quizModule && typeof this.quizModule.removeKeyboardListeners === 'function') {
+                    this.quizModule.removeKeyboardListeners();
+                }
+                break;
+            case 'completion':
+                if (this.completionModule && typeof this.completionModule.removeKeyboardListeners === 'function') {
+                    this.completionModule.removeKeyboardListeners();
+                }
+                break;
+            case 'sorting':
+                if (this.sortingModule && typeof this.sortingModule.removeKeyboardListeners === 'function') {
+                    this.sortingModule.removeKeyboardListeners();
+                }
+                break;
+            case 'matching':
+                if (this.matchingModule && typeof this.matchingModule.removeKeyboardListeners === 'function') {
+                    this.matchingModule.removeKeyboardListeners();
+                }
+                break;
+        }
     }
 };
 

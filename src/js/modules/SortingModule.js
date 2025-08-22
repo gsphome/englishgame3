@@ -100,6 +100,7 @@ class SortingModule {
         this.words = this.gameCallbacks.shuffleArray(selectedWords); // Final shuffle of the words to be displayed
         this.renderInitialView();
         this.render(); // Call the new render method after initial view is set up
+        this.addKeyboardListeners();
 
         this.userAnswers = {};
         this.originalWordPositions = {};
@@ -454,31 +455,38 @@ class SortingModule {
         });
     }
 
-    addKeyboardListeners() {
-        document.addEventListener('keydown', (e) => {
-            // Only handle keyboard events if the sorting container is visible
-            const sortingContainer = document.getElementById('sorting-container');
-            if (!sortingContainer || sortingContainer.closest('.hidden')) {
-                return;
-            }
+    _handleKeyboardEvent(e) {
+        // Only handle keyboard events if the sorting container is visible
+        const sortingContainer = document.getElementById('sorting-container');
+        if (!sortingContainer || sortingContainer.closest('.hidden')) {
+            return;
+        }
 
-            const sortingCompletionModal = document.getElementById('sorting-completion-modal');
-            if (sortingCompletionModal && !sortingCompletionModal.classList.contains('hidden')) {
-                if (e.key === 'Enter') {
-                    document.getElementById('sorting-completion-replay-btn').click();
-                } else if (e.key === 'Escape') {
-                    document.getElementById('sorting-completion-back-to-menu-btn').click();
-                }
-                return; // Consume event if modal is handled
-            }
-
+        const sortingCompletionModal = document.getElementById('sorting-completion-modal');
+        if (sortingCompletionModal && !sortingCompletionModal.classList.contains('hidden')) {
             if (e.key === 'Enter') {
-                this.checkAnswers();
-            } else if (e.key === 'Backspace') {
-                e.preventDefault();
-                this.undo();
+                document.getElementById('sorting-completion-replay-btn').click();
+            } else if (e.key === 'Escape') {
+                document.getElementById('sorting-completion-back-to-menu-btn').click();
             }
-        });
+            return; // Consume event if modal is handled
+        }
+
+        if (e.key === 'Enter') {
+            this.checkAnswers();
+        } else if (e.key === 'Backspace') {
+            e.preventDefault();
+            this.undo();
+        }
+    }
+
+    addKeyboardListeners() {
+        this._boundHandleKeyboardEvent = this._handleKeyboardEvent.bind(this);
+        document.addEventListener('keydown', this._boundHandleKeyboardEvent);
+    }
+
+    removeKeyboardListeners() {
+        document.removeEventListener('keydown', this._boundHandleKeyboardEvent);
     }
 }
 
