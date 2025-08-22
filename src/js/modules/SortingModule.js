@@ -453,6 +453,33 @@ class SortingModule {
             }
         });
     }
+
+    addKeyboardListeners() {
+        document.addEventListener('keydown', (e) => {
+            // Only handle keyboard events if the sorting container is visible
+            const sortingContainer = document.getElementById('sorting-container');
+            if (!sortingContainer || sortingContainer.closest('.hidden')) {
+                return;
+            }
+
+            const sortingCompletionModal = document.getElementById('sorting-completion-modal');
+            if (sortingCompletionModal && !sortingCompletionModal.classList.contains('hidden')) {
+                if (e.key === 'Enter') {
+                    document.getElementById('sorting-completion-replay-btn').click();
+                } else if (e.key === 'Escape') {
+                    document.getElementById('sorting-completion-back-to-menu-btn').click();
+                }
+                return; // Consume event if modal is handled
+            }
+
+            if (e.key === 'Enter') {
+                this.checkAnswers();
+            } else if (e.key === 'Backspace') {
+                e.preventDefault();
+                this.undo();
+            }
+        });
+    }
 }
 
 export default SortingModule;

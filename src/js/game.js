@@ -6,7 +6,7 @@ import MatchingModule from './modules/MatchingModule.js';
 import { auth } from './auth.js';
 import { MESSAGES } from './interface.js';
 
-import { shuffleArray, getGameModeIconSvg } from './utils.js';
+import { shuffleArray, getGameModeIconSvg, toggleModal, showExplanationModal, toggleHamburgerMenu, updateSessionScoreDisplay, updateHeaderText, renderHeader, updateFooterVisibility } from './utils.js';
 import { fetchModuleData, fetchAllLearningModules } from './dataManager.js';
 
 export const game = {
@@ -25,7 +25,7 @@ export const game = {
     flashcardModule: null,
 
     toggleModal(show) {
-        this.modal.classList.toggle('hidden', !show);
+        toggleModal(this.modal, show);
         if (show) {
             this.messageElement.textContent = MESSAGES.get('confirmLogoutMessage');
         }
@@ -61,36 +61,36 @@ export const game = {
 
         this.yesButton.addEventListener('click', () => {
             auth.logout();
-            this.toggleModal(false);
+            toggleModal(this.modal, false); // Use imported toggleModal
         });
 
         this.noButton.addEventListener('click', () => {
-            this.toggleModal(false);
+            toggleModal(this.modal, false); // Use imported toggleModal
         });
 
-        this.closeMenuBtn.addEventListener('click', () => this.toggleHamburgerMenu(false));
-        this.menuOverlay.addEventListener('click', () => this.toggleHamburgerMenu(false));
+        this.closeMenuBtn.addEventListener('click', () => toggleHamburgerMenu(false)); // Use imported toggleHamburgerMenu
+        this.menuOverlay.addEventListener('click', () => toggleHamburgerMenu(false)); // Use imported toggleHamburgerMenu
 
         this.menuLangToggleBtn.addEventListener('click', () => {
             const newLang = MESSAGES.getLanguage() === 'en' ? 'es' : 'en';
             MESSAGES.setLanguage(newLang);
             localStorage.setItem('appLang', newLang);
-            this.updateMenuText(); // Explicitly call to update menu buttons
+            this.updateMenuText(); // This is a method of game, so keep this.
             if (this.currentView === 'menu') { // Only re-render menu if currently on main menu
                 this.renderMenu();
             }
-            this.updateFooterVisibility(); // Always update footer
+            updateFooterVisibility(this.currentView, MESSAGES); // Use imported updateFooterVisibility
         });
 
         this.menuLogoutBtn.addEventListener('click', () => {
-            this.toggleHamburgerMenu(false); // Close menu before showing confirmation
+            toggleHamburgerMenu(false); // Use imported toggleHamburgerMenu
             game.showLogoutConfirmation();
         });
 
         this.menuRandomModeBtn.addEventListener('click', () => {
             this.randomMode = !this.randomMode;
             localStorage.setItem('randomMode', this.randomMode);
-            this.updateMenuText();
+            this.updateMenuText(); // This is a method of game, so keep this.
         });
 
         if (this.menuDarkModeToggleBtn) {
@@ -101,7 +101,7 @@ export const game = {
                 } else {
                     localStorage.setItem('darkMode', 'disabled');
                 }
-                this.updateMenuText(); // Update button text and icon
+                this.updateMenuText(); // This is a method of game, so keep this.
             });
         }
 
@@ -113,14 +113,14 @@ export const game = {
         if (this.sortingCompletionReplayBtn) {
             this.sortingCompletionReplayBtn.addEventListener('click', () => {
                 this.sortingCompletionModal.classList.add('hidden');
-                this.renderSorting(this.currentModule); // Replay the current sorting module
+                this.renderSorting(this.currentModule); // This is a method of game, so keep this.
             });
         }
 
         if (this.sortingCompletionBackToMenuBtn) {
             this.sortingCompletionBackToMenuBtn.addEventListener('click', () => {
                 this.sortingCompletionModal.classList.add('hidden');
-                this.renderMenu(); // Go back to main menu
+                this.renderMenu(); // This is a method of game, so keep this.
             });
         }
 
@@ -134,9 +134,9 @@ export const game = {
             });
         }
 
-        MESSAGES.addListener(this.updateHeaderText.bind(this));
-        MESSAGES.addListener(this.updateMenuText.bind(this)); // New listener for menu text
-        this.updateMenuText(); // Call explicitly to set initial menu button text
+        MESSAGES.addListener(updateHeaderText.bind(this)); // Use imported updateHeaderText
+        MESSAGES.addListener(this.updateMenuText.bind(this)); // This is a method of game, so keep this.
+        this.updateMenuText(); // This is a method of game, so keep this.
 
         // Initial render will be handled after user check
         MESSAGES.addListener(() => {
@@ -165,16 +165,16 @@ export const game = {
 
             if (flashcardSummaryContainer && !flashcardSummaryContainer.classList.contains('hidden')) {
                 // Re-render flashcard summary with current data
-                this.showFlashcardSummary(this.flashcardModule.moduleData.data.length); // Assuming moduleData is still available
+                this.showFlashcardSummary(this.flashcardModule.moduleData.data.length); // This is a method of game, so keep this.
             } else if (quizSummaryContainer && !quizSummaryContainer.classList.contains('hidden')) {
                 // Re-render quiz summary with current data
-                this.quizModule.showFinalScore(); // This function re-renders the summary
+                this.quizModule.showFinalScore();
             } else if (completionSummaryContainer && !completionSummaryContainer.classList.contains('hidden')) {
                 // Re-render completion summary with current data
-                this.completionModule.showFinalScore(); // This function re-renders the summary
+                this.completionModule.showFinalScore();
             } else if (matchingSummaryContainer && !matchingSummaryContainer.classList.contains('hidden')) {
                 // Re-render matching summary with current data
-                this.showMatchingSummary();
+                this.showMatchingSummary(); // This is a method of game, so keep this.
             }
             // Update matching completion modal text if visible
             const matchingCompletionModal = document.getElementById('matching-completion-modal');
@@ -186,30 +186,28 @@ export const game = {
             }
         });
 
-        this.addKeyboardListeners();
-        this.addSwipeListeners();
+        this.addKeyboardListeners(); // This is a method of game, so keep this.
+        this.addSwipeListeners(); // This is a method of game, so keep this.
 
         // Initial user check and rendering
         auth.user = JSON.parse(localStorage.getItem('user')); // Initialize auth.user
-        this.renderHeader(); // Always render header
+        renderHeader(auth, MESSAGES, toggleHamburgerMenu); // Use imported renderHeader
         if (!auth.user) {
             auth.renderLogin();
         } else {
-            this.renderMenu(); // Render main menu for logged-in user
+            this.renderMenu(); // This is a method of game, so keep this.
         }
     },
 
     showExplanationModal(wordData) {
-        const modal = this.explanationModal;
-        document.getElementById('explanation-word').textContent = wordData.word;
-        document.getElementById('explanation-word-translation').textContent = wordData.translation_es;
-        document.getElementById('explanation-example-en').textContent = `"${wordData.example}"`;
-        document.getElementById('explanation-example-es').textContent = `"${wordData.example_es}"`;
-        document.body.appendChild(modal);
-        modal.classList.remove('hidden');
+        showExplanationModal(this.explanationModal, wordData); // Use imported showExplanationModal
     },
 
-    updateMenuText() {
+    updateFooterVisibility() { // This is a method of game, so keep this.
+        updateFooterVisibility(this.currentView, MESSAGES); // Use imported updateFooterVisibility
+    },
+
+    updateMenuText() { // This is a method of game, so keep this.
         if (this.menuLangToggleBtn) {
             const currentLang = MESSAGES.getLanguage();
             this.menuLangToggleBtn.innerHTML = currentLang === 'en' ? 'Lenguaje 🇪🇸' : 'Language 🇬🇧';
@@ -235,72 +233,7 @@ export const game = {
         }
     },
 
-    toggleHamburgerMenu(show) {
-        document.body.classList.toggle('hamburger-menu-open', show);
-    },
-
-    updateSessionScoreDisplay(correct, incorrect, total) {
-        const sessionScoreDisplay = document.getElementById('session-score-display');
-        if (sessionScoreDisplay) {
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            const correctColor = isDarkMode ? 'text-green-400' : 'text-green-700';
-            const incorrectColor = isDarkMode ? 'text-red-400' : 'text-red-700';
-            const totalColor = isDarkMode ? 'text-gray-300' : 'text-gray-600';
-
-            sessionScoreDisplay.innerHTML = `
-                <span class="text-sm font-semibold">Session:</span>
-                <span class="ml-1 ${correctColor} font-bold">✅ ${correct}</span>
-                <span class="ml-1 ${incorrectColor} font-bold">❌ ${incorrect}</span>
-                <span class="ml-1 ${totalColor} font-bold">Total: ${total}</span>
-            `;
-            sessionScoreDisplay.classList.remove('hidden');
-        }
-    },
-
-    updateHeaderText() {
-        const user = auth.getUser();
-        if (!user) return;
-
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        const correctColor = isDarkMode ? 'text-green-400' : 'text-green-700';
-        const incorrectColor = isDarkMode ? 'text-red-400' : 'text-red-700';
-
-        const globalScoreEl = document.getElementById('global-score');
-        if (globalScoreEl) {
-            globalScoreEl.innerHTML = `
-                <span class="text-sm font-semibold">${MESSAGES.get('globalScore')}:</span>
-                <span class="ml-1 ${correctColor} font-bold">✅ ${user.globalScore.correct}</span>
-                <span class="ml-1 ${incorrectColor} font-bold">❌ ${user.globalScore.incorrect}</span>
-            `;
-        }
-
-        const usernameDisplayEl = document.getElementById('username-display');
-        if (usernameDisplayEl) {
-            usernameDisplayEl.innerHTML = `<span class="text-lg font-bold">👤 ${user.username}</span>`;
-        }
-    },
-
-    renderHeader() {
-        const user = auth.getUser();
-        const scoreContainer = document.getElementById('score-container');
-        const usernameDisplay = document.getElementById('username-display');
-        const hamburgerBtn = document.getElementById('hamburger-btn');
-
-        if (user) {
-            scoreContainer.classList.remove('hidden');
-            usernameDisplay.classList.remove('hidden');
-            hamburgerBtn.classList.remove('hidden'); // Ensure hamburger button is visible if user is logged in
-            hamburgerBtn.addEventListener('click', () => this.toggleHamburgerMenu(true));
-            this.updateHeaderText();
-        } else {
-            scoreContainer.classList.add('hidden');
-            usernameDisplay.classList.add('hidden');
-            hamburgerBtn.classList.add('hidden'); // Hide hamburger button if no user
-        }
-    },
-
-    renderCurrentView() {
-
+    renderCurrentView() { // This is a method of game, so keep this.
         switch (this.currentView) {
             case 'menu':
                 document.body.classList.remove('module-active');
@@ -318,36 +251,21 @@ export const game = {
             case 'sorting':
                 this.renderSorting(this.currentModule);
                 break;
+            case 'matching': // Added matching case
+                this.renderMatching(this.currentModule);
+                break;
         }
     },
 
-    updateFooterVisibility() {
-        const footer = document.getElementById('main-footer-copyright');
-        const footerWebText = document.getElementById('footer-web-text');
-        const footerMobileText = document.getElementById('footer-mobile-text');
-
-        if (footer && footerWebText && footerMobileText) {
-            if (this.currentView === 'menu') {
-                footer.style.display = 'block';
-                footerWebText.textContent = MESSAGES.get('footerWeb');
-                footerMobileText.textContent = MESSAGES.get('footerMobile');
-            } else {
-                footer.style.display = 'none';
-            }
-        }
-    },
-
-    
-
-    renderFlashcard(module) {
+    renderFlashcard(module) { // This is a method of game, so keep this.
         this.currentView = 'flashcard';
         document.body.classList.add('module-active');
-        document.getElementById('app-container').classList.remove('main-menu-active'); // ADD THIS LINE
+        document.getElementById('app-container').classList.remove('main-menu-active');
         this.flashcardModule.init(module);
-        this.updateFooterVisibility();
+        updateFooterVisibility(this.currentView, MESSAGES); // Use imported updateFooterVisibility
     },
 
-    renderMenu() {
+    renderMenu() { // This is a method of game, so keep this.
         document.body.classList.remove('module-active');
         this.currentView = 'menu';
         const sessionScoreDisplay = document.getElementById('session-score-display');
@@ -417,12 +335,12 @@ export const game = {
                 this.startModule(moduleId);
             });
         });
-        this.updateFooterVisibility();
+        updateFooterVisibility(this.currentView, MESSAGES); // Use imported updateFooterVisibility
     },
 
-    getMenuMaxWidth() {
+    getMenuMaxWidth() { // This is a method of game, so keep this.
         const width = window.innerWidth;
-        if (game.isMobile()) {
+        if (this.isMobile()) { // Use this.isMobile()
             return '300px'; // Ancho para móviles
         }
         // Si el ancho es para 4 columnas (entre 768px y 1024px)
@@ -433,17 +351,16 @@ export const game = {
         return '760px'; // Usamos el ancho original
     },
 
-    async startModule(moduleId) {
+    async startModule(moduleId) { // This is a method of game, so keep this.
         const moduleMeta = this.allLearningModules.find(m => m.id === moduleId);
         if (!moduleMeta) return;
 
         try {
-            const response = await fetch(moduleMeta.dataPath);
-            const fetchedData = await response.json();
-
-            const moduleWithData = Array.isArray(fetchedData)
-                ? { ...moduleMeta, data: fetchedData }
-                : { ...moduleMeta, ...fetchedData };
+            const moduleWithData = await fetchModuleData(moduleId);
+            if (!moduleWithData) {
+                console.error(`Failed to load data for module ${moduleId}`);
+                return;
+            }
 
             this.currentModule = moduleWithData;
             switch (moduleWithData.gameMode) {
@@ -468,18 +385,18 @@ export const game = {
         }
     },
 
-    addKeyboardListeners() {
+    addKeyboardListeners() { // This is a method of game, so keep this.
         const modal = this.modal;
         const yesButton = this.yesButton;
         const noButton = this.noButton;
 
         yesButton.addEventListener('click', () => {
             auth.logout();
-            this.toggleModal(false);
+            toggleModal(this.modal, false); // Use imported toggleModal
         });
 
         noButton.addEventListener('click', () => {
-            this.toggleModal(false);
+            toggleModal(this.modal, false); // Use imported toggleModal
         });
 
         document.addEventListener('keydown', (e) => {
@@ -508,7 +425,7 @@ export const game = {
                 if (e.key === 'Enter') {
                     yesButton.click();
                 } else if (e.key === 'Escape') {
-                    this.toggleModal(false); // Close modal on Escape
+                    toggleModal(this.modal, false); // Use imported toggleModal
                 }
                 return; // Consume event if modal is handled
             }
@@ -516,27 +433,26 @@ export const game = {
             // 4. Handle hamburger menu
             if (document.body.classList.contains('hamburger-menu-open')) { // If hamburger menu is open
                 if (e.key === 'Escape') {
-                    this.toggleHamburgerMenu(false); // Close hamburger menu on Escape
+                    toggleHamburgerMenu(false); // Use imported toggleHamburgerMenu
                 }
                 return; // Consume event if menu is handled
             }
 
             // 5. Handle game-specific escape behavior (lowest priority)
             if (e.key === 'Escape') {
-                
                 if (this.currentView === 'sorting') { // If sorting is active, go back to menu
-                    this.renderMenu();
+                    this.renderMenu(); // This is a method of game, so keep this.
                 } else if (document.getElementById('app-container').classList.contains('main-menu-active')) {
-                    this.toggleModal(true); // Show logout modal if in main menu
+                    toggleModal(this.modal, true); // Use imported toggleModal
                 } else {
-                    this.renderMenu(); // Go back to main menu from other games
+                    this.renderMenu(); // This is a method of game, so keep this.
                 }
             } else if (e.key === '.') {
                 const newLang = MESSAGES.getLanguage() === 'en' ? 'es' : 'en';
                 MESSAGES.setLanguage(newLang);
                 localStorage.setItem('appLang', newLang);
-                this.renderCurrentView();
-                this.updateMenuText();
+                this.renderCurrentView(); // This is a method of game, so keep this.
+                this.updateMenuText(); // This is a method of game, so keep this.
             } else if (this.currentView === 'menu') { // Check if main menu is active
                 const pressedKey = e.key.toUpperCase();
                 const moduleButtons = document.querySelectorAll('[data-module-id]');
@@ -546,101 +462,20 @@ export const game = {
                     }
                 });
             } else if (this.currentView === 'flashcard') { // If flashcard is active
-                const flashcardSummaryContainer = document.getElementById('flashcard-summary-container');
-                if (flashcardSummaryContainer && e.key === 'Enter') {
-                    document.getElementById('flashcard-summary-back-to-menu-btn').click();
-                    return; // Exit early if summary handled
-                }
-
-                if (e.key === 'Enter') {
-                    const card = document.querySelector('.flashcard');
-                    if (card) {
-                        
-                        if (card.classList.contains('flipped')) {
-                            card.classList.remove('flipped'); // Unflip the card
-                            
-                            setTimeout(() => {
-                                if (this.flashcardModule.currentIndex === this.flashcardModule.moduleData.data.length - 1) {
-                                    game.showFlashcardSummary(this.flashcardModule.moduleData.data.length);
-                                } else {
-                                    this.flashcardModule.next();
-                                }
-                            }, 150); // Small delay to allow unflip animation
-                        } else {
-                            this.flashcardModule.flip();
-                        }
-                    }
-                } else if (e.key === 'Backspace') {
-                    e.preventDefault();
-                    this.flashcardModule.prev();
-                }
-            } else if (this.currentView === 'quiz') { // If quiz is active
-                const quizSummaryContainer = document.getElementById('quiz-summary-container');
-                if (quizSummaryContainer && e.key === 'Enter') {
-                    game.renderMenu(); // Go back to menu from summary
-                    return; // Exit early if summary handled
-                }
-
-                const feedbackContainer = document.getElementById('feedback-container');
-                const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
-
-                
-                if (e.key === 'Enter' && optionsDisabled) {
-                    this.quizModule.next();
-                } else if (e.key === 'Backspace') {
-                    e.preventDefault();
-                    this.quizModule.prev();
-                } else {
-                    const pressedKey = e.key.toUpperCase();
-                    const optionLetters = ['A', 'B', 'C', 'D'];
-                    const optionIndex = optionLetters.indexOf(pressedKey);
-                    if (optionIndex !== -1) {
-                        const options = document.querySelectorAll('[data-option]');
-                        if (options[optionIndex]) {
-                            options[optionIndex].click();
-                        }
-                    }
-                }
-            } else if (this.currentView === 'completion') { // If completion is active
-                const completionSummaryContainer = document.getElementById('completion-summary-container');
-                if (completionSummaryContainer && e.key === 'Enter') {
-                    document.querySelector('#completion-summary-container button').click(); // Click the back to menu button
-                    return; // Exit early if summary handled
-                }
-
-                if (e.key === 'Enter') {
-                    this.completionModule.handleNextAction();
-                } else if (e.key === 'Backspace') {
-                    const inputElement = document.getElementById('completion-input');
-                    if (inputElement && document.activeElement === inputElement) {
-                        // Allow default backspace behavior for input field
-                        return;
-                    }
-                    e.preventDefault();
-                    this.completionModule.prev();
-                }
-            } else if (this.currentView === 'matching') { // If matching is active
-                const matchingCompletionModal = document.getElementById('matching-completion-modal');
-                if (matchingCompletionModal && !matchingCompletionModal.classList.contains('hidden')) {
-                    if (e.key === 'Enter') {
-                        document.getElementById('matching-completion-replay-btn').click();
-                    } else if (e.key === 'Escape') {
-                        document.getElementById('matching-completion-back-to-menu-btn').click();
-                    }
-                    return; // Consume event if modal is handled
-                }
-            } else if (this.currentView === 'sorting') { // If sorting is active
-                if (e.key === 'Enter') {
-                    this.sortingModule.checkAnswers();
-                } else if (e.key === 'Backspace') {
-                    e.preventDefault();
-                    this.sortingModule.undo();
-                }
+                this.flashcardModule.addKeyboardListeners();
+            } else if (this.currentView === 'quiz') {
+                this.quizModule.addKeyboardListeners();
+            } else if (this.currentView === 'completion') {
+                this.completionModule.addKeyboardListeners();
+            } else if (this.currentView === 'matching') {
+                this.matchingModule.addKeyboardListeners();
+            } else if (this.currentView === 'sorting') {
+                this.sortingModule.addKeyboardListeners();
             }
         });
     },
 
-    showSortingCompletionModal(moduleData) {
+    showSortingCompletionModal(moduleData) { // This is a method of game, so keep this.
         const modal = this.sortingCompletionModal;
         const title = document.getElementById('sorting-completion-title');
         const message = document.getElementById('sorting-completion-message');
@@ -684,7 +519,7 @@ export const game = {
                 </button>
             `;
             wordItem.querySelector('.explanation-btn').addEventListener('click', () => {
-                this.showExplanationModal(item);
+                showExplanationModal(this.explanationModal, item); // Use imported showExplanationModal
             });
             wordsContainer.appendChild(wordItem);
         });
@@ -695,7 +530,7 @@ export const game = {
         modal.classList.remove('hidden');
     },
 
-    showFlashcardSummary(totalCards) {
+    showFlashcardSummary(totalCards) { // This is a method of game, so keep this.
         const appContainer = document.getElementById('app-container');
         appContainer.classList.remove('main-menu-active');
 
@@ -714,7 +549,7 @@ export const game = {
         }
     },
 
-    showMatchingSummary() {
+    showMatchingSummary() { // This is a method of game, so keep this.
         const appContainer = document.getElementById('app-container');
         appContainer.classList.remove('main-menu-active');
 
@@ -753,12 +588,12 @@ export const game = {
             document.getElementById('matching-completion-replay-btn').addEventListener('click', () => {
                 
                 modal.classList.add('hidden');
-                game.renderMatching(game.currentModule); // Replay the current matching module
+                game.renderMatching(game.currentModule); // This is a method of game, so keep this.
             });
             document.getElementById('matching-completion-back-to-menu-btn').addEventListener('click', () => {
                 
                 modal.classList.add('hidden');
-                game.renderMenu(); // Go back to main menu
+                game.renderMenu(); // This is a method of game, so keep this.
             });
         }
 
@@ -795,7 +630,7 @@ export const game = {
                 explanationButton.title = MESSAGES.get('showExplanation');
                 explanationButton.ariaLabel = MESSAGES.get('showExplanation');
                 explanationButton.addEventListener('click', () => {
-                    game.showExplanationModal({
+                    showExplanationModal({ // Use imported showExplanationModal
                         word: termData.term,
                         translation_es: termData.term_es,
                         example: termData.explanation,
@@ -810,27 +645,27 @@ export const game = {
         modal.classList.remove('hidden'); // Show the modal
     },
 
-    showLogoutConfirmation() {
-        this.toggleModal(true);
+    showLogoutConfirmation() { // This is a method of game, so keep this.
+        toggleModal(this.modal, true); // Use imported toggleModal
     },
 
-    renderQuiz(module) {
+    renderQuiz(module) { // This is a method of game, so keep this.
         this.currentView = 'quiz';
         document.body.classList.add('module-active');
-        document.getElementById('app-container').classList.remove('main-menu-active'); // ADD THIS LINE
+        document.getElementById('app-container').classList.remove('main-menu-active');
         this.quizModule.init(module);
-        this.updateFooterVisibility();
+        updateFooterVisibility(this.currentView, MESSAGES); // Use imported updateFooterVisibility
     },
 
-    renderCompletion(module) {
+    renderCompletion(module) { // This is a method of game, so keep this.
         this.currentView = 'completion';
         document.body.classList.add('module-active');
-        document.getElementById('app-container').classList.remove('main-menu-active'); // ADD THIS LINE
+        document.getElementById('app-container').classList.remove('main-menu-active');
         this.completionModule.init(module);
-        this.updateFooterVisibility();
+        updateFooterVisibility(this.currentView, MESSAGES); // Use imported updateFooterVisibility
     },
 
-        renderSorting(module) {
+    renderSorting(module) { // This is a method of game, so keep this.
         // If we are already in sorting view and the container exists, just update text
         if (this.currentView === 'sorting' && document.getElementById('sorting-container')) {
             this.sortingModule.updateText();
@@ -839,20 +674,20 @@ export const game = {
         }
         this.currentView = 'sorting';
         document.body.classList.add('module-active');
-        document.getElementById('app-container').classList.remove('main-menu-active'); // ADD THIS LINE
+        document.getElementById('app-container').classList.remove('main-menu-active');
         this.sortingModule.init(module);
-        this.updateFooterVisibility();
+        updateFooterVisibility(this.currentView, MESSAGES); // Use imported updateFooterVisibility
     },
 
-    renderMatching(module) {
+    renderMatching(module) { // This is a method of game, so keep this.
         this.currentView = 'matching';
         document.body.classList.add('module-active');
-        document.getElementById('app-container').classList.remove('main-menu-active'); // ADD THIS LINE
+        document.getElementById('app-container').classList.remove('main-menu-active');
         this.matchingModule.init(module);
-        this.updateFooterVisibility();
+        updateFooterVisibility(this.currentView, MESSAGES); // Use imported updateFooterVisibility
     },
 
-    addSwipeListeners() {
+    addSwipeListeners() { // This is a method of game, so keep this.
         const appContainer = document.getElementById('app-container');
         const SWIPE_THRESHOLD = 50; // pixels
 
@@ -905,6 +740,10 @@ export const game = {
                 }
             }
         });
+    },
+
+    isMobile() { // Added isMobile function
+        return window.innerWidth <= 768; // Example breakpoint for mobile
     }
 };
 

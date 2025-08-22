@@ -240,6 +240,45 @@ class FlashcardModule {
         document.getElementById('next-btn').textContent = this.MESSAGES.get('nextButton');
         document.getElementById('back-to-menu-flashcard-btn').textContent = this.MESSAGES.get('backToMenu');
     }
+
+    addKeyboardListeners() {
+        document.addEventListener('keydown', (e) => {
+            // Only handle keyboard events if the flashcard container is visible
+            const flashcardContainer = document.getElementById('flashcard-container');
+            if (!flashcardContainer || flashcardContainer.closest('.hidden')) {
+                return;
+            }
+
+            const flashcardSummaryContainer = document.getElementById('flashcard-summary-container');
+            if (flashcardSummaryContainer && !flashcardSummaryContainer.classList.contains('hidden')) {
+                if (e.key === 'Enter') {
+                    document.getElementById('flashcard-summary-back-to-menu-btn').click();
+                }
+                return; // Exit early if summary handled
+            }
+
+            if (e.key === 'Enter') {
+                const card = document.querySelector('.flashcard');
+                if (card) {
+                    if (card.classList.contains('flipped')) {
+                        card.classList.remove('flipped'); // Unflip the card
+                        setTimeout(() => {
+                            if (this.currentIndex === this.moduleData.data.length - 1) {
+                                this.gameCallbacks.showFlashcardSummary(this.moduleData.data.length);
+                            } else {
+                                this.next();
+                            }
+                        }, 150); // Small delay to allow unflip animation
+                    } else {
+                        this.flip();
+                    }
+                }
+            } else if (e.key === 'Backspace') {
+                e.preventDefault();
+                this.prev();
+            }
+        });
+    }
 }
 
 export default FlashcardModule;

@@ -244,6 +244,26 @@ class MatchingModule {
         document.querySelector('#terms-column h3').textContent = this.MESSAGES.get('terms');
         document.querySelector('#definitions-column h3').textContent = this.MESSAGES.get('definitions');
     }
+
+    addKeyboardListeners() {
+        document.addEventListener('keydown', (e) => {
+            // Only handle keyboard events if the matching container is visible
+            const matchingContainer = document.getElementById('matching-container');
+            if (!matchingContainer || matchingContainer.closest('.hidden')) {
+                return;
+            }
+
+            const matchingCompletionModal = document.getElementById('matching-completion-modal');
+            if (matchingCompletionModal && !matchingCompletionModal.classList.contains('hidden')) {
+                if (e.key === 'Enter') {
+                    document.getElementById('matching-completion-replay-btn').click();
+                } else if (e.key === 'Escape') {
+                    document.getElementById('matching-completion-back-to-menu-btn').click();
+                }
+                return; // Consume event if modal is handled
+            }
+        });
+    }
 }
 
 export default MatchingModule;

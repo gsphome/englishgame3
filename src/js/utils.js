@@ -24,3 +24,96 @@ export function getGameModeIconSvg(gameMode) {
             return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 inline-block align-middle mr-1"><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clip-rule="evenodd" /></svg>`; // Default icon (e.g., a question mark or generic icon)
     }
 }
+
+export function toggleModal(modalElement, show) {
+    modalElement.classList.toggle('hidden', !show);
+}
+
+export function showExplanationModal(modalElement, wordData) {
+    document.getElementById('explanation-word').textContent = wordData.word;
+    document.getElementById('explanation-word-translation').textContent = wordData.translation_es;
+    document.getElementById('explanation-example-en').textContent = `"${wordData.example}"`;
+    document.getElementById('explanation-example-es').textContent = `"${wordData.example_es}"`;
+    document.body.appendChild(modalElement);
+    modalElement.classList.remove('hidden');
+}
+
+export function toggleHamburgerMenu(show) {
+    document.body.classList.toggle('hamburger-menu-open', show);
+}
+
+export function updateSessionScoreDisplay(correct, incorrect, total, MESSAGES) {
+    const sessionScoreDisplay = document.getElementById('session-score-display');
+    if (sessionScoreDisplay) {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const correctColor = isDarkMode ? 'text-green-400' : 'text-green-700';
+        const incorrectColor = isDarkMode ? 'text-red-400' : 'text-red-700';
+        const totalColor = isDarkMode ? 'text-gray-300' : 'text-gray-600';
+
+        sessionScoreDisplay.innerHTML = `
+            <span class="text-sm font-semibold">Session:</span>
+            <span class="ml-1 ${correctColor} font-bold">✅ ${correct}</span>
+            <span class="ml-1 ${incorrectColor} font-bold">❌ ${incorrect}</span>
+            <span class="ml-1 ${totalColor} font-bold">Total: ${total}</span>
+        `;
+        sessionScoreDisplay.classList.remove('hidden');
+    }
+}
+
+export function updateHeaderText(auth, MESSAGES) {
+    const user = auth.getUser();
+    if (!user) return;
+
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const correctColor = isDarkMode ? 'text-green-400' : 'text-green-700';
+    const incorrectColor = isDarkMode ? 'text-red-400' : 'text-red-700';
+
+    const globalScoreEl = document.getElementById('global-score');
+    if (globalScoreEl) {
+        globalScoreEl.innerHTML = `
+            <span class="text-sm font-semibold">${MESSAGES.get('globalScore')}:</span>
+            <span class="ml-1 ${correctColor} font-bold">✅ ${user.globalScore.correct}</span>
+            <span class="ml-1 ${incorrectColor} font-bold">❌ ${user.globalScore.incorrect}</span>
+        `;
+    }
+
+    const usernameDisplayEl = document.getElementById('username-display');
+    if (usernameDisplayEl) {
+        usernameDisplayEl.innerHTML = `<span class="text-lg font-bold">👤 ${user.username}</span>`;
+    }
+}
+
+export function updateFooterVisibility(currentView, MESSAGES) {
+    const footer = document.getElementById('main-footer-copyright');
+    const footerWebText = document.getElementById('footer-web-text');
+    const footerMobileText = document.getElementById('footer-mobile-text');
+
+    if (footer && footerWebText && footerMobileText) {
+        if (currentView === 'menu') {
+            footer.style.display = 'block';
+            footerWebText.textContent = MESSAGES.get('footerWeb');
+            footerMobileText.textContent = MESSAGES.get('footerMobile');
+        } else {
+            footer.style.display = 'none';
+        }
+    }
+}
+
+export function renderHeader(auth, MESSAGES, toggleHamburgerMenu) {
+    const user = auth.getUser();
+    const scoreContainer = document.getElementById('score-container');
+    const usernameDisplay = document.getElementById('username-display');
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+
+    if (user) {
+        scoreContainer.classList.remove('hidden');
+        usernameDisplay.classList.remove('hidden');
+        hamburgerBtn.classList.remove('hidden'); // Ensure hamburger button is visible if user is logged in
+        hamburgerBtn.addEventListener('click', () => toggleHamburgerMenu(true));
+        updateHeaderText(auth, MESSAGES);
+    } else {
+        scoreContainer.classList.add('hidden');
+        usernameDisplay.classList.add('hidden');
+        hamburgerBtn.classList.add('hidden'); // Hide hamburger button if no user
+    }
+}

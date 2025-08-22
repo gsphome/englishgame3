@@ -212,6 +212,36 @@ class CompletionModule {
             inputElement.classList.remove('text-green-500', 'text-red-500'); // Remove colors if no feedback
         }
     }
+
+    addKeyboardListeners() {
+        document.addEventListener('keydown', (e) => {
+            // Only handle keyboard events if the completion container is visible
+            const completionContainer = document.getElementById('completion-container');
+            if (!completionContainer || completionContainer.closest('.hidden')) {
+                return;
+            }
+
+            const completionSummaryContainer = document.getElementById('completion-summary-container');
+            if (completionSummaryContainer && !completionSummaryContainer.classList.contains('hidden')) {
+                if (e.key === 'Enter') {
+                    document.querySelector('#completion-summary-container button').click(); // Click the back to menu button
+                }
+                return; // Exit early if summary handled
+            }
+
+            if (e.key === 'Enter') {
+                this.handleNextAction();
+            } else if (e.key === 'Backspace') {
+                const inputElement = document.getElementById('completion-input');
+                if (inputElement && document.activeElement === inputElement) {
+                    // Allow default backspace behavior for input field
+                    return;
+                }
+                e.preventDefault();
+                this.prev();
+            }
+        });
+    }
 }
 
 export default CompletionModule;
