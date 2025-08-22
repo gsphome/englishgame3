@@ -234,32 +234,36 @@ class QuizGame {
                 this.historyPointer--;
                 this.renderHistoryState();
             } else {
-                // If we are at the beginning of history, go to the actual previous question
+                // If we are at the beginning of history for the current question,
+                // try to go to the previous question.
                 this.isViewingHistory = false;
                 this.scoreFrozen = false;
                 if (this.currentIndex > 0) {
                     this.currentIndex--;
-                    this.render();
+                    // After moving to the previous question, check if it has a history entry
+                    const prevQuestionHistoryEntry = this.history.findLast(entry => entry.index === this.currentIndex);
+                    if (prevQuestionHistoryEntry) {
+                        this.historyPointer = this.history.indexOf(prevQuestionHistoryEntry);
+                        this.isViewingHistory = true;
+                        this.renderHistoryState();
+                    } else {
+                        this.render(); // No history for this previous question, render normally
+                    }
                 }
             }
         } else {
-            const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
-            if (optionsDisabled) {
-                // If current question is answered, and we are not viewing history,
-                // start viewing history from the current question's history entry
-                const currentQuestionHistoryEntry = this.history.find(entry => entry.index === this.currentIndex);
-                if (currentQuestionHistoryEntry) {
-                    this.historyPointer = this.history.indexOf(currentQuestionHistoryEntry);
+            // Normal quiz mode, user pressed prev
+            if (this.currentIndex > 0) {
+                this.currentIndex--;
+                this.scoreFrozen = false; // Unfreeze score when moving to a new question
+                const prevQuestionHistoryEntry = this.history.findLast(entry => entry.index === this.currentIndex);
+                if (prevQuestionHistoryEntry) {
+                    this.historyPointer = this.history.indexOf(prevQuestionHistoryEntry);
                     this.isViewingHistory = true;
                     this.renderHistoryState();
-                } else if (this.currentIndex > 0) { // If no history for current, just go back to previous question
-                    this.currentIndex--;
-                    this.render();
+                } else {
+                    this.render(); // No history for this previous question, render normally
                 }
-            } else if (this.currentIndex > 0) {
-                this.scoreFrozen = false;
-                this.currentIndex--;
-                this.render();
             }
         }
         this.updateNavigationButtons(); // Update buttons after prev
