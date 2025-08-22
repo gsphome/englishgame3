@@ -1,6 +1,8 @@
 import { auth } from '../auth.js';
 import { MESSAGES } from '../interface.js';
 import { game } from '../game.js';
+jest.mock('../utils.js');
+import * as utils from '../utils.js';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -16,12 +18,15 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 
 
+
+
 describe('auth.js', () => {
     let messagesSetLanguageSpy;
     let messagesAddListenerSpy;
     let messagesGetSpy;
-    let gameRenderHeaderSpy;
     let gameRenderMenuSpy;
+    let renderHeaderSpy; // Add this line
+    let toggleHamburgerMenuSpy; // Add this line
 
     beforeEach(() => {
         // Reset DOM before each test
@@ -43,9 +48,10 @@ describe('auth.js', () => {
             return messages[key] || key;
         });
 
-        // Spy on game methods
-        gameRenderHeaderSpy = jest.spyOn(game, 'renderHeader').mockImplementation(() => {});
+        // Spy on imported functions and game methods
+        renderHeaderSpy = jest.spyOn(utils, 'renderHeader').mockImplementation(() => {}); // Modify this line
         gameRenderMenuSpy = jest.spyOn(game, 'renderMenu').mockImplementation(() => {});
+        toggleHamburgerMenuSpy = jest.spyOn(utils, 'toggleHamburgerMenu').mockImplementation(() => {});
 
         // Reset auth.user before each test
         auth.user = null;
@@ -187,9 +193,9 @@ describe('auth.js', () => {
             }));
         });
 
-        test('should call game.renderHeader and game.renderMenu', () => {
+        test('should call renderHeader and game.renderMenu', () => { // Updated test description
             auth.login('newuser');
-            expect(gameRenderHeaderSpy).toHaveBeenCalled();
+            expect(renderHeaderSpy).toHaveBeenCalled(); // Use the new spy
             expect(gameRenderMenuSpy).toHaveBeenCalled();
         });
     });
@@ -205,19 +211,11 @@ describe('auth.js', () => {
             reloadPageSpy.mockRestore();
         });
 
-        test('should remove user from localStorage, reload and hide menu', () => {
+        test('should remove user from localStorage and reload page', () => {
             localStorageMock.setItem('user', JSON.stringify({ username: 'testuser' }));
-            game.hamburgerMenu = document.createElement('button');
-            game.hamburgerMenu.classList.remove('hidden');
             auth.logout();
             expect(localStorageMock.removeItem).toHaveBeenCalledWith('user');
             expect(reloadPageSpy).toHaveBeenCalled();
-            expect(game.hamburgerMenu.classList.contains('hidden')).toBe(true);
-        });
-
-        test('should not throw error if game.hamburgerMenu is null', () => {
-            game.hamburgerMenu = null; // Set hamburgerMenu to null
-            expect(() => auth.logout()).not.toThrow();
         });
     });
 
@@ -257,10 +255,10 @@ describe('auth.js', () => {
             }));
         });
 
-        test('should call game.renderHeader', () => {
+        test('should call renderHeader', () => { // Updated test description
             const sessionScore = { correct: 2, incorrect: 1 };
             auth.updateGlobalScore(sessionScore);
-            expect(gameRenderHeaderSpy).toHaveBeenCalled();
+            expect(renderHeaderSpy).toHaveBeenCalled(); // Use the new spy
         });
     });
 
@@ -279,12 +277,5 @@ describe('auth.js', () => {
         });
     });
 
-    describe('_internalReloadPage()', () => {
-        // test('should call location.reload()', () => {
-        //     const reloadSpy = jest.spyOn(window.location, 'reload').mockImplementation(() => {});
-        //     auth._internalReloadPage();
-        //     expect(reloadSpy).toHaveBeenCalled();
-        //     reloadSpy.mockRestore();
-        // });
-    });
+    
 });

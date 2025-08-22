@@ -1,5 +1,6 @@
 import { MESSAGES } from './interface.js';
 import { game } from './game.js';
+import { renderHeader } from './utils.js';
 
 export const auth = {
     user: null,
@@ -80,7 +81,7 @@ export const auth = {
             globalScore: { correct: 0, incorrect: 0 }
         };
         localStorage.setItem('user', JSON.stringify(this.user));
-        game.renderHeader(); // Update header with logged-in user info
+        renderHeader(this, MESSAGES, game.toggleHamburgerMenu); // Update header with logged-in user info
         // game.init(); // Removed: game.init() is now called directly in game.js after DOMContentLoaded
         game.renderMenu(); // Render the menu after login
     },
@@ -109,6 +110,6 @@ export const auth = {
         this.user.globalScore.correct += sessionScore.correct;
         this.user.globalScore.incorrect += sessionScore.incorrect;
         localStorage.setItem('user', JSON.stringify(this.user));
-        game.renderHeader();
+        renderHeader(this, MESSAGES, game.toggleHamburgerMenu);
     }
 };

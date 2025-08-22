@@ -6,7 +6,7 @@ import MatchingModule from './modules/MatchingModule.js';
 import { auth } from './auth.js';
 import { MESSAGES } from './interface.js';
 
-import { shuffleArray, getGameModeIconSvg, toggleModal, showExplanationModal, toggleHamburgerMenu, updateSessionScoreDisplay, updateHeaderText, renderHeader, updateFooterVisibility } from './utils.js';
+import { shuffleArray, getGameModeIconSvg, toggleModal, showExplanationModal, toggleHamburgerMenu, updateSessionScoreDisplay, updateFooterVisibility, renderHeader as renderHeaderUtil } from './utils.js';
 import { fetchModuleData, fetchAllLearningModules } from './dataManager.js';
 
 export const game = {
@@ -35,11 +35,23 @@ export const game = {
         this.modal = document.getElementById('confirmation-modal');
         auth.init();
         this.allLearningModules = await fetchAllLearningModules();
-        this.flashcardModule = new FlashcardModule(auth, MESSAGES, this);
-        this.quizModule = new QuizModule(auth, MESSAGES, this);
-        this.completionModule = new CompletionModule(auth, MESSAGES, this);
-        this.sortingModule = new SortingModule(auth, MESSAGES, this);
-        this.matchingModule = new MatchingModule(auth, MESSAGES, this);
+        const gameCallbacks = {
+            renderMenu: this.renderMenu.bind(this),
+            showFlashcardSummary: this.showFlashcardSummary.bind(this),
+            updateSessionScoreDisplay: updateSessionScoreDisplay, // Directly use the imported function
+            randomMode: this.randomMode,
+            shuffleArray: this.shuffleArray,
+            showSortingCompletionModal: this.showSortingCompletionModal.bind(this),
+            showMatchingSummary: this.showMatchingSummary.bind(this),
+            renderHeader: this.renderHeader.bind(this),
+            toggleHamburgerMenu: toggleHamburgerMenu, // Add toggleHamburgerMenu from utils.js
+        };
+
+        this.flashcardModule = new FlashcardModule(auth, MESSAGES, gameCallbacks);
+        this.quizModule = new QuizModule(auth, MESSAGES, gameCallbacks);
+        this.completionModule = new CompletionModule(auth, MESSAGES, gameCallbacks);
+        this.sortingModule = new SortingModule(auth, MESSAGES, gameCallbacks);
+        this.matchingModule = new MatchingModule(auth, MESSAGES, gameCallbacks);
         this.yesButton = document.getElementById('confirm-yes');
         this.noButton = document.getElementById('confirm-no');
         this.messageElement = document.getElementById('confirmation-message');
@@ -134,64 +146,13 @@ export const game = {
             });
         }
 
-        MESSAGES.addListener(updateHeaderText.bind(this)); // Use imported updateHeaderText
+        MESSAGES.addListener(this.renderHeader.bind(this)); // Use imported updateHeaderText
         MESSAGES.addListener(this.updateMenuText.bind(this)); // This is a method of game, so keep this.
         this.updateMenuText(); // This is a method of game, so keep this.
 
-        // Initial render will be handled after user check
-        MESSAGES.addListener(() => {
-            if (!this.modal.classList.contains('hidden')) {
-                this.messageElement.textContent = MESSAGES.get('confirmLogoutMessage');
-            }
-
-            // Update current game view if active
-            if (this.currentView === 'flashcard') {
-                this.flashcardModule.updateText();
-            } else if (this.currentView === 'quiz') {
-                this.quizModule.updateText();
-            } else if (this.currentView === 'completion') {
-                this.completionModule.updateText();
-            } else if (this.currentView === 'sorting') {
-                this.sortingModule.updateText();
-            } else if (this.currentView === 'matching') {
-                this.matchingModule.updateText();
-            }
-
-            // Re-render summary screens if active
-            const flashcardSummaryContainer = document.getElementById('flashcard-summary-container');
-            const quizSummaryContainer = document.getElementById('quiz-summary-container');
-            const completionSummaryContainer = document.getElementById('completion-summary-container');
-            const matchingSummaryContainer = document.getElementById('matching-summary-container');
-
-            if (flashcardSummaryContainer && !flashcardSummaryContainer.classList.contains('hidden')) {
-                // Re-render flashcard summary with current data
-                this.showFlashcardSummary(this.flashcardModule.moduleData.data.length); // This is a method of game, so keep this.
-            } else if (quizSummaryContainer && !quizSummaryContainer.classList.contains('hidden')) {
-                // Re-render quiz summary with current data
-                this.quizModule.showFinalScore();
-            } else if (completionSummaryContainer && !completionSummaryContainer.classList.contains('hidden')) {
-                // Re-render completion summary with current data
-                this.completionModule.showFinalScore();
-            } else if (matchingSummaryContainer && !matchingSummaryContainer.classList.contains('hidden')) {
-                // Re-render matching summary with current data
-                this.showMatchingSummary(); // This is a method of game, so keep this.
-            }
-            // Update matching completion modal text if visible
-            const matchingCompletionModal = document.getElementById('matching-completion-modal');
-            if (matchingCompletionModal && !matchingCompletionModal.classList.contains('hidden')) {
-                document.getElementById('matching-completion-title').textContent = MESSAGES.get('sessionScore');
-                document.getElementById('matching-completion-message').textContent = MESSAGES.get('matchingCompletionMessage');
-                document.getElementById('matching-completion-replay-btn').textContent = MESSAGES.get('replayButton');
-                document.getElementById('matching-completion-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
-            }
-        });
-
-        this.addKeyboardListeners(); // This is a method of game, so keep this.
-        this.addSwipeListeners(); // This is a method of game, so keep this.
-
         // Initial user check and rendering
         auth.user = JSON.parse(localStorage.getItem('user')); // Initialize auth.user
-        renderHeader(auth, MESSAGES, toggleHamburgerMenu); // Use imported renderHeader
+        this.renderHeader(); // Use imported renderHeader
         if (!auth.user) {
             auth.renderLogin();
         } else {
@@ -201,6 +162,25 @@ export const game = {
 
     showExplanationModal(wordData) {
         showExplanationModal(this.explanationModal, wordData); // Use imported showExplanationModal
+    },
+
+    renderHeader() {
+        const user = auth.getUser();
+        const scoreContainer = document.getElementById('score-container');
+        const usernameDisplay = document.getElementById('username-display');
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+    
+        if (user) {
+            scoreContainer.classList.remove('hidden');
+            usernameDisplay.classList.remove('hidden');
+            hamburgerBtn.classList.remove('hidden'); // Ensure hamburger button is visible if user is logged in
+            hamburgerBtn.addEventListener('click', () => toggleHamburgerMenu(true));
+            renderHeaderUtil(auth, MESSAGES, toggleHamburgerMenu);
+        } else {
+            scoreContainer.classList.add('hidden');
+            usernameDisplay.classList.add('hidden');
+            hamburgerBtn.classList.add('hidden'); // Hide hamburger button if no user
+        }
     },
 
     updateFooterVisibility() { // This is a method of game, so keep this.
@@ -461,7 +441,7 @@ export const game = {
                         button.click();
                     }
                 });
-            } else if (this.currentView === 'flashcard') { // If flashcard is active
+            } else if (this.currentView === 'flashcard') {
                 this.flashcardModule.addKeyboardListeners();
             } else if (this.currentView === 'quiz') {
                 this.quizModule.addKeyboardListeners();
@@ -717,18 +697,6 @@ export const game = {
                     } else { // Swiped left (next)
                         if (this.currentView === 'flashcard') {
                             this.flashcardModule.next();
-                        } else if (this.currentView === 'quiz') {
-                            const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
-                            if (optionsDisabled) {
-                                this.quizModule.next();
-                            }
-                        } else if (this.currentView === 'completion') {
-                            const inputElement = document.getElementById('completion-input');
-                            if (inputElement && inputElement.disabled) {
-                                this.completionModule.next();
-                            }
-                        } else if (this.currentView === 'sorting') {
-                            // No next/prev for sorting, but can add swipe for check/undo if needed
                         }
                     }
                 }

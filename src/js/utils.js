@@ -60,7 +60,7 @@ export function updateSessionScoreDisplay(correct, incorrect, total, MESSAGES) {
     }
 }
 
-export function updateHeaderText(auth, MESSAGES) {
+export function renderHeader(auth, MESSAGES, toggleHamburgerMenu) {
     const user = auth.getUser();
     if (!user) return;
 
@@ -99,21 +99,3 @@ export function updateFooterVisibility(currentView, MESSAGES) {
     }
 }
 
-export function renderHeader(auth, MESSAGES, toggleHamburgerMenu) {
-    const user = auth.getUser();
-    const scoreContainer = document.getElementById('score-container');
-    const usernameDisplay = document.getElementById('username-display');
-    const hamburgerBtn = document.getElementById('hamburger-btn');
-
-    if (user) {
-        scoreContainer.classList.remove('hidden');
-        usernameDisplay.classList.remove('hidden');
-        hamburgerBtn.classList.remove('hidden'); // Ensure hamburger button is visible if user is logged in
-        hamburgerBtn.addEventListener('click', () => toggleHamburgerMenu(true));
-        updateHeaderText(auth, MESSAGES);
-    } else {
-        scoreContainer.classList.add('hidden');
-        usernameDisplay.classList.add('hidden');
-        hamburgerBtn.classList.add('hidden'); // Hide hamburger button if no user
-    }
-}
