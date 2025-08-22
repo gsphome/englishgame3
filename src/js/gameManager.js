@@ -20,7 +20,7 @@ export const gameManager = {
     init(appInstance) {
         this.appInstance = appInstance; // Almacenar la instancia de app para callbacks
 
-        const gameCallbacks = {
+        this.gameCallbacks = {
             renderMenu: this.appInstance.renderMenu.bind(this.appInstance), // Llamar al renderMenu de app
             showFlashcardSummary: ui.showFlashcardSummary.bind(ui),
             updateSessionScoreDisplay: ui.updateSessionScoreDisplay.bind(ui),
@@ -30,16 +30,17 @@ export const gameManager = {
             showMatchingSummary: ui.showMatchingSummary.bind(ui),
             renderHeader: ui.renderHeader.bind(ui),
             toggleHamburgerMenu: ui.toggleHamburgerMenu.bind(ui),
+            isHistoryMode: false, // Default to false
         };
 
-        this.flashcardModule = new FlashcardModule(auth, MESSAGES, gameCallbacks);
-        this.quizModule = new QuizModule(auth, MESSAGES, gameCallbacks);
-        this.completionModule = new CompletionModule(auth, MESSAGES, gameCallbacks);
-        this.sortingModule = new SortingModule(auth, MESSAGES, gameCallbacks);
-        this.matchingModule = new MatchingModule(auth, MESSAGES, gameCallbacks);
+        this.flashcardModule = new FlashcardModule(auth, MESSAGES, this.gameCallbacks);
+        this.quizModule = new QuizModule(auth, MESSAGES, this.gameCallbacks);
+        this.completionModule = new CompletionModule(auth, MESSAGES, this.gameCallbacks);
+        this.sortingModule = new SortingModule(auth, MESSAGES, this.gameCallbacks);
+        this.matchingModule = new MatchingModule(auth, MESSAGES, this.gameCallbacks);
     },
 
-    async startModule(moduleId) {
+    async startModule(moduleId, isHistoryMode = false) { // Added isHistoryMode parameter
         this.removeCurrentModuleKeyboardListeners(); // Eliminar listeners del módulo anterior
         const moduleMeta = this.appInstance.allLearningModules.find(m => m.id === moduleId);
         if (!moduleMeta) return;
@@ -53,6 +54,9 @@ export const gameManager = {
 
             this.currentModule = moduleWithData;
             this.appInstance.currentModule = moduleWithData; // Actualizar currentModule de app
+
+            // Update gameCallbacks with the current isHistoryMode state
+            this.gameCallbacks.isHistoryMode = isHistoryMode; // Set the history mode
 
             switch (moduleWithData.gameMode) {
                 case 'flashcard':

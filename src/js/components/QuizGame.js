@@ -149,7 +149,10 @@ class QuizGame {
             feedbackContainer.innerHTML = ''; // Clear feedback for normal unanswered state
             this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         }
-        this.updateNavigationButtons(); // Update buttons after render
+        // Defer updateNavigationButtons to ensure DOM is fully updated
+        setTimeout(() => {
+            this.updateNavigationButtons();
+        }, 0);
     }
 
     handleAnswer(selectedOption) {
@@ -234,39 +237,35 @@ class QuizGame {
                 this.historyPointer--;
                 this.renderHistoryState();
             } else {
-                // If we are at the beginning of history for the current question,
-                // try to go to the previous question.
                 this.isViewingHistory = false;
                 this.scoreFrozen = false;
                 if (this.currentIndex > 0) {
                     this.currentIndex--;
-                    // After moving to the previous question, check if it has a history entry
                     const prevQuestionHistoryEntry = this.history.findLast(entry => entry.index === this.currentIndex);
                     if (prevQuestionHistoryEntry) {
                         this.historyPointer = this.history.indexOf(prevQuestionHistoryEntry);
                         this.isViewingHistory = true;
                         this.renderHistoryState();
                     } else {
-                        this.render(); // No history for this previous question, render normally
+                        this.render();
                     }
                 }
             }
         } else {
-            // Normal quiz mode, user pressed prev
             if (this.currentIndex > 0) {
                 this.currentIndex--;
-                this.scoreFrozen = false; // Unfreeze score when moving to a new question
+                this.scoreFrozen = false;
                 const prevQuestionHistoryEntry = this.history.findLast(entry => entry.index === this.currentIndex);
                 if (prevQuestionHistoryEntry) {
                     this.historyPointer = this.history.indexOf(prevQuestionHistoryEntry);
                     this.isViewingHistory = true;
                     this.renderHistoryState();
                 } else {
-                    this.render(); // No history for this previous question, render normally
+                    this.render();
                 }
             }
         }
-        this.updateNavigationButtons(); // Update buttons after prev
+        this.updateNavigationButtons();
     }
 
     next() {
@@ -275,31 +274,31 @@ class QuizGame {
                 this.historyPointer++;
                 this.renderHistoryState();
             } else {
-                // If we are at the end of history, go to the next actual question
-                this.isViewingHistory = false;
+                this.isViewingHistory = false; // Exit history mode
                 this.scoreFrozen = false;
                 if (this.currentIndex < this.moduleData.data.length - 1) {
                     this.currentIndex++;
                     this.render();
+                    this.updateNavigationButtons(); // This was the added line
                 } else {
                     this.showFinalScore();
                 }
             }
         } else {
             const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
-            if (!optionsDisabled && this.moduleData.data[this.currentIndex].options) { 
+            if (!optionsDisabled && this.moduleData.data[this.currentIndex].options) {
                 return; // Current question not answered yet
             }
 
             if (this.currentIndex < this.moduleData.data.length - 1) {
-                this.scoreFrozen = false; 
+                this.scoreFrozen = false;
                 this.currentIndex++;
                 this.render();
-            } else {
+            }
+            else {
                 this.showFinalScore();
             }
         }
-        this.updateNavigationButtons(); // Update buttons after next
     }
 
     undo() {
@@ -384,8 +383,6 @@ class QuizGame {
 
         // Update score display to reflect the score at the time of this history entry
         this.gameCallbacks.updateSessionScoreDisplay(historyEntry.sessionScoreBefore.correct, historyEntry.sessionScoreBefore.incorrect, this.moduleData.data.length);
-
-        this.updateNavigationButtons(); // Update buttons after rendering history state
     }
 
     showFinalScore() {
@@ -469,23 +466,19 @@ class QuizGame {
         const undoBtn = document.getElementById('undo-btn');
 
         if (!prevBtn || !nextBtn || !undoBtn) {
-            // Buttons might not be rendered yet
             return;
         }
 
         if (this.isViewingHistory) {
-            // In history viewing mode
             prevBtn.disabled = this.historyPointer <= 0;
-            nextBtn.disabled = this.historyPointer >= this.history.length - 1;
-            undoBtn.disabled = true; // Undo is blocked in history view
+            nextBtn.disabled = (this.historyPointer >= this.history.length - 1) && (this.currentIndex >= this.moduleData.data.length - 1); // This was the modified line
+            undoBtn.disabled = true;
         } else {
-            // Normal quiz mode
             const currentQuestionAnswered = document.querySelectorAll('[data-option][disabled]').length > 0;
 
-            prevBtn.disabled = this.currentIndex === 0 && !currentQuestionAnswered; // Disabled if at Q0 and not answered
-            nextBtn.disabled = !currentQuestionAnswered; // Disabled if not answered
+            prevBtn.disabled = this.currentIndex === 0 && !currentQuestionAnswered;
+            nextBtn.disabled = !currentQuestionAnswered;
 
-            // Undo is disabled if no history, or if the current question is not the one that was last answered
             const lastAction = this.history[this.historyPointer];
             undoBtn.disabled = this.history.length === 0 || this.historyPointer < 0 || (lastAction && lastAction.index !== this.currentIndex);
         }

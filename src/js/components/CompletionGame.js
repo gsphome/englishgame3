@@ -51,7 +51,7 @@ class CompletionGame {
                         <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
                     </div>
                     <div class="flex justify-between mt-4">
-                        <button id="undo-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('undoButton')}</button>
+                        <button id="undo-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4" ${this.gameCallbacks.isHistoryMode ? 'disabled' : ''}>${this.MESSAGES.get('undoButton')}</button>
                         <div>
                             <button id="prev-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-l md:py-2 md:px-4">${this.MESSAGES.get('prevButton')}</button>
                             <button id="next-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-r md:py-2 md:px-4">${this.MESSAGES.get('nextButton')}</button>
@@ -184,9 +184,6 @@ class CompletionGame {
         const inputElement = document.getElementById('completion-input');
         if (inputElement && !inputElement.disabled) {
             this.handleAnswer();
-            // After handling the answer, immediately proceed to the next question
-            // This makes the "Next" button (and Enter) work in one press
-            this.advanceQuestion();
         } else {
             this.advanceQuestion();
         }
