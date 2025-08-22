@@ -14,7 +14,8 @@ const config = {
 
   // A list of glob patterns indicating a set of files for which coverage information should be collected
   // collectCoverageFrom: ['src/js/**/*.js', '!src/js/game.js'],
-  collectCoverageFrom: ['src/js/**/*.js'],
+  // collectCoverageFrom: ['src/js/**/*.js'],
+  collectCoverageFrom: ['!src/js/**/*.js'],
 
 
   // Setup file for Jest DOM matchers

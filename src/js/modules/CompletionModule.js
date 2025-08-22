@@ -29,7 +29,7 @@ class CompletionModule {
         }
     }
 
-    render() {
+    render(isUndo = false) {
         if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
             console.error("Completion module data is invalid or empty.");
             this.gameCallbacks.renderMenu();
@@ -71,13 +71,8 @@ class CompletionModule {
 
         // Update question and input field for every render
         document.getElementById('completion-question').innerHTML = questionData.sentence.replace('______', '<input type="text" id="completion-input" class="border-b-2 border-gray-400 focus:border-blue-500 outline-none text-left w-[20px] bg-transparent" autocomplete="off" />');
-        document.getElementById('feedback-container').innerHTML = ''; // Clear feedback
 
-        let inputElement = document.getElementById('completion-input');
-        inputElement.value = ''; // Clear the input field
-        inputElement.disabled = false; // Enable input field
-        inputElement.classList.remove('text-green-500', 'text-red-500'); // Remove color classes
-        inputElement.focus();
+        
 
         const completionTipElement = document.getElementById('completion-tip');
         if (questionData.tip) {
@@ -99,6 +94,7 @@ class CompletionModule {
                 completionTipElement.classList.add('hidden');
             }
         }
+        this.updateText();
     }
 
     handleAnswer() {
@@ -117,12 +113,26 @@ class CompletionModule {
             this.auth.updateGlobalScore({ correct: 1, incorrect: 0 });
             inputElement.classList.add('text-green-500');
             document.getElementById('feedback-container').innerHTML = `<p class="text-lg">Correct Answer: <strong>${questionData.correct}</strong></p><p class="text-lg">${questionData.explanation}</p>`;
+            this.history.push({
+                isCorrect: true,
+                index: this.currentIndex,
+                userAnswer: userAnswer,
+                correctAnswer: questionData.correct,
+                explanation: questionData.explanation
+            });
             this.lastFeedback = { isCorrect: true, correct: questionData.correct, explanation: questionData.explanation, index: this.currentIndex, userAnswer: userAnswer };
         } else {
             this.sessionScore.incorrect++;
             this.auth.updateGlobalScore({ correct: 0, incorrect: 1 });
             inputElement.classList.add('text-red-500');
             document.getElementById('feedback-container').innerHTML = `<p class="text-lg">Correct Answer: <strong>${questionData.correct}</strong></p><p class="text-lg">${questionData.explanation}</p>`;
+            this.history.push({
+                isCorrect: false,
+                index: this.currentIndex,
+                userAnswer: userAnswer,
+                correctAnswer: questionData.correct,
+                explanation: questionData.explanation
+            });
             this.lastFeedback = { isCorrect: false, correct: questionData.correct, explanation: questionData.explanation, index: this.currentIndex, userAnswer: userAnswer };
         }
         inputElement.disabled = true;
@@ -130,6 +140,7 @@ class CompletionModule {
     }
 
     undo() {
+        console.log('undo() method called');
         const lastAction = this.history.pop();
         if (lastAction) {
             if (lastAction.isCorrect) {
@@ -140,8 +151,9 @@ class CompletionModule {
                 this.auth.updateGlobalScore({ correct: 0, incorrect: -1 });
             }
             this.currentIndex = lastAction.index;
-            this.render();
             this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.lastFeedback = lastAction; // Restore lastFeedback to the undone action
+            this.render(true); // Re-render the UI for the undone question
         }
     }
 
@@ -191,16 +203,14 @@ class CompletionModule {
 
     updateText() {
         const questionData = this.moduleData.data[this.currentIndex];
-        const currentInputValue = document.getElementById('completion-input') ? document.getElementById('completion-input').value : ''; // Save current value
         document.getElementById('completion-question').innerHTML = questionData.sentence.replace('______', '<input type="text" id="completion-input" class="border-b-2 border-gray-400 focus:border-blue-500 outline-none text-left w-[20px] bg-transparent" autocomplete="off" />');
         let inputElement = document.getElementById('completion-input'); // Re-get the element after innerHTML update
-        inputElement.value = currentInputValue; // Restore saved value
-        inputElement.focus();
 
         // Restore feedback if available for the current question
         if (this.lastFeedback && this.lastFeedback.index === this.currentIndex) {
-            const feedbackHtml = `<p class="text-lg">Correct Answer: <strong>${this.lastFeedback.correct}</strong></p><p class="text-lg">${this.lastFeedback.explanation}</p>`;
+            const feedbackHtml = `<p class="text-lg">Correct Answer: <strong>${this.lastFeedback.correctAnswer}</strong></p><p class="text-lg">${this.lastFeedback.explanation}</p>`;
             document.getElementById('feedback-container').innerHTML = feedbackHtml;
+            inputElement.value = this.lastFeedback.userAnswer; // Set the input value from lastFeedback
             inputElement.disabled = true; // Keep disabled
             if (this.lastFeedback.isCorrect) {
                 inputElement.classList.add('text-green-500');
@@ -209,9 +219,11 @@ class CompletionModule {
             }
         } else {
             document.getElementById('feedback-container').innerHTML = ''; // Clear feedback if no relevant feedback is stored
+            inputElement.value = ''; // Clear the input field if no feedback
             inputElement.disabled = false; // Enable if no feedback
             inputElement.classList.remove('text-green-500', 'text-red-500'); // Remove colors if no feedback
         }
+        inputElement.focus(); // Focus after setting value and state
     }
 
     _handleKeyboardEvent(e) {
