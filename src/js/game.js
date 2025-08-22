@@ -342,6 +342,7 @@ export const game = {
     renderFlashcard(module) {
         this.currentView = 'flashcard';
         document.body.classList.add('module-active');
+        document.getElementById('app-container').classList.remove('main-menu-active'); // ADD THIS LINE
         this.flashcardModule.init(module);
         this.updateFooterVisibility();
     },
@@ -522,6 +523,7 @@ export const game = {
 
             // 5. Handle game-specific escape behavior (lowest priority)
             if (e.key === 'Escape') {
+                
                 if (this.currentView === 'sorting') { // If sorting is active, go back to menu
                     this.renderMenu();
                 } else if (document.getElementById('app-container').classList.contains('main-menu-active')) {
@@ -553,8 +555,10 @@ export const game = {
                 if (e.key === 'Enter') {
                     const card = document.querySelector('.flashcard');
                     if (card) {
+                        
                         if (card.classList.contains('flipped')) {
                             card.classList.remove('flipped'); // Unflip the card
+                            
                             setTimeout(() => {
                                 if (this.flashcardModule.currentIndex === this.flashcardModule.moduleData.data.length - 1) {
                                     game.showFlashcardSummary(this.flashcardModule.moduleData.data.length);
@@ -580,6 +584,7 @@ export const game = {
                 const feedbackContainer = document.getElementById('feedback-container');
                 const optionsDisabled = document.querySelectorAll('[data-option][disabled]').length > 0;
 
+                
                 if (e.key === 'Enter' && optionsDisabled) {
                     this.quizModule.next();
                 } else if (e.key === 'Backspace') {
@@ -746,20 +751,23 @@ export const game = {
 
             // Add event listeners for the new buttons
             document.getElementById('matching-completion-replay-btn').addEventListener('click', () => {
+                
                 modal.classList.add('hidden');
                 game.renderMatching(game.currentModule); // Replay the current matching module
             });
             document.getElementById('matching-completion-back-to-menu-btn').addEventListener('click', () => {
+                
                 modal.classList.add('hidden');
                 game.renderMenu(); // Go back to main menu
             });
         }
 
         // Update modal content
-        document.getElementById('matching-completion-title').textContent = MESSAGES.get('sessionScore');
-        document.getElementById('matching-completion-message').textContent = MESSAGES.get('matchingCompletionMessage');
-        document.getElementById('matching-completion-replay-btn').textContent = MESSAGES.get('replayButton');
-        document.getElementById('matching-completion-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
+        // Use modal.querySelector to get elements within the newly created modal
+        modal.querySelector('#matching-completion-title').textContent = MESSAGES.get('sessionScore');
+        modal.querySelector('#matching-completion-message').textContent = MESSAGES.get('matchingCompletionMessage');
+        modal.querySelector('#matching-completion-replay-btn').textContent = MESSAGES.get('replayButton');
+        modal.querySelector('#matching-completion-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
 
         const matchedPairsGrid = document.getElementById('matched-pairs-grid');
         matchedPairsGrid.innerHTML = ''; // Clear previous pairs
@@ -809,6 +817,7 @@ export const game = {
     renderQuiz(module) {
         this.currentView = 'quiz';
         document.body.classList.add('module-active');
+        document.getElementById('app-container').classList.remove('main-menu-active'); // ADD THIS LINE
         this.quizModule.init(module);
         this.updateFooterVisibility();
     },
@@ -816,20 +825,21 @@ export const game = {
     renderCompletion(module) {
         this.currentView = 'completion';
         document.body.classList.add('module-active');
+        document.getElementById('app-container').classList.remove('main-menu-active'); // ADD THIS LINE
         this.completionModule.init(module);
         this.updateFooterVisibility();
     },
 
-    renderSorting(module) {
+        renderSorting(module) {
         // If we are already in sorting view and the container exists, just update text
         if (this.currentView === 'sorting' && document.getElementById('sorting-container')) {
             this.sortingModule.updateText();
             // No need to re-init or re-add module-active class if already active
             return;
         }
-
         this.currentView = 'sorting';
         document.body.classList.add('module-active');
+        document.getElementById('app-container').classList.remove('main-menu-active'); // ADD THIS LINE
         this.sortingModule.init(module);
         this.updateFooterVisibility();
     },
@@ -837,6 +847,7 @@ export const game = {
     renderMatching(module) {
         this.currentView = 'matching';
         document.body.classList.add('module-active');
+        document.getElementById('app-container').classList.remove('main-menu-active'); // ADD THIS LINE
         this.matchingModule.init(module);
         this.updateFooterVisibility();
     },
