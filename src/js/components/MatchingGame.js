@@ -119,7 +119,7 @@ class MatchingGame {
             this.feedbackActive = true; // Disable further interaction
             // Show the matching summary modal
             setTimeout(() => {
-                this.gameCallbacks.showMatchingSummary();
+                this.gameCallbacks.showMatchingSummary(this.matchedPairs, this.moduleData);
             }, 500);
         }
     }
@@ -260,7 +260,7 @@ class MatchingGame {
         const matchingCompletionModal = document.getElementById('matching-completion-modal');
         if (matchingCompletionModal && !matchingCompletionModal.classList.contains('hidden')) {
             if (e.key === 'Enter') {
-                document.getElementById('matching-completion-replay-btn').click();
+                e.preventDefault(); // Prevent default action (e.g., form submission)
             } else if (e.key === 'Escape') {
                 document.getElementById('matching-completion-back-to-menu-btn').click();
             }

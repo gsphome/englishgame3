@@ -369,7 +369,7 @@ export const ui = {
         }
     },
 
-    showMatchingSummary() {
+    showMatchingSummary(matchedPairs, moduleData) {
         const appContainer = document.getElementById('app-container');
         appContainer.classList.remove('main-menu-active');
 
@@ -406,7 +406,7 @@ export const ui = {
 
             document.getElementById('matching-completion-replay-btn').addEventListener('click', () => {
                 modal.classList.add('hidden');
-                this.app.renderMatching(this.app.currentModule);
+                gameManager.startModule(this.app.currentModule.id);
             });
             document.getElementById('matching-completion-back-to-menu-btn').addEventListener('click', () => {
                 modal.classList.add('hidden');
@@ -422,8 +422,8 @@ export const ui = {
         const matchedPairsGrid = document.getElementById('matched-pairs-grid');
         matchedPairsGrid.innerHTML = '';
 
-        this.app.gameManager.matchingModule.matchedPairs.forEach(pair => {
-            const termData = this.app.gameManager.matchingModule.moduleData.data.find(item => item.id === pair.termId);
+        matchedPairs.forEach(pair => {
+            const termData = moduleData.data.find(item => item.id === pair.termId);
             if (termData) {
                 const termSpan = document.createElement('span');
                 termSpan.className = 'font-semibold';
