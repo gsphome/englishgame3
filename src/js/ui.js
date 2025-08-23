@@ -422,8 +422,8 @@ export const ui = {
         const matchedPairsGrid = document.getElementById('matched-pairs-grid');
         matchedPairsGrid.innerHTML = '';
 
-        this.app.matchingModule.matchedPairs.forEach(pair => {
-            const termData = this.app.matchingModule.moduleData.data.find(item => item.id === pair.termId);
+        this.app.gameManager.matchingModule.matchedPairs.forEach(pair => {
+            const termData = this.app.gameManager.matchingModule.moduleData.data.find(item => item.id === pair.termId);
             if (termData) {
                 const termSpan = document.createElement('span');
                 termSpan.className = 'font-semibold';

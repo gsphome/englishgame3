@@ -473,14 +473,20 @@ class SortingGame {
             return;
         }
 
+        const explanationModal = document.getElementById('explanation-modal');
+        if (explanationModal && !explanationModal.classList.contains('hidden')) {
+            if (e.key === 'Enter' || e.key === 'Escape') {
+                document.getElementById('close-explanation-modal-btn').click();
+            }
+            return; // Consume event if explanation modal is handled
+        }
+
         const sortingCompletionModal = document.getElementById('sorting-completion-modal');
         if (sortingCompletionModal && !sortingCompletionModal.classList.contains('hidden')) {
-            if (e.key === 'Enter') {
-                document.getElementById('sorting-completion-replay-btn').click();
-            } else if (e.key === 'Escape') {
+            if (e.key === 'Enter' || e.key === 'Escape') {
                 document.getElementById('sorting-completion-back-to-menu-btn').click();
             }
-            return; // Consume event if modal is handled
+            return; // Consume event if sorting completion modal is handled
         }
 
         if (e.key === 'Enter') {
