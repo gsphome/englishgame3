@@ -3,6 +3,7 @@ export const MESSAGES = {
     _listeners: [],
 
     es: {
+        // General / App-wide
         loginTitle: "Bienvenido",
         welcomeTitle: "¡Empieza tu Viaje en Inglés!",
         welcomeSubtitle: "Practica, aprende y domina el inglés con ejercicios divertidos.",
@@ -10,62 +11,87 @@ export const MESSAGES = {
         logoutButton: "Cerrar Sesión",
         globalScore: "Puntaje Global",
         mainMenu: "Menú Principal",
-        nextButton: "Siguiente",
-        prevButton: "Anterior",
-        undoButton: "Deshacer",
         backToMenu: "Volver al Menú",
         sessionScore: "Puntaje de la Sesión",
         sessionLabel: "Sesión",
-        correct: "Correcto",
-        incorrect: "Incorrecto",
-        correctIcon: "✅ ",
-        incorrectIcon: "❌ ",
         totalLabel: "Total",
-        userIcon: "👤 ",
+        usernamePlaceholder: "Ingresa tu nombre",
         confirmLogout: "Confirmar Cierre de Sesión",
         confirmLogoutMessage: "¿Estás seguro de que quieres cerrar sesión?",
-        flashcardSummaryMessage: "¡Felicidades! Has estudiado {count} tarjetas.",
-        usernamePlaceholder: "Ingresa tu nombre",
-        randomMode: "Aleatorio",
-        sortingGameTitle: "Juego de Clasificación de Palabras",
+        aboutTitle: "Acerca de Esta Aplicación",
+        aboutText1: "Esta es una aplicación de aprendizaje avanzado diseñada para ayudarte a mejorar tu vocabulario y comprensión del inglés a través de ejercicios interactivos.",
+        aboutText2: "Desarrollado por Genil Suarez.",
+        aboutButton: "Acerca de",
+        closeButton: "Cerrar",
+        appLogoAlt: "App Logo",
+        defaultModuleIcon: "📚",
+        onText: "ON",
+        offText: "OFF",
+
+        // Navigation / Action Buttons
+        nextButton: "Siguiente",
+        prevButton: "Anterior",
+        undoButton: "Deshacer",
         checkButton: "Comprobar",
-        allCorrectMessage: "¡Todo correcto! ¡Bien hecho!",
-        lightMode: "Modo Claro",
-        darkMode: "Modo Oscuro",
-        footerWeb: "Advanced Learning App",
-        footerMobile: "App de Aprendizaje Avanzado",
-        sortingCompletionTitle: "¡Modo de Clasificación Completado!",
-        sortingCompletionMessage: "¡Has clasificado todas las palabras correctamente!",
         replayButton: "Ver Resumen",
-        translationLabel: "Traducción",
-        matchingGameTitle: "Juego de Emparejamiento",
-        matchingCompletionMessage: "¡Has emparejado todos los elementos correctamente!",
-        terms: "Términos",
-        definitions: "Definiciones",
         resetButton: "Reiniciar",
         moreInfoButton: "Más Información",
         showExplanation: "Mostrar Explicación",
         yesButton: "Sí",
         noButton: "No",
-        aboutTitle: "Acerca de Esta Aplicación",
-        aboutText1: "Esta es una aplicación de aprendizaje avanzado diseñada para ayudarte a mejorar tu vocabulario y comprensión del inglés a través de ejercicios interactivos.",
-        aboutText2: "Desarrollado por Genil Suarez.",
-        closeButton: "Cerrar",
-        aboutButton: "Acerca de",
-        languageEs: "Lenguaje 🇪🇸",
-        languageEn: "Language 🇬🇧",
+
+        // Feedback / Status
+        correct: "Correcto",
+        incorrect: "Incorrecto",
+        correctIcon: "✅ ",
+        incorrectIcon: "❌ ",
+        allCorrectMessage: "¡Todo correcto! ¡Bien hecho!",
+
+        // Icons
+        userIcon: "👤 ",
         logoutIcon: " 🚪",
         lightModeIcon: " ☀️",
         darkModeIcon: " 🌙",
-        onText: "ON",
-        offText: "OFF",
-        appLogoAlt: "App Logo",
-        defaultModuleIcon: "📚",
+
+        // Language Selection
+        languageEs: "Lenguaje 🇪🇸",
+        languageEn: "Language 🇬🇧",
+
+        // Theme / Display
+        lightMode: "Modo Claro",
+        darkMode: "Modo Oscuro",
+
+        // Footer
+        footerWeb: "Advanced Learning App",
+        footerMobile: "App de Aprendizaje Avanzado",
+
+        // Game Modes - Flashcard
+        flashcardSummaryMessage: "¡Felicidades! Has estudiado {count} tarjetas.",
         flashcardPrefix: "Flashcard: ",
+
+        // Game Modes - Sorting
+        sortingGameTitle: "Juego de Clasificación de Palabras",
+        sortingCompletionTitle: "¡Modo de Clasificación Completado!",
+        sortingCompletionMessage: "¡Has clasificado todas las palabras correctamente!",
+
+        // Game Modes - Matching
+        matchingGameTitle: "Juego de Emparejamiento",
+        matchingCompletionMessage: "¡Has emparejado todos los elementos correctamente!",
+        terms: "Términos",
+        definitions: "Definiciones",
+
+        // Game Modes - Quiz
         quizPrefix: "Quiz: ",
-        completionPrefix: "Completion: "
+
+        // Game Modes - Completion
+        completionPrefix: "Completion: ",
+
+        // Game Modes - General
+        randomMode: "Aleatorio",
+        translationLabel: "Traducción",
     },
     en: {
+        // General / App-wide
         loginTitle: "Welcome",
         welcomeTitle: "Start Your English Journey!",
         welcomeSubtitle: "Practice, learn, and master English with fun exercises.",
@@ -73,60 +99,84 @@ export const MESSAGES = {
         logoutButton: "Logout",
         globalScore: "Global Score",
         mainMenu: "Main Menu",
-        nextButton: "Next",
-        prevButton: "Previous",
-        undoButton: "Undo",
         backToMenu: "Back to Menu",
         sessionScore: "Session Score",
         sessionLabel: "Session",
-        correct: "Correct",
-        incorrect: "Incorrect",
-        correctIcon: "✅ ",
-        incorrectIcon: "❌ ",
         totalLabel: "Total",
-        userIcon: "👤 ",
+        usernamePlaceholder: "Enter your name",
         confirmLogout: "Confirm Logout",
         confirmLogoutMessage: "Are you sure you want to logout?",
-        flashcardSummaryMessage: "Congratulations! You have studied {count} cards.",
-        usernamePlaceholder: "Enter your name",
-        randomMode: "Random",
-        sortingModeTitle: "Word Sorting Game",
+        aboutTitle: "About This App",
+        aboutText1: "This is an advanced learning application designed to help you improve your English vocabulary and understanding through interactive exercises.",
+        aboutText2: "Developed by Genil Suarez.",
+        aboutButton: "About",
+        closeButton: "Close",
+        appLogoAlt: "App Logo",
+        defaultModuleIcon: "📚",
+        onText: "ON",
+        offText: "OFF",
+
+        // Navigation / Action Buttons
+        nextButton: "Next",
+        prevButton: "Previous",
+        undoButton: "Undo",
         checkButton: "Check",
-        allCorrectMessage: "All correct! Well done!",
-        lightMode: "Light Mode",
-        darkMode: "Dark Mode",
-        footerWeb: "Advanced Learning App",
-        footerMobile: "Advanced Learning App",
-        sortingCompletionTitle: "Sorting Mode Completed!",
-        sortingCompletionMessage: "You have sorted all the words correctly!",
         replayButton: "View Summary",
-        translationLabel: "Translation",
-        matchingModeTitle: "Matching Game",
-        matchingCompletionMessage: "You have matched all items correctly!",
-        terms: "Terms",
-        definitions: "Definitions",
         resetButton: "Reset",
         moreInfoButton: "More Info",
         showExplanation: "Show Explanation",
         yesButton: "Yes",
         noButton: "No",
-        aboutTitle: "About This App",
-        aboutText1: "This is an advanced learning application designed to help you improve your English vocabulary and understanding through interactive exercises.",
-        aboutText2: "Developed by Genil Suarez.",
-        closeButton: "Close",
-        aboutButton: "About",
-        languageEs: "Language 🇬🇧",
-        languageEn: "Lenguaje 🇪🇸",
+
+        // Feedback / Status
+        correct: "Correct",
+        incorrect: "Incorrect",
+        correctIcon: "✅ ",
+        incorrectIcon: "❌ ",
+        allCorrectMessage: "All correct! Well done!",
+
+        // Icons
+        userIcon: "👤 ",
         logoutIcon: " 🚪",
         lightModeIcon: " ☀️",
         darkModeIcon: " 🌙",
-        onText: "ON",
-        offText: "OFF",
-        appLogoAlt: "App Logo",
-        defaultModuleIcon: "📚",
+
+        // Language Selection
+        languageEs: "Language 🇬🇧",
+        languageEn: "Lenguaje 🇪🇸",
+
+        // Theme / Display
+        lightMode: "Light Mode",
+        darkMode: "Dark Mode",
+
+        // Footer
+        footerWeb: "Advanced Learning App",
+        footerMobile: "Advanced Learning App",
+
+        // Game Modes - Flashcard
+        flashcardSummaryMessage: "Congratulations! You have studied {count} cards.",
         flashcardPrefix: "Flashcard: ",
+
+        // Game Modes - Sorting
+        sortingGameTitle: "Word Sorting Game",
+        sortingCompletionTitle: "Sorting Mode Completed!",
+        sortingCompletionMessage: "You have sorted all the words correctly!",
+
+        // Game Modes - Matching
+        matchingGameTitle: "Matching Game",
+        matchingCompletionMessage: "You have matched all items correctly!",
+        terms: "Terms",
+        definitions: "Definitions",
+
+        // Game Modes - Quiz
         quizPrefix: "Quiz: ",
-        completionPrefix: "Completion: "
+
+        // Game Modes - Completion
+        completionPrefix: "Completion: ",
+
+        // Game Modes - General
+        randomMode: "Random",
+        translationLabel: "Translation",
     },
 
     get(key) {
@@ -148,4 +198,3 @@ export const MESSAGES = {
         this._listeners.push(listener);
     }
 };
-
