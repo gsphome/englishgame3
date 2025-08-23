@@ -45,7 +45,6 @@ export const MESSAGES = {
     },
     en: {
         loginTitle: "Welcome",
-        loginTitle: "Welcome",
         welcomeTitle: "Start Your English Journey!",
         welcomeSubtitle: "Practice, learn, and master English with fun exercises.",
         loginButton: "Login",
@@ -81,7 +80,9 @@ export const MESSAGES = {
         definitions: "Definitions",
         resetButton: "Reset",
         moreInfoButton: "More Info",
-        showExplanation: "Show Explanation"
+        showExplanation: "Show Explanation",
+        yesButton: "Yes",
+        noButton: "No"
     },
 
     get(key) {
