@@ -62,6 +62,9 @@ export const ui = {
         MESSAGES.addListener(this.updateMenuText.bind(this));
         MESSAGES.addListener(this.updateConfirmationModalText.bind(this));
         MESSAGES.addListener(this.updateAboutModalText.bind(this));
+        MESSAGES.addListener(this.updateFlashcardSummaryText.bind(this));
+        MESSAGES.addListener(this.updateMatchingSummaryText.bind(this));
+        MESSAGES.addListener(this.updateSortingCompletionModalText.bind(this));
         this.updateMenuText();
         this.updateConfirmationModalText();
         this.updateAboutModalText();
@@ -321,20 +324,42 @@ export const ui = {
         }
     },
 
-    showSortingCompletionModal(moduleData) {
-        const modal = this.sortingCompletionModal;
+    updateSortingCompletionModalText() {
         const title = document.getElementById('sorting-completion-title');
         const message = document.getElementById('sorting-completion-message');
         const replayBtn = document.getElementById('sorting-completion-replay-btn');
         const backToMenuBtn = document.getElementById('sorting-completion-back-to-menu-btn');
+
+        if (title) {
+            title.textContent = MESSAGES.get('sortingCompletionTitle');
+        }
+        if (message) {
+            message.textContent = MESSAGES.get('sortingCompletionMessage');
+        }
+        if (replayBtn) {
+            replayBtn.textContent = MESSAGES.get('replayButton');
+        }
+        if (backToMenuBtn) {
+            backToMenuBtn.textContent = MESSAGES.get('backToMenu');
+        }
+
+        // Update explanation buttons within the words container
+        const wordsContainer = document.getElementById('sorting-completion-words-container');
+        if (wordsContainer) {
+            wordsContainer.querySelectorAll('.explanation-btn').forEach(button => {
+                button.title = MESSAGES.get('showExplanation');
+                button.ariaLabel = MESSAGES.get('showExplanation');
+            });
+        }
+    },
+
+    showSortingCompletionModal(moduleData) {
+        const modal = this.sortingCompletionModal;
         const wordsContainer = document.createElement('div');
         wordsContainer.id = 'sorting-completion-words-container';
         wordsContainer.className = 'mt-4 mb-4 text-left pr-4';
 
-        title.textContent = MESSAGES.get('sortingCompletionTitle');
-        message.textContent = MESSAGES.get('sortingCompletionMessage');
-        replayBtn.textContent = MESSAGES.get('replayButton');
-        backToMenuBtn.textContent = MESSAGES.get('backToMenu');
+        this.updateSortingCompletionModalText();
 
         const existingWordsContainer = modal.querySelector('#sorting-completion-words-container');
         if (existingWordsContainer) {
@@ -374,6 +399,22 @@ export const ui = {
         modal.classList.remove('hidden');
     },
 
+    updateFlashcardSummaryText(totalCards) {
+        const flashcardSummaryTitle = document.getElementById('flashcard-summary-title');
+        const flashcardSummaryMessage = document.getElementById('flashcard-summary-message');
+        const flashcardSummaryBackToMenuBtn = document.getElementById('flashcard-summary-back-to-menu-btn');
+
+        if (flashcardSummaryTitle) {
+            flashcardSummaryTitle.textContent = MESSAGES.get('sessionScore');
+        }
+        if (flashcardSummaryMessage) {
+            flashcardSummaryMessage.textContent = MESSAGES.get('flashcardSummaryMessage').replace('{count}', totalCards);
+        }
+        if (flashcardSummaryBackToMenuBtn) {
+            flashcardSummaryBackToMenuBtn.textContent = MESSAGES.get('backToMenu');
+        }
+    },
+
     showFlashcardSummary(totalCards) {
         const appContainer = document.getElementById('app-container');
         appContainer.classList.remove('main-menu-active');
@@ -381,16 +422,13 @@ export const ui = {
         if (!document.getElementById('flashcard-summary-container')) {
             appContainer.innerHTML = `
                 <div id="flashcard-summary-container" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
-                    <h1 id="flashcard-summary-title" class="text-2xl font-bold mb-4">${MESSAGES.get('sessionScore')}</h1>
-                    <p id="flashcard-summary-message" class="text-xl mb-4">${MESSAGES.get('flashcardSummaryMessage').replace('{count}', totalCards)}</p>
-                    <button id="flashcard-summary-back-to-menu-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out" onclick="app.renderMenu()">${MESSAGES.get('backToMenu')}</button>
+                    <h1 id="flashcard-summary-title" class="text-2xl font-bold mb-4"></h1>
+                    <p id="flashcard-summary-message" class="text-xl mb-4"></p>
+                    <button id="flashcard-summary-back-to-menu-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out" onclick="app.renderMenu()"></button>
                 </div>
             `;
-        } else {
-            document.getElementById('flashcard-summary-title').textContent = MESSAGES.get('sessionScore');
-            document.getElementById('flashcard-summary-message').textContent = MESSAGES.get('flashcardSummaryMessage').replace('{count}', totalCards);
-            document.getElementById('flashcard-summary-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
         }
+        this.updateFlashcardSummaryText(totalCards);
     },
 
     showMatchingSummary(matchedPairs, moduleData) {
@@ -405,12 +443,12 @@ export const ui = {
             modal.className = 'fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden';
             modal.innerHTML = `
                 <div class="bg-white p-8 rounded-lg shadow-xl max-w-xl w-full text-center">
-                    <h2 id="matching-completion-title" class="text-2xl font-bold mb-4">${MESSAGES.get('sessionScore')}</h2>
-                    <p id="matching-completion-message" class="text-xl mb-4">${MESSAGES.get('matchingCompletionMessage')}</p>
+                    <h2 id="matching-completion-title" class="text-2xl font-bold mb-4"></h2>
+                    <p id="matching-completion-message" class="text-xl mb-4"></p>
                     <div class="mb-4 text-left max-h-60 overflow-y-auto pr-2">
                         <div class="grid grid-cols-2 gap-2 font-bold border-b-2 border-gray-300 pb-2 mb-2">
-                            <span>${MESSAGES.get('terms')}</span>
-                            <span>${MESSAGES.get('translationLabel')}</span>
+                            <span></span>
+                            <span></span>
                         </div>
                         <div id="matched-pairs-grid" class="grid grid-cols-2 gap-2">
                             <!-- Matched pairs and explanation buttons will be listed here -->
@@ -418,10 +456,8 @@ export const ui = {
                     </div>
                     <div class="flex justify-center space-x-4">
                         <button id="matching-completion-replay-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
-                            ${MESSAGES.get('replayButton')}
                         </button>
                         <button id="matching-completion-back-to-menu-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
-                            ${MESSAGES.get('backToMenu')}
                         </button>
                     </div>
                 </div>
@@ -438,10 +474,144 @@ export const ui = {
             });
         }
 
+        this.updateMatchingSummaryText(matchedPairs, moduleData);
+
+        const matchedPairsGrid = document.getElementById('matched-pairs-grid');
+        matchedPairsGrid.innerHTML = '';
+
+        matchedPairs.forEach(pair => {
+            const termData = moduleData.data.find(item => item.id === pair.termId);
+            if (termData) {
+                const termSpan = document.createElement('span');
+                termSpan.className = 'font-semibold';
+                termSpan.textContent = termData.term;
+                matchedPairsGrid.appendChild(termSpan);
+
+                const translationContainer = document.createElement('div');
+                translationContainer.className = 'flex items-center justify-between';
+
+                const translationSpan = document.createElement('span');
+                translationSpan.textContent = termData.term_es;
+                translationContainer.appendChild(translationSpan);
+
+                const explanationButton = document.createElement('button');
+                explanationButton.className = 'explanation-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-md text-sm justify-self-center mr-1';
+                explanationButton.innerHTML = '&#x2139;';
+                explanationButton.title = MESSAGES.get('showExplanation');
+                explanationButton.ariaLabel = MESSAGES.get('showExplanation');
+                explanationButton.addEventListener('click', () => {
+                    this.showExplanationModal(this.explanationModal, {
+                        word: termData.term,
+                        translation_es: termData.term_es,
+                        example: termData.explanation,
+                        example_es: termData.explanation_es
+                    });
+                });
+                translationContainer.appendChild(explanationButton);
+                matchedPairsGrid.appendChild(translationContainer);
+            }
+        });
+
+        modal.classList.remove('hidden');
+    },
+
+    updateFlashcardSummaryText(totalCards) {
+        const flashcardSummaryTitle = document.getElementById('flashcard-summary-title');
+        const flashcardSummaryMessage = document.getElementById('flashcard-summary-message');
+        const flashcardSummaryBackToMenuBtn = document.getElementById('flashcard-summary-back-to-menu-btn');
+
+        if (flashcardSummaryTitle) {
+            flashcardSummaryTitle.textContent = MESSAGES.get('sessionScore');
+        }
+        if (flashcardSummaryMessage) {
+            flashcardSummaryMessage.textContent = MESSAGES.get('flashcardSummaryMessage').replace('{count}', totalCards);
+        }
+        if (flashcardSummaryBackToMenuBtn) {
+            flashcardSummaryBackToMenuBtn.textContent = MESSAGES.get('backToMenu');
+        }
+    },
+
+    showFlashcardSummary(totalCards) {
+        const appContainer = document.getElementById('app-container');
+        appContainer.classList.remove('main-menu-active');
+
+        if (!document.getElementById('flashcard-summary-container')) {
+            appContainer.innerHTML = `
+                <div id="flashcard-summary-container" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
+                    <h1 id="flashcard-summary-title" class="text-2xl font-bold mb-4"></h1>
+                    <p id="flashcard-summary-message" class="text-xl mb-4"></p>
+                    <button id="flashcard-summary-back-to-menu-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out" onclick="app.renderMenu()"></button>
+                </div>
+            `;
+        }
+        this.updateFlashcardSummaryText(totalCards);
+    },
+
+    updateMatchingSummaryText(matchedPairs, moduleData) {
+        const modal = document.getElementById('matching-completion-modal');
+        if (!modal) return; // If modal doesn't exist, nothing to update
+
         modal.querySelector('#matching-completion-title').textContent = MESSAGES.get('sessionScore');
         modal.querySelector('#matching-completion-message').textContent = MESSAGES.get('matchingCompletionMessage');
         modal.querySelector('#matching-completion-replay-btn').textContent = MESSAGES.get('replayButton');
         modal.querySelector('#matching-completion-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
+        modal.querySelector('.grid.grid-cols-2.gap-2.font-bold.border-b-2.border-gray-300.pb-2.mb-2 > span:first-child').textContent = MESSAGES.get('terms');
+        modal.querySelector('.grid.grid-cols-2.gap-2.font-bold.border-b-2.border-gray-300.pb-2.mb-2 > span:last-child').textContent = MESSAGES.get('translationLabel');
+
+        // Update explanation buttons within the matched pairs grid
+        const matchedPairsGrid = document.getElementById('matched-pairs-grid');
+        if (matchedPairsGrid) {
+            matchedPairsGrid.querySelectorAll('.explanation-btn').forEach(button => {
+                button.title = MESSAGES.get('showExplanation');
+                button.ariaLabel = MESSAGES.get('showExplanation');
+            });
+        }
+    },
+
+    showMatchingSummary(matchedPairs, moduleData) {
+        const appContainer = document.getElementById('app-container');
+        appContainer.classList.remove('main-menu-active');
+
+        let modal = document.getElementById('matching-completion-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            
+            modal.id = 'matching-completion-modal';
+            modal.className = 'fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden';
+            modal.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-xl max-w-xl w-full text-center">
+                    <h2 id="matching-completion-title" class="text-2xl font-bold mb-4"></h2>
+                    <p id="matching-completion-message" class="text-xl mb-4"></p>
+                    <div class="mb-4 text-left max-h-60 overflow-y-auto pr-2">
+                        <div class="grid grid-cols-2 gap-2 font-bold border-b-2 border-gray-300 pb-2 mb-2">
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div id="matched-pairs-grid" class="grid grid-cols-2 gap-2">
+                            <!-- Matched pairs and explanation buttons will be listed here -->
+                        </div>
+                    </div>
+                    <div class="flex justify-center space-x-4">
+                        <button id="matching-completion-replay-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                        </button>
+                        <button id="matching-completion-back-to-menu-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            document.getElementById('matching-completion-replay-btn').addEventListener('click', () => {
+                modal.classList.add('hidden');
+                gameManager.startModule(this.app.currentModule.id);
+            });
+            document.getElementById('matching-completion-back-to-menu-btn').addEventListener('click', () => {
+                modal.classList.add('hidden');
+                this.app.renderMenu();
+            });
+        }
+
+        this.updateMatchingSummaryText(matchedPairs, moduleData);
 
         const matchedPairsGrid = document.getElementById('matched-pairs-grid');
         matchedPairsGrid.innerHTML = '';

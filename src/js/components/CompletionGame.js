@@ -36,6 +36,23 @@ class CompletionGame {
         if (sessionScoreDisplay) {
             sessionScoreDisplay.classList.remove('hidden');
         }
+        this.MESSAGES.addListener(this.updateButtonText.bind(this));
+        this.MESSAGES.addListener(this.updateCompletionSummaryText.bind(this));
+    }
+
+    /**
+     * Updates the text content of buttons and other static elements.
+     */
+    updateButtonText() {
+        const undoBtn = document.getElementById('undo-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-completion-btn');
+
+        if (undoBtn) undoBtn.textContent = this.MESSAGES.get('undoButton');
+        if (prevBtn) prevBtn.textContent = this.MESSAGES.get('prevButton');
+        if (nextBtn) nextBtn.textContent = this.MESSAGES.get('nextButton');
+        if (backToMenuBtn) backToMenuBtn.textContent = this.MESSAGES.get('backToMenu');
     }
 
     render() {
@@ -56,14 +73,14 @@ class CompletionGame {
                         <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
                     </div>
                     <div class="flex justify-between mt-4">
-                        <button id="undo-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4" ${this.gameCallbacks.isHistoryMode ? 'disabled' : ''}>${this.MESSAGES.get('undoButton')}</button>
+                        <button id="undo-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4" ${this.gameCallbacks.isHistoryMode ? 'disabled' : ''}></button>
                         <div>
-                            <button id="prev-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-l md:py-2 md:px-4">${this.MESSAGES.get('prevButton')}</button>
-                            <button id="next-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-r md:py-2 md:px-4">${this.MESSAGES.get('nextButton')}</button>
+                            <button id="prev-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-l md:py-2 md:px-4"></button>
+                            <button id="next-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-r md:py-2 md:px-4"></button>
                         </div>
                     </div>
                     <div class="mt-1">
-                        <button id="back-to-menu-completion-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
+                        <button id="back-to-menu-completion-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4"></button>
                     </div>
                 </div>
             `;
@@ -82,6 +99,7 @@ class CompletionGame {
 
         // Update question and input field for every render
         document.getElementById('completion-question').innerHTML = questionData.sentence.replace('______', '<input type="text" id="completion-input" class="border-b-2 border-gray-400 focus:border-blue-500 outline-none text-left w-[20px] bg-transparent" autocomplete="off" />');
+        this.updateButtonText(); // Call to update button texts after rendering
 
         
 
@@ -196,20 +214,34 @@ class CompletionGame {
         }
     }
 
+    updateCompletionSummaryText() {
+        const summaryTitle = document.getElementById('completion-summary-title');
+        const summaryCorrect = document.getElementById('completion-summary-correct');
+        const summaryIncorrect = document.getElementById('completion-summary-incorrect');
+        const backToMenuBtn = document.getElementById('completion-summary-back-to-menu-btn');
+
+        if (summaryTitle) summaryTitle.textContent = this.MESSAGES.get('sessionScore');
+        if (summaryCorrect) summaryCorrect.textContent = `${this.MESSAGES.get('correct')}: ${this.sessionScore.correct}`;
+        if (summaryIncorrect) summaryIncorrect.textContent = `${this.MESSAGES.get('incorrect')}: ${this.sessionScore.incorrect}`;
+        if (backToMenuBtn) backToMenuBtn.textContent = this.MESSAGES.get('backToMenu');
+    }
+
     showFinalScore() {
         this.auth.updateGlobalScore(this.sessionScore);
         this.gameCallbacks.renderHeader();
 
         this.appContainer.innerHTML = `
              <div id="completion-summary-container" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
-                <h1 id="completion-summary-title" class="text-2xl font-bold mb-4">${this.MESSAGES.get('sessionScore')}</h1>
-                <p id="completion-summary-correct" class="text-xl mb-2">${this.MESSAGES.get('correct')}: ${this.sessionScore.correct}</p>
-                <p id="completion-summary-incorrect" class="text-xl mb-4">${this.MESSAGES.get('incorrect')}: ${this.sessionScore.incorrect}</p>
+                <h1 id="completion-summary-title" class="text-2xl font-bold mb-4"></h1>
+                <p id="completion-summary-correct" class="text-xl mb-2"></p>
+                <p id="completion-summary-incorrect" class="text-xl mb-4"></p>
                 <div class="mt-1">
-                    <button id="completion-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
+                    <button id="completion-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4"></button>
                 </div>
              </div>
         `;
+        this.updateCompletionSummaryText(); // Call to update text after rendering HTML
+
         const backToMenuButton = document.getElementById('completion-summary-back-to-menu-btn');
         if (backToMenuButton) {
             backToMenuButton.addEventListener('click', () => this.gameCallbacks.renderMenu());

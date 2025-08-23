@@ -41,6 +41,8 @@ class QuizGame {
         this.render();
         this.updateNavigationButtons(); // Update buttons after initial render
         this.addKeyboardListeners();
+        this.MESSAGES.addListener(this.updateText.bind(this));
+        this.MESSAGES.addListener(this.updateQuizSummaryText.bind(this));
     }
 
     render(historyEntry = null) {
@@ -143,10 +145,7 @@ class QuizGame {
             }
         }
 
-        document.getElementById('undo-btn').textContent = this.MESSAGES.get('undoButton');
-        document.getElementById('prev-btn').textContent = this.MESSAGES.get('prevButton');
-        document.getElementById('next-btn').textContent = this.MESSAGES.get('nextButton');
-        document.getElementById('quiz-summary-back-to-menu-btn').textContent = this.MESSAGES.get('backToMenu');
+        this.updateText(); // Call updateText after rendering HTML
 
         const feedbackContainer = document.getElementById('feedback-container');
         if (historyEntry) {
@@ -392,6 +391,18 @@ class QuizGame {
         this.gameCallbacks.updateSessionScoreDisplay(historyEntry.sessionScoreBefore.correct, historyEntry.sessionScoreBefore.incorrect, this.moduleData.data.length);
     }
 
+    updateQuizSummaryText() {
+        const summaryTitle = document.getElementById('quiz-summary-title');
+        const summaryCorrect = document.getElementById('quiz-summary-correct');
+        const summaryIncorrect = document.getElementById('quiz-summary-incorrect');
+        const backToMenuBtn = document.getElementById('quiz-summary-back-to-menu-btn');
+
+        if (summaryTitle) summaryTitle.textContent = this.MESSAGES.get('sessionScore');
+        if (summaryCorrect) summaryCorrect.textContent = `${this.MESSAGES.get('correct')}: ${this.sessionScore.correct}`;
+        if (summaryIncorrect) summaryIncorrect.textContent = `${this.MESSAGES.get('incorrect')}: ${this.sessionScore.incorrect}`;
+        if (backToMenuBtn) backToMenuBtn.textContent = this.MESSAGES.get('backToMenu');
+    }
+
     showFinalScore() {
         this.auth.updateGlobalScore(this.sessionScore);
         this.gameCallbacks.renderHeader();
@@ -399,26 +410,26 @@ class QuizGame {
         if (!document.getElementById('quiz-summary-container')) {
             this.appContainer.innerHTML = `
                  <div id="quiz-summary-container" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
-                    <h1 id="quiz-summary-title" class="text-2xl font-bold mb-4">${this.MESSAGES.get('sessionScore')}</h1>
-                    <p id="quiz-summary-correct" class="text-xl mb-2">${this.MESSAGES.get('correct')}: ${this.sessionScore.correct}</p>
-                    <p id="quiz-summary-incorrect" class="text-xl mb-4">${this.MESSAGES.get('incorrect')}: ${this.sessionScore.incorrect}</p>
+                    <h1 id="quiz-summary-title" class="text-2xl font-bold mb-4"></h1>
+                    <p id="quiz-summary-correct" class="text-xl mb-2"></p>
+                    <p id="quiz-summary-incorrect" class="text-xl mb-4"></p>
                     <div class="mt-1">
-                        <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
+                        <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4"></button>
                     </div>
                  </div>
             `;
             document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
-        } else {
-            document.getElementById('quiz-summary-title').textContent = this.MESSAGES.get('sessionScore');
-            document.getElementById('quiz-summary-correct').textContent = `${this.MESSAGES.get('correct')}: ${this.sessionScore.correct}`;
-            document.getElementById('quiz-summary-incorrect').textContent = `${this.MESSAGES.get('incorrect')}: ${this.sessionScore.incorrect}`;
-            document.getElementById('quiz-summary-back-to-menu-btn').textContent = this.MESSAGES.get('backToMenu');
         }
+        this.updateQuizSummaryText(); // Call to update text after rendering HTML
     }
 
     updateText() {
+        const quizQuestion = document.getElementById('quiz-question');
+        if (!quizQuestion) return; // Exit if quiz UI is not rendered
+
         const questionData = this.moduleData.data[this.currentIndex];
-        document.getElementById('quiz-question').innerHTML = questionData.sentence.replace('______', '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>');
+        quizQuestion.innerHTML = questionData.sentence.replace('______', '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>');
+        
         let quizTipElement = document.getElementById('quiz-tip'); // Use let
         if (questionData.tip) {
             if (quizTipElement) {
@@ -429,7 +440,7 @@ class QuizGame {
                 quizTipElement = document.createElement('p'); // Assign to quizTipElement
                 quizTipElement.id = 'quiz-tip';
                 quizTipElement.className = 'text-lg text-gray-500 mb-4';
-                document.getElementById('quiz-question').after(quizTipElement); // Insert after question
+                quizQuestion.after(quizTipElement); // Insert after question
                 quizTipElement.textContent = `Tip: ${questionData.tip}`;
             }
         } else {
@@ -439,33 +450,42 @@ class QuizGame {
         }
 
         const optionsContainer = document.getElementById('options-container');
-        const optionButtons = optionsContainer.querySelectorAll('[data-option]');
-        const optionLetters = ['A', 'B', 'C', 'D'];
-        optionButtons.forEach((button, index) => {
-            const optionTextSpan = button.querySelector('span:last-child');
-            if (optionTextSpan) {
-                optionTextSpan.textContent = button.dataset.option; 
-            }
-            const optionLetterSpan = button.querySelector('span:first-child');
-            if (optionLetterSpan) {
-                optionLetterSpan.textContent = optionLetters[index];
-            }
-        });
+        if (optionsContainer) {
+            const optionButtons = optionsContainer.querySelectorAll('[data-option]');
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            optionButtons.forEach((button, index) => {
+                const optionTextSpan = button.querySelector('span:last-child');
+                if (optionTextSpan) {
+                    optionTextSpan.textContent = button.dataset.option; 
+                }
+                const optionLetterSpan = button.querySelector('span:first-child');
+                if (optionLetterSpan) {
+                    optionLetterSpan.textContent = optionLetters[index];
+                }
+            });
+        }
 
-        document.getElementById('undo-btn').textContent = this.MESSAGES.get('undoButton');
-        document.getElementById('prev-btn').textContent = this.MESSAGES.get('prevButton');
-        document.getElementById('next-btn').textContent = this.MESSAGES.get('nextButton');
-        document.getElementById('quiz-summary-back-to-menu-btn').textContent = this.MESSAGES.get('backToMenu');
+        const undoBtn = document.getElementById('undo-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const quizSummaryBackToMenuBtn = document.getElementById('quiz-summary-back-to-menu-btn');
+
+        if (undoBtn) undoBtn.textContent = this.MESSAGES.get('undoButton');
+        if (prevBtn) prevBtn.textContent = this.MESSAGES.get('prevButton');
+        if (nextBtn) nextBtn.textContent = this.MESSAGES.get('nextButton');
+        if (quizSummaryBackToMenuBtn) quizSummaryBackToMenuBtn.textContent = this.MESSAGES.get('backToMenu');
 
         const feedbackContainer = document.getElementById('feedback-container');
-        // Only update feedback if not in history viewing mode, or if it's the current history entry's feedback
-        if (!this.isViewingHistory && this.history.length > 0 && this.historyPointer === this.history.length - 1) {
-            const lastQuestionData = this.moduleData.data[this.history[this.history.length - 1].index];
-            feedbackContainer.innerHTML = `<p class="text-lg">${lastQuestionData.explanation}</p>`;
-        } else if (this.isViewingHistory && this.historyPointer >= 0) {
-            feedbackContainer.innerHTML = this.history[this.historyPointer].feedbackHtml;
-        } else {
-            feedbackContainer.innerHTML = ''; // Clear feedback if no relevant history or not viewing history
+        if (feedbackContainer) {
+            // Only update feedback if not in history viewing mode, or if it's the current history entry's feedback
+            if (!this.isViewingHistory && this.history.length > 0 && this.historyPointer === this.history.length - 1) {
+                const lastQuestionData = this.moduleData.data[this.history[this.history.length - 1].index];
+                feedbackContainer.innerHTML = `<p class="text-lg">${lastQuestionData.explanation}</p>`;
+            } else if (this.isViewingHistory && this.historyPointer >= 0) {
+                feedbackContainer.innerHTML = this.history[this.historyPointer].feedbackHtml;
+            } else {
+                feedbackContainer.innerHTML = ''; // Clear feedback if no relevant history or not viewing history
+            }
         }
     }
 

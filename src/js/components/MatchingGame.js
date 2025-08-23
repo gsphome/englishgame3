@@ -42,6 +42,7 @@ class MatchingGame {
         }
         this.render();
         this.addKeyboardListeners();
+        this.MESSAGES.addListener(this.updateText.bind(this));
     }
 
     handleItemClick(element) {
@@ -172,19 +173,19 @@ class MatchingGame {
             <div id="matching-container" class="max-w-4xl mx-auto p-2">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div id="terms-column" class="bg-white p-4 rounded-lg shadow-md">
-                        <h3 class="text-xl font-semibold mb-3">${this.MESSAGES.get('terms')}</h3>
+                        <h3 class="text-xl font-semibold mb-3"></h3>
                         <!-- Terms will be rendered here -->
                     </div>
                     <div id="definitions-column" class="bg-white p-4 rounded-lg shadow-md">
-                        <h3 class="text-xl font-semibold mb-3">${this.MESSAGES.get('definitions')}</h3>
+                        <h3 class="text-xl font-semibold mb-3"></h3>
                         <!-- Definitions will be rendered here -->
                     </div>
                 </div>
                 <div class="flex justify-end mt-4">
-                    <button id="undo-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${this.MESSAGES.get('undoButton')}</button>
+                    <button id="undo-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg"></button>
                 </div>
                 <div class="mt-1">
-                    <button id="back-to-menu-matching-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">${this.MESSAGES.get('backToMenu')}</button>
+                    <button id="back-to-menu-matching-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"></button>
                 </div>
             </div>
         `;
@@ -217,6 +218,7 @@ class MatchingGame {
         document.getElementById('undo-matching-btn').addEventListener('click', () => this.undo());
         document.getElementById('back-to-menu-matching-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
         this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        this.updateText(); // Call updateText after rendering HTML
     }
 
     updateText() {

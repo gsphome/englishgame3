@@ -33,6 +33,7 @@ class FlashcardGame {
         }
         this.render();
         this.addKeyboardListeners(); // Add this line
+        this.MESSAGES.addListener(this.updateText.bind(this));
     }
 
     render() {
@@ -246,9 +247,13 @@ class FlashcardGame {
         }
 
         // Update button texts
-        document.getElementById('prev-btn').textContent = this.MESSAGES.get('prevButton');
-        document.getElementById('next-btn').textContent = this.MESSAGES.get('nextButton');
-        document.getElementById('back-to-menu-flashcard-btn').textContent = this.MESSAGES.get('backToMenu');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-flashcard-btn');
+
+        if (prevBtn) prevBtn.textContent = this.MESSAGES.get('prevButton');
+        if (nextBtn) nextBtn.textContent = this.MESSAGES.get('nextButton');
+        if (backToMenuBtn) backToMenuBtn.textContent = this.MESSAGES.get('backToMenu');
     }
 
     _handleKeyboardEvent(e) {

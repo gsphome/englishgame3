@@ -106,6 +106,7 @@ class SortingGame {
         this.renderInitialView();
         this.render(); // Call the new render method after initial view is set up
         this.addKeyboardListeners();
+        this.MESSAGES.addListener(this.updateText.bind(this));
 
         this.userAnswers = {};
         this.originalWordPositions = {};
@@ -130,11 +131,11 @@ class SortingGame {
                 </div>
 
                 <div class="flex justify-between mt-4">
-                        <button id="undo-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${this.MESSAGES.get('undoButton')}</button>
-                        <button id="check-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">${this.MESSAGES.get('checkButton')}</button>
+                        <button id="undo-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg"></button>
+                        <button id="check-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg"></button>
                     </div>
                     <div class="mt-1">
-                        <button id="back-to-menu-sorting-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">${this.MESSAGES.get('backToMenu')}</button>
+                        <button id="back-to-menu-sorting-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"></button>
                     </div>
 
                 </div>
@@ -144,6 +145,7 @@ class SortingGame {
         this.renderCategories();
         this.addEventListeners();
         this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
+        this.updateText(); // Call updateText after rendering HTML
     }
 
     checkAnswers() {
