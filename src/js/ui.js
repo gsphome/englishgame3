@@ -60,7 +60,9 @@ export const ui = {
         // Initial UI updates
         MESSAGES.addListener(this.renderHeader.bind(this));
         MESSAGES.addListener(this.updateMenuText.bind(this));
+        MESSAGES.addListener(this.updateConfirmationModalText.bind(this)); // Add this line
         this.updateMenuText();
+        this.updateConfirmationModalText(); // Add this line
     },
 
     // Helper functions moved from utils.js
@@ -160,14 +162,12 @@ export const ui = {
     // Specific UI setup methods
     setupConfirmationModalListeners() {
         if (this.yesButton) {
-            this.yesButton.textContent = MESSAGES.get('yesButton');
             this.yesButton.addEventListener('click', () => {
                 auth.logout();
                 this.toggleModal(this.modal, false);
             });
         }
         if (this.noButton) {
-            this.noButton.textContent = MESSAGES.get('noButton');
             this.noButton.addEventListener('click', () => {
                 this.toggleModal(this.modal, false);
             });
@@ -297,6 +297,15 @@ export const ui = {
             document.getElementById('sorting-completion-message').textContent = MESSAGES.get('sortingCompletionMessage');
             document.getElementById('sorting-completion-replay-btn').textContent = MESSAGES.get('replayButton');
             document.getElementById('sorting-completion-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
+        }
+    },
+
+    updateConfirmationModalText() {
+        if (this.yesButton) {
+            this.yesButton.textContent = MESSAGES.get('yesButton');
+        }
+        if (this.noButton) {
+            this.noButton.textContent = MESSAGES.get('noButton');
         }
     },
 
