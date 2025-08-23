@@ -54,6 +54,11 @@ export const gameManager = {
                 return;
             }
 
+            // Shuffle module data if random mode is enabled
+            if (this.gameCallbacks.randomMode && moduleWithData.data && Array.isArray(moduleWithData.data)) {
+                this.gameCallbacks.shuffleArray(moduleWithData.data);
+            }
+
             this.currentModule = moduleWithData;
             this.appInstance.currentModule = moduleWithData; // Actualizar currentModule de app
 
