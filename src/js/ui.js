@@ -97,10 +97,10 @@ export const ui = {
             const totalColor = isDarkMode ? 'text-gray-300' : 'text-gray-600';
 
             sessionScoreDisplay.innerHTML = `
-                <span class="text-sm font-semibold">Session:</span>
-                <span class="ml-1 ${correctColor} font-bold">✅ ${correct}</span>
-                <span class="ml-1 ${incorrectColor} font-bold">❌ ${incorrect}</span>
-                <span class="ml-1 ${totalColor} font-bold">Total: ${total}</span>
+                <span class="text-sm font-semibold">${MESSAGES.get('sessionLabel')}:</span>
+                <span class="ml-1 ${correctColor} font-bold">${MESSAGES.get('correctIcon')} ${correct}</span>
+                <span class="ml-1 ${incorrectColor} font-bold">${MESSAGES.get('incorrectIcon')} ${incorrect}</span>
+                <span class="ml-1 ${totalColor} font-bold">${MESSAGES.get('totalLabel')}: ${total}</span>
             `;
             sessionScoreDisplay.classList.remove('hidden');
         }
@@ -135,7 +135,7 @@ export const ui = {
 
             const usernameDisplayEl = document.getElementById('username-display');
             if (usernameDisplayEl) {
-                usernameDisplayEl.innerHTML = `<span class="text-lg font-bold">👤 ${user.username}</span>`;
+                usernameDisplayEl.innerHTML = `<span class="text-lg font-bold">${MESSAGES.get('userIcon')} ${user.username}</span>`;
             }
         } else {
             scoreContainer.classList.add('hidden');
@@ -283,17 +283,20 @@ export const ui = {
     updateMenuText() {
         if (this.menuLangToggleBtn) {
             const currentLang = MESSAGES.getLanguage();
-            this.menuLangToggleBtn.innerHTML = currentLang === 'en' ? 'Lenguaje 🇪🇸' : 'Language 🇬🇧';
+            this.menuLangToggleBtn.innerHTML = currentLang === 'en' ? MESSAGES.get('languageEs') : MESSAGES.get('languageEn');
         }
         if (this.menuLogoutBtn) {
-            this.menuLogoutBtn.innerHTML = `${MESSAGES.get('logoutButton')} 🚪`;
+            this.menuLogoutBtn.innerHTML = `${MESSAGES.get('logoutButton')}${MESSAGES.get('logoutIcon')}`;
         }
         if (this.menuDarkModeToggleBtn) {
             const isDarkMode = document.body.classList.contains('dark-mode');
-            this.menuDarkModeToggleBtn.innerHTML = isDarkMode ? `${MESSAGES.get('lightMode')} ☀️` : `${MESSAGES.get('darkMode')} 🌙`;
+            this.menuDarkModeToggleBtn.innerHTML = isDarkMode ? `${MESSAGES.get('lightMode')}${MESSAGES.get('lightModeIcon')}` : `${MESSAGES.get('darkMode')}${MESSAGES.get('darkModeIcon')}`;
         }
         if (this.menuRandomModeBtn) {
-            this.menuRandomModeBtn.innerHTML = `${MESSAGES.get('randomMode')} ${this.app.randomMode ? 'ON' : 'OFF'}`; // Use this.app.randomMode
+            this.menuRandomModeBtn.innerHTML = `${MESSAGES.get('randomMode')} ${this.app.randomMode ? MESSAGES.get('onText') : MESSAGES.get('offText')}`; // Use this.app.randomMode
+        }
+        if (this.aboutBtn) {
+            this.aboutBtn.innerHTML = `${MESSAGES.get('aboutButton')}`;
         }
 
         // Update sorting completion modal text if visible

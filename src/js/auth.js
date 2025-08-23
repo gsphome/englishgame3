@@ -42,7 +42,7 @@ export const auth = {
                 <div class="relative z-10">
                     <!-- App Logo/Icon - Place your logo at assets/logo.png -->
                     <div class="mx-auto mb-4 w-24 h-24 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-purple-600 dark:from-blue-600 dark:to-purple-800 shadow-lg">
-                        <img src="src/assets/images/logo.png" alt="App Logo" class="w-20 h-20 rounded-full object-cover">
+                        <img src="src/assets/images/logo.png" alt="${MESSAGES.get('appLogoAlt')}" class="w-20 h-20 rounded-full object-cover">
                     </div>
 
                     <h1 class="text-3xl font-extrabold text-blue-700 mb-2">${MESSAGES.get('welcomeTitle')}</h1>

@@ -111,7 +111,7 @@ export const app = {
 
         this.allLearningModules.forEach((module, index) => {
             const colorClass = colors[index % colors.length];
-            const icon = module.icon || '📚';
+            const icon = module.icon || MESSAGES.get('defaultModuleIcon');
             const description = module.description || '';
 
             const buttonTemplate = document.getElementById('module-button-template');
@@ -123,7 +123,7 @@ export const app = {
             if (index <= 25) {
                 button.querySelector('[data-module-index]').textContent = `${String.fromCharCode(65 + index)}.`;
             }
-            button.querySelector('[data-module-name]').textContent = module.name.replace('Flashcard: ', '').replace('Quiz: ', '').replace('Completion: ', '');
+            button.querySelector('[data-module-name]').textContent = module.name.replace(MESSAGES.get('flashcardPrefix'), '').replace(MESSAGES.get('quizPrefix'), '').replace(MESSAGES.get('completionPrefix'), '');
             button.querySelector('[data-game-mode-icon]').innerHTML = getGameModeIconSvg(module.gameMode);
 
             moduleButtonsContainer.appendChild(button);
