@@ -444,9 +444,13 @@ class SortingGame {
 
     updateText() {
         // Update button texts
-        document.getElementById('undo-btn').textContent = this.MESSAGES.get('undoButton');
-        document.getElementById('check-btn').textContent = this.MESSAGES.get('checkButton');
-        document.getElementById('back-to-menu-sorting-btn').textContent = this.MESSAGES.get('backToMenu');
+        const undoBtn = document.getElementById('undo-btn');
+        const checkBtn = document.getElementById('check-btn');
+        const backToMenuSortingBtn = document.getElementById('back-to-menu-sorting-btn');
+
+        if (undoBtn) undoBtn.textContent = this.MESSAGES.get('undoButton');
+        if (checkBtn) checkBtn.textContent = this.MESSAGES.get('checkButton');
+        if (backToMenuSortingBtn) backToMenuSortingBtn.textContent = this.MESSAGES.get('backToMenu');
 
         // Update score display if visible
         const scoreDisplay = document.getElementById('score-display');
