@@ -1,90 +1,89 @@
-# English Learning App
+# Advanced Learning App
 
 ## Description
+The Advanced Learning App is an interactive web application designed to enhance English language skills through various engaging exercises. It features a modular design, dynamic content loading, and a user-friendly interface, making language learning accessible and effective.
 
-This is a web-based application designed for learning English, built with modern web technologies. It offers a dynamic and interactive user experience for mastering vocabulary, grammar, and more.
+## Features
+*   **Interactive Exercises:** Includes completion, flashcards, matching, quizzes, and sorting games to practice vocabulary, grammar, and idioms.
+*   **Modular Design:** Easily expandable with new learning modules and game types.
+*   **Dynamic Content:** Content is loaded dynamically, allowing for flexible updates and diverse learning materials.
+*   **User Authentication:** (Assuming `auth.js` implies some form of user management, even if basic)
+*   **Internationalization (i18n):** Supports multiple languages for a broader user base.
+*   **Responsive Design:** Built with Tailwind CSS for a seamless experience across various devices.
+*   **Score Tracking:** Tracks user progress.
+*   **Dark Mode:** Provides a comfortable viewing experience.
 
 ## Technologies Used
+*   **Frontend:** HTML5, CSS3 (Tailwind CSS), JavaScript (ES Modules)
+*   **Build/Dev Tools:**
+    *   `http-server`: For serving the application locally.
+    *   `ESLint`: For code linting and maintaining code quality.
+    *   `Jest`: For JavaScript unit testing.
+    *   `Babel`: For JavaScript transpilation.
+    *   `Playwright`: (Likely for end-to-end testing, though not explicitly used in scripts, it's a dev dependency)
 
-*   **HTML5:** For structuring the web content.
-*   **CSS3 (Tailwind CSS):** For modern and responsive styling.
-*   **JavaScript:** For core application logic, interactivity, and dynamic content generation.
-*   **localStorage:** For persisting user progress and settings locally in the browser.
+## Project Structure
+```
+.
+├───index.html              # Main application entry point
+├───package.json            # Project metadata and dependencies
+├───src/
+│   ├───assets/
+│   │   ├───data/           # JSON files for game content (quizzes, flashcards, etc.)
+│   │   └───images/         # Application images (e.g., logo.png)
+│   ├───css/
+│   │   └───game.css        # Custom CSS styles
+│   └───js/
+│       ├───app.js          # Main application logic
+│       ├───auth.js         # Authentication related logic
+│       ├───dataManager.js  # Handles data loading and management
+│       ├───gameManager.js  # Manages game states and logic
+│       ├───i18n.js         # Internationalization utilities
+│       ├───ui.js           # User interface rendering and manipulation
+│       ├───utils.js        # General utility functions
+│       └───components/     # Individual game components (CompletionGame, FlashcardGame, etc.)
+└───... (other config files like .eslintrc.cjs, jest.config.js, etc.)
+```
 
-## Key Features
+## Installation and Setup
 
-*   **Login System:** User progress and global scores are saved using `localStorage`.
-*   **Global Score:** Tracks the user's overall performance across all learning modules.
-*   **Keyboard Navigation:** Full control of the application using keyboard shortcuts for efficient learning.
-*   **Dynamic Content:** The application's learning content is generated dynamically from the `game-db.json` file, allowing for easy expansion.
-*   **Multiple Game Modes:** Includes flashcards, quizzes, sentence completion, and sorting exercises to cater to different learning styles.
-*   **Multi-language Support:** The interface supports both English and Spanish, with easy toggling.
-*   **Dark Mode:** A toggleable dark mode for improved readability and user comfort.
-*   **Random Mode:** Option to randomize the order of questions within modules for varied practice.
-*   **Mobile-friendly Design:** Responsive layout with intuitive swipe gestures for navigation on touch devices.
-
-## Setup and Running
-
-To get this application up and running on your local machine:
+To get this project up and running on your local machine, follow these steps:
 
 1.  **Clone the repository:**
     ```bash
     git clone <repository_url>
     cd english-learning-app
     ```
+
 2.  **Install dependencies:**
-    This project uses `http-server` to serve the application and `eslint` for code linting.
     ```bash
     npm install
     ```
-3.  **Start the application:**
-    ```bash
-    npm start
-    ```
-    This will typically open the application in your default web browser.
 
-## How to Add New Learning Modules
+## Running the Application
 
-To add new content to the application, you need to modify the `game-db.json` file. This file contains an array called `learningModules`.
+To start the local development server:
 
-1.  **Open `game-db.json`:** Locate the `learningModules` array.
-2.  **Add a New Module Object:** Add a new object to the array with the following structure:
+```bash
+npm start
+```
+This will typically open the application in your default web browser at `http://localhost:5500`.
 
-    ```javascript
-    {
-        id: 'unique-id', // A unique identifier for the module
-        name: 'Module Name', // The name to be displayed in the menu
-        gameMode: 'flashcard' | 'quiz' | 'completion' | 'sorting', // The type of game
-        data: [ /* ... content ... */ ] // An array of data for the module
-    }
-    ```
+## Running Tests
 
-3.  **Provide Data for the Module:** The structure of the `data` array depends on the `gameMode`:
+To execute the unit tests:
 
-    *   For `flashcard` mode:
+```bash
+npm test
+```
 
-        ```javascript
-        { en: "Word", es: "Palabra", ipa: "/pron/", example: "...", example_es: "..." }
-        ```
+## Code Quality
 
-    *   For `quiz` and `completion` modes:
+To run the linter and check for code style issues:
 
-        ```javascript
-        { sentence: "...", options: ["...", "..."], correct: "...", explanation: "...", tip: "..." }
-        ```
+```bash
+npm run lint
+```
 
-    *   For `sorting` mode:
-
-        ```javascript
-        { word: "...", category: "..." }
-        ```
-        And the module object should also include a `categories` array:
-        ```javascript
-        {
-            id: 'unique-id',
-            name: 'Module Name',
-            gameMode: 'sorting',
-            data: [ /* ... content ... */ ],
-            categories: ["category1", "category2", "category3"]
-        }
-        ```
+## License
+This project is licensed under the MIT License - see the `LICENSE` file for details.
