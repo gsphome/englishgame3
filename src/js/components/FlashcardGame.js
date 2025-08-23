@@ -74,7 +74,7 @@ class FlashcardGame {
                             ${this.MESSAGES.get('nextButton')}
                         </button>
                     </div>
-                     <button id="back-to-menu-flashcard-btn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">${this.MESSAGES.get('backToMenu')}</button>
+                     <button id="back-to-menu-flashcard-btn" class="w-full mt-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">${this.MESSAGES.get('backToMenu')}</button>
                 </div>
             `;
             // Event listeners should be attached here, inside this if block

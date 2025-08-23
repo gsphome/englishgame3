@@ -67,7 +67,9 @@ class QuizGame {
                             <button id="next-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-r md:py-2 md:px-4"></button>
                         </div>
                     </div>
-                    <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4"></button>
+                    <div class="mt-1">
+                        <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4"></button>
+                    </div>
                 </div>
             `;
             document.getElementById('prev-btn').addEventListener('click', () => this.prev());
@@ -400,7 +402,9 @@ class QuizGame {
                     <h1 id="quiz-summary-title" class="text-2xl font-bold mb-4">${this.MESSAGES.get('sessionScore')}</h1>
                     <p id="quiz-summary-correct" class="text-xl mb-2">${this.MESSAGES.get('correct')}: ${this.sessionScore.correct}</p>
                     <p id="quiz-summary-incorrect" class="text-xl mb-4">${this.MESSAGES.get('incorrect')}: ${this.sessionScore.incorrect}</p>
-                    <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
+                    <div class="mt-1">
+                        <button id="quiz-summary-back-to-menu-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4">${this.MESSAGES.get('backToMenu')}</button>
+                    </div>
                  </div>
             `;
             document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
