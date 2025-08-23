@@ -1,10 +1,11 @@
 // src/js/modules/QuizModule.js
 
 class QuizGame {
-    constructor(authInstance, messagesInstance, gameCallbacks) {
+    constructor(authInstance, messagesInstance, gameCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
         this.gameCallbacks = gameCallbacks; // Object containing specific game functions
+        this.settings = settings; // New: Store game settings
 
         this.currentIndex = 0;
         this.sessionScore = { correct: 0, incorrect: 0 };
@@ -32,6 +33,10 @@ class QuizGame {
 
         if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
             this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
+        }
+        // Limit the number of questions based on settings
+        if (this.settings && this.settings.questionCount && this.moduleData.data.length > this.settings.questionCount) {
+            this.moduleData.data = this.moduleData.data.slice(0, this.settings.questionCount);
         }
         this.render();
         this.updateNavigationButtons(); // Update buttons after initial render

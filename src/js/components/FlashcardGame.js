@@ -1,10 +1,11 @@
 // src/js/modules/FlashcardModule.js
 
 class FlashcardGame {
-    constructor(authInstance, messagesInstance, gameCallbacks) {
+    constructor(authInstance, messagesInstance, gameCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
         this.gameCallbacks = gameCallbacks; // Object containing specific game functions
+        this.settings = settings; // New: Store game settings
 
         this.currentIndex = 0;
         this.moduleData = null;
@@ -25,6 +26,10 @@ class FlashcardGame {
         this.sessionScore = { correct: 0, incorrect: 0 }; // Initialize session score
         if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
             this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
+        }
+        // Limit the number of flashcards based on settings
+        if (this.settings && this.settings.wordCount && this.moduleData.data.length > this.settings.wordCount) {
+            this.moduleData.data = this.moduleData.data.slice(0, this.settings.wordCount);
         }
         this.render();
         this.addKeyboardListeners(); // Add this line

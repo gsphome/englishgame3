@@ -16,9 +16,11 @@ export const gameManager = {
     matchingModule: null,
     currentModule: null, // Referencia a los datos del módulo actualmente cargado
     appInstance: null, // Referencia a la instancia principal de app
+    gameSettings: null, // New: Store game settings
 
-    init(appInstance) {
+    init(appInstance, gameSettings) {
         this.appInstance = appInstance; // Almacenar la instancia de app para callbacks
+        this.gameSettings = gameSettings; // Store game settings
 
         this.gameCallbacks = {
             renderMenu: this.appInstance.renderMenu.bind(this.appInstance), // Llamar al renderMenu de app
@@ -33,11 +35,11 @@ export const gameManager = {
             isHistoryMode: false, // Default to false
         };
 
-        this.flashcardModule = new FlashcardModule(auth, MESSAGES, this.gameCallbacks);
-        this.quizModule = new QuizModule(auth, MESSAGES, this.gameCallbacks);
-        this.completionModule = new CompletionModule(auth, MESSAGES, this.gameCallbacks);
-        this.sortingModule = new SortingModule(auth, MESSAGES, this.gameCallbacks);
-        this.matchingModule = new MatchingModule(auth, MESSAGES, this.gameCallbacks);
+        this.flashcardModule = new FlashcardModule(auth, MESSAGES, this.gameCallbacks, this.gameSettings.flashcardGame);
+        this.quizModule = new QuizModule(auth, MESSAGES, this.gameCallbacks, this.gameSettings.quizGame);
+        this.completionModule = new CompletionModule(auth, MESSAGES, this.gameCallbacks, this.gameSettings.completionGame);
+        this.sortingModule = new SortingModule(auth, MESSAGES, this.gameCallbacks, this.gameSettings.sortingGame);
+        this.matchingModule = new MatchingModule(auth, MESSAGES, this.gameCallbacks, this.gameSettings.matchingGame);
     },
 
     async startModule(moduleId, isHistoryMode = false) { // Added isHistoryMode parameter

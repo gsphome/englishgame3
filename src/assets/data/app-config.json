@@ -1,0 +1,21 @@
+{
+  "defaultLanguage": "en",
+
+  "gameSettings": {
+    "matchingGame": {
+      "wordCount": 3
+    },
+    "sortingGame": {
+      "wordCount": 3
+    },
+    "flashcardGame": {
+      "wordCount": 10
+    },
+    "quizGame": {
+      "questionCount": 10
+    },
+    "completionGame": {
+      "itemCount": 10
+    }
+  }
+}

@@ -4,7 +4,7 @@ import { ui } from './ui.js';
 import { gameManager } from './gameManager.js'; // Import gameManager module
 
 import { shuffleArray, getGameModeIconSvg } from './utils.js';
-import { fetchAllLearningModules } from './dataManager.js'; // fetchModuleData moved to gameManager
+import { fetchAllLearningModules, fetchAppConfig, getAppConfig } from './dataManager.js'; // fetchModuleData moved to gameManager
 
 /**
  * @file Manages the main application flow, module initialization, and global state.
@@ -26,12 +26,20 @@ export const app = {
      * @returns {Promise<void>}
      */
     async init() {
+        await fetchAppConfig(); // Load app configuration
+        const appConfig = getAppConfig();
+
+        // Set default language based on config or local storage
+        const storedLang = localStorage.getItem('appLang');
+        const initialLang = storedLang || appConfig.defaultLanguage;
+        MESSAGES.setLanguage(initialLang);
+
         this.modal = document.getElementById('confirmation-modal');
         auth.init();
         this.allLearningModules = await fetchAllLearningModules();
 
         ui.init(this); // Initialize UI module, pass app instance
-        gameManager.init(this); // Initialize GameManager, pass app instance
+        gameManager.init(this, appConfig.gameSettings); // Initialize GameManager, pass app instance and game settings
 
         // All game module instantiation moved to gameManager.init()
         // All gameCallbacks are now handled by gameManager

@@ -1,10 +1,11 @@
 // src/js/modules/SortingModule.js
 
 class SortingGame {
-    constructor(authInstance, messagesInstance, gameCallbacks) {
+    constructor(authInstance, messagesInstance, gameCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
         this.gameCallbacks = gameCallbacks; // Object containing specific game functions
+        this.settings = settings; // New: Store game settings
 
         this.moduleData = null;
         this.appContainer = null;
@@ -85,7 +86,7 @@ class SortingGame {
             }
         });
 
-        // Fill the rest up to 5 words from the remaining words in selected categories
+        // Fill the rest up to `this.settings.wordCount` words from the remaining words in selected categories
         let remainingWords = [];
         for (const categoryId in wordsPerCategory) { // Iterate over category_ids
             remainingWords = remainingWords.concat(wordsPerCategory[categoryId]);
@@ -93,7 +94,7 @@ class SortingGame {
         remainingWords = this.gameCallbacks.shuffleArray(remainingWords); // Shuffle remaining words
 
         let i = 0;
-        while (selectedWords.length < 4 && i < remainingWords.length) {
+        while (selectedWords.length < this.settings.wordCount && i < remainingWords.length) {
             const wordToAdd = remainingWords[i];
             if (!selectedWords.includes(wordToAdd)) { // Avoid duplicates
                 selectedWords.push(wordToAdd);

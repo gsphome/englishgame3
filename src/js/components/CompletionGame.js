@@ -1,10 +1,11 @@
 // src/js/modules/CompletionModule.js
 
 class CompletionGame {
-    constructor(authInstance, messagesInstance, gameCallbacks) {
+    constructor(authInstance, messagesInstance, gameCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
         this.gameCallbacks = gameCallbacks; // Object containing specific game functions
+        this.settings = settings; // New: Store game settings
 
         this.currentIndex = 0;
         this.sessionScore = { correct: 0, incorrect: 0 };
@@ -24,6 +25,10 @@ class CompletionGame {
         this.appContainer = document.getElementById('app-container');
         if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
             this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
+        }
+        // Limit the number of items based on settings
+        if (this.settings && this.settings.itemCount && this.moduleData.data.length > this.settings.itemCount) {
+            this.moduleData.data = this.moduleData.data.slice(0, this.settings.itemCount);
         }
         this.render();
         this.addKeyboardListeners(); // Add this line

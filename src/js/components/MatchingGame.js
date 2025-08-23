@@ -1,10 +1,11 @@
 // src/js/modules/MatchingModule.js
 
 class MatchingGame {
-    constructor(authInstance, messagesInstance, gameCallbacks) {
+    constructor(authInstance, messagesInstance, gameCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
         this.gameCallbacks = gameCallbacks; // Object containing specific game functions
+        this.settings = settings; // New: Store game settings
 
         this.currentIndex = 0;
         this.moduleData = null;
@@ -35,7 +36,10 @@ class MatchingGame {
         if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
             this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
         }
-        this.moduleData.data = this.moduleData.data.slice(0, 3);
+        // Limit the number of items based on settings
+        if (this.settings && this.settings.wordCount && this.moduleData.data.length > this.settings.wordCount) {
+            this.moduleData.data = this.moduleData.data.slice(0, this.settings.wordCount);
+        }
         this.render();
         this.addKeyboardListeners();
     }

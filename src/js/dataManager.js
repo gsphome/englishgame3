@@ -1,3 +1,34 @@
+let appConfig = null;
+
+/**
+ * Fetches the application configuration from app-config.json.
+ * @returns {Promise<object>} A promise that resolves to the application configuration object.
+ */
+export async function fetchAppConfig() {
+    if (appConfig) {
+        return appConfig; // Return cached config if already loaded
+    }
+    try {
+        const response = await fetch('src/assets/data/app-config.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        appConfig = await response.json();
+        return appConfig;
+    } catch (error) {
+        console.error('Failed to load app configuration:', error);
+        return {}; // Return empty object on error to prevent app from crashing
+    }
+}
+
+/**
+ * Returns the loaded application configuration.
+ * @returns {object|null} The application configuration object, or null if not yet loaded.
+ */
+export function getAppConfig() {
+    return appConfig;
+}
+
 /**
  * Fetches all learning modules from the game database JSON file.
  * @returns {Promise<Array>} A promise that resolves to an array of learning module metadata.
