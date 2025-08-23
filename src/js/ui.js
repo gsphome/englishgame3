@@ -60,9 +60,11 @@ export const ui = {
         // Initial UI updates
         MESSAGES.addListener(this.renderHeader.bind(this));
         MESSAGES.addListener(this.updateMenuText.bind(this));
-        MESSAGES.addListener(this.updateConfirmationModalText.bind(this)); // Add this line
+        MESSAGES.addListener(this.updateConfirmationModalText.bind(this));
+        MESSAGES.addListener(this.updateAboutModalText.bind(this));
         this.updateMenuText();
-        this.updateConfirmationModalText(); // Add this line
+        this.updateConfirmationModalText();
+        this.updateAboutModalText();
     },
 
     // Helper functions moved from utils.js
@@ -306,6 +308,16 @@ export const ui = {
         }
         if (this.noButton) {
             this.noButton.textContent = MESSAGES.get('noButton');
+        }
+    },
+
+    updateAboutModalText() {
+        const aboutModal = document.getElementById('about-modal');
+        if (aboutModal) {
+            aboutModal.querySelector('[data-i18n="aboutTitle"]').textContent = MESSAGES.get('aboutTitle');
+            aboutModal.querySelector('[data-i18n="aboutText1"]').textContent = MESSAGES.get('aboutText1');
+            aboutModal.querySelector('[data-i18n="aboutText2"]').textContent = MESSAGES.get('aboutText2');
+            aboutModal.querySelector('[data-i18n="closeButton"]').textContent = MESSAGES.get('closeButton');
         }
     },
 

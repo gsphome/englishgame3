@@ -82,7 +82,11 @@ export const MESSAGES = {
         moreInfoButton: "More Info",
         showExplanation: "Show Explanation",
         yesButton: "Yes",
-        noButton: "No"
+        noButton: "No",
+        aboutTitle: "About This App",
+        aboutText1: "This is an advanced learning application designed to help you improve your English vocabulary and understanding through interactive exercises.",
+        aboutText2: "Developed by Genil Suarez.",
+        closeButton: "Close"
     },
 
     get(key) {
