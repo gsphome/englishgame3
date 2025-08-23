@@ -127,18 +127,16 @@
     <!-- Settings Modal -->
     <div id="settings-modal"
         class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full flex items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-lg mx-auto">
+        <div class="bg-white p-4 rounded-lg shadow-xl text-center max-w-lg mx-auto">
             <h2 class="text-2xl font-bold mb-4" data-i18n="settingsTitle">Settings</h2>
             <div id="settings-form-container" class="text-left mb-6">
                 <!-- Settings inputs will be dynamically loaded here -->
             </div>
             <div class="flex justify-center space-x-4">
-                <button id="settings-edit-btn"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out" data-i18n="editButton">Edit</button>
-                <button id="settings-cancel-btn"
-                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out" data-i18n="cancelButton">Cancel</button>
+                <button id="settings-close-btn"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out" data-i18n="closeButton"></button>
                 <button id="settings-save-btn"
-                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out" data-i18n="saveButton">Save</button>
+                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out" data-i18n="saveButton"></button>
             </div>
         </div>
     </div>

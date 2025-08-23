@@ -58,8 +58,7 @@ export const ui = {
         this.menuSettingsBtn = document.getElementById('menu-settings-btn');
         this.settingsModal = document.getElementById('settings-modal');
         this.settingsFormContainer = document.getElementById('settings-form-container');
-        this.settingsEditBtn = document.getElementById('settings-edit-btn');
-        this.settingsCancelBtn = document.getElementById('settings-cancel-btn');
+        this.settingsCloseBtn = document.getElementById('settings-close-btn');
         this.settingsSaveBtn = document.getElementById('settings-save-btn');
 
 
@@ -302,16 +301,9 @@ export const ui = {
             });
         }
 
-        if (this.settingsEditBtn) {
-            this.settingsEditBtn.addEventListener('click', () => {
-                this.renderSettingsForm(true); // Render in editable mode
-            });
-        }
-
-        if (this.settingsCancelBtn) {
-            this.settingsCancelBtn.addEventListener('click', () => {
+        if (this.settingsCloseBtn) {
+            this.settingsCloseBtn.addEventListener('click', () => {
                 this.toggleModal(this.settingsModal, false);
-                this.renderSettingsForm(false); // Revert to read-only and close
             });
         }
 
@@ -324,28 +316,83 @@ export const ui = {
         }
     },
 
-    renderSettingsForm(editable) {
+    // Helper to convert keyPath to i18n key
+    keyPathToI18nKey(keyPath) {
+        const parts = keyPath.split('.');
+        let i18nKey = 'settings';
+        for (const part of parts) {
+            i18nKey += part.charAt(0).toUpperCase() + part.slice(1);
+        }
+        return i18nKey;
+    },
+
+    // Helper to convert keyPath to i18n description key
+    keyPathToDescriptionI18nKey(keyPath) {
+        const parts = keyPath.split('.');
+        let i18nKey = 'settings';
+        for (const part of parts) {
+            i18nKey += part.charAt(0).toUpperCase() + part.slice(1);
+        }
+        return i18nKey + 'Description';
+    },
+
+    renderSettingsForm() {
         this.settingsFormContainer.innerHTML = ''; // Clear previous form
         const settings = settingsManager.settings; // Get current settings
 
+        // Add main title
+        const mainTitle = document.createElement('h2');
+        mainTitle.className = 'text-lg font-bold mb-2 text-center'; // Smaller title, reduced mb
+        mainTitle.textContent = MESSAGES.get('settingsTitle');
+        this.settingsFormContainer.appendChild(mainTitle);
+
         // Helper to create input fields
         const createInputField = (keyPath, value, type = 'number') => {
-            const div = document.createElement('div');
-            div.className = 'mb-4';
-            const label = document.createElement('label');
-            label.className = 'block text-gray-700 text-sm font-bold mb-2';
-            label.textContent = keyPath; // Use keyPath as label for now
-            div.appendChild(label);
+            const settingRow = document.createElement('div');
+            settingRow.className = 'flex flex-col mb-1'; // Reduced mb
 
-            const input = document.createElement('input');
-            input.type = type;
-            input.className = 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline';
-            input.value = value;
-            input.dataset.keyPath = keyPath; // Store keyPath for easy retrieval
-            input.readOnly = !editable;
-            input.disabled = !editable;
-            div.appendChild(input);
-            return div;
+            const label = document.createElement('label');
+            label.className = 'text-gray-700 text-sm font-semibold'; // Removed mb-0.5
+            label.textContent = MESSAGES.get(this.keyPathToI18nKey(keyPath));
+            settingRow.appendChild(label);
+
+            const descriptionKey = this.keyPathToDescriptionI18nKey(keyPath);
+            if (MESSAGES.get(descriptionKey) !== descriptionKey) {
+                const description = document.createElement('p');
+                description.className = 'text-gray-600 text-xs'; // Removed mb-1
+                description.textContent = MESSAGES.get(descriptionKey);
+                settingRow.appendChild(description);
+            }
+
+            let inputElement;
+            if (keyPath === 'defaultLanguage') {
+                inputElement = document.createElement('select');
+                inputElement.className = 'shadow appearance-none border rounded w-full py-0.5 px-1 text-gray-700 text-sm leading-tight focus:outline-none focus:shadow-outline'; // Reduced padding
+                inputElement.dataset.keyPath = keyPath;
+                const enOption = document.createElement('option');
+                enOption.value = 'en';
+                enOption.textContent = MESSAGES.get('languageEn');
+                inputElement.appendChild(enOption);
+                const esOption = document.createElement('option');
+                esOption.value = 'es';
+                esOption.textContent = MESSAGES.get('languageEs');
+                inputElement.appendChild(esOption);
+                inputElement.value = value; // Set selected value
+                settingRow.appendChild(inputElement);
+            } else {
+                inputElement = document.createElement('input');
+                inputElement.type = type;
+                inputElement.className = 'shadow appearance-none border rounded py-0.5 px-1 text-gray-700 text-sm leading-tight focus:outline-none focus:shadow-outline ' + (type === 'number' ? 'w-16 text-center' : 'w-full'); // Reduced padding, width
+                inputElement.value = value;
+                inputElement.dataset.keyPath = keyPath;
+
+                if (type === 'number') {
+                    inputElement.min = "1";
+                    inputElement.max = "50";
+                }
+                settingRow.appendChild(inputElement);
+            }
+            return settingRow;
         };
 
         // Recursively build form fields
@@ -353,15 +400,14 @@ export const ui = {
             for (const key in obj) {
                 const keyPath = prefix ? `${prefix}.${key}` : key;
                 if (typeof obj[key] === 'object' && obj[key] !== null) {
-                    // If it's an object, create a section or just recurse
+                    // If it's an object, create a section
                     const sectionTitle = document.createElement('h3');
-                    sectionTitle.className = 'text-lg font-semibold mt-4 mb-2';
-                    sectionTitle.textContent = keyPath;
+                    sectionTitle.className = 'text-base font-bold mt-2 mb-1 pb-0.5 border-b border-gray-200'; // Smaller font, reduced padding/margin, lighter border
+                    sectionTitle.textContent = MESSAGES.get(this.keyPathToI18nKey(keyPath));
                     this.settingsFormContainer.appendChild(sectionTitle);
                     buildForm(obj[key], keyPath);
                 } else {
                     // Assume it's a simple setting (number, string, boolean)
-                    // For simplicity, treating all as numbers for now based on app-config.json
                     this.settingsFormContainer.appendChild(createInputField(keyPath, obj[key]));
                 }
             }
@@ -369,19 +415,19 @@ export const ui = {
 
         buildForm(settings);
 
-        // Adjust button visibility
-        this.settingsEditBtn.classList.toggle('hidden', editable);
-        this.settingsCancelBtn.classList.toggle('hidden', !editable);
-        this.settingsSaveBtn.classList.toggle('hidden', !editable);
+        // Adjust button visibility - Save and Close are always visible
+        // The edit button is removed from the DOM entirely.
+        this.settingsSaveBtn.classList.remove('hidden');
+        this.settingsCloseBtn.classList.remove('hidden');
     },
 
     getSettingsFormData() {
         const formData = {};
-        this.settingsFormContainer.querySelectorAll('input[data-key-path]').forEach(input => {
+        this.settingsFormContainer.querySelectorAll('input[data-key-path], select[data-key-path]').forEach(input => {
             const keyPath = input.dataset.keyPath;
             let value = input.value;
-            // Convert to number if it was originally a number
-            if (!isNaN(value) && !isNaN(parseFloat(value))) {
+            // Convert to number if it was originally a number and not defaultLanguage
+            if (input.type === 'number' && !isNaN(value) && !isNaN(parseFloat(value))) {
                 value = parseFloat(value);
             }
             formData[keyPath] = value;
@@ -393,7 +439,7 @@ export const ui = {
         for (const keyPath in formData) {
             settingsManager.setSetting(keyPath, formData[keyPath]);
         }
-        this.renderSettingsForm(false); // Re-render in read-only mode after saving
+        // No need to re-render in read-only mode, just close the modal
     },
 
     // UI update methods (moved from app.js)

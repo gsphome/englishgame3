@@ -179,6 +179,32 @@ export const MESSAGES = {
         // Game Modes - General
         randomMode: "Random",
         translationLabel: "Translation",
+
+        // Settings
+        settingsTitle: "Settings",
+        settingsGeneral: "General Settings",
+        settingsGame: "Game Settings",
+        settingsDefaultLanguage: "Default Language",
+        settingsMatchingGameWordCount: "Matching Game Word Count",
+        settingsSortingGameWordCount: "Sorting Game Word Count",
+        settingsFlashcardGameWordCount: "Flashcard Game Word Count",
+        settingsQuizGameQuestionCount: "Quiz Game Question Count",
+        settingsCompletionGameItemCount: "Completion Game Item Count",
+        saveButton: "Save",
+        closeButton: "Close",
+
+        // Settings Descriptions
+        settingsDefaultLanguageDescription: "Choose the default language for the application.",
+        settingsMatchingGameWordCountDescription: "Number of word pairs to match in the matching game.",
+        settingsSortingGameWordCountDescription: "Number of words to sort in the sorting game.",
+        settingsFlashcardGameWordCountDescription: "Number of flashcards to review in the flashcard game.",
+        settingsQuizGameQuestionCountDescription: "Number of questions in the quiz game.",
+        settingsCompletionGameItemCountDescription: "Number of items to complete in the completion game.",
+        settingsHelpButton: "Help",
+        settingsExplanationTitle: "Settings Explanation",
+        settingNameColumn: "Setting",
+        settingDescriptionColumn: "Description",
+        settingValueColumn: "Current Value",
     },
 
     get(key) {

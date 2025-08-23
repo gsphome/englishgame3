@@ -2,6 +2,7 @@ import { auth } from './auth.js';
 import { MESSAGES } from './i18n.js';
 import { ui } from './ui.js';
 import { gameManager } from './gameManager.js'; // Import gameManager module
+import { settingsManager } from './settingsManager.js'; // Import settingsManager module
 
 import { shuffleArray, getGameModeIconSvg } from './utils.js';
 import { fetchAllLearningModules, fetchAppConfig, getAppConfig } from './dataManager.js'; // fetchModuleData moved to gameManager
@@ -28,6 +29,9 @@ export const app = {
     async init() {
         await fetchAppConfig(); // Load app configuration
         const appConfig = getAppConfig();
+
+        // Await settingsManager.loadSettings() here
+        await settingsManager.loadSettings(); // <--- ADD THIS LINE
 
         // Set default language based on config or local storage
         const storedLang = localStorage.getItem('appLang');
