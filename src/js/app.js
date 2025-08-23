@@ -112,7 +112,6 @@ export const app = {
 
             if (index <= 25) {
                 button.querySelector('[data-module-index]').textContent = `${String.fromCharCode(65 + index)}.`;
-            } else {
             }
             button.querySelector('[data-module-name]').textContent = module.name.replace('Flashcard: ', '').replace('Quiz: ', '').replace('Completion: ', '');
             button.querySelector('[data-game-mode-icon]').innerHTML = getGameModeIconSvg(module.gameMode);
@@ -162,13 +161,17 @@ export const app = {
     addKeyboardListeners() {
         const modal = ui.modal;
         const yesButton = ui.yesButton;
-        const noButton = ui.noButton;
+        
 
         document.addEventListener('keydown', (e) => {
             const explanationModal = ui.explanationModal;
             if (explanationModal && !explanationModal.classList.contains('hidden')) {
                 if (e.key === 'Enter' || e.key === 'Escape') {
-                    ui.closeExplanationModalBtn.click();
+                    explanationModal.classList.add('hidden'); // Directly hide the modal
+                    if (this.currentView === 'sorting') {
+                        this.renderMenu(); // Return to main menu if in SortingGame
+                    }
+                    e.stopPropagation(); // Stop event propagation
                 }
                 return;
             }
@@ -176,7 +179,7 @@ export const app = {
             const sortingCompletionModal = ui.sortingCompletionModal;
             if (sortingCompletionModal && !sortingCompletionModal.classList.contains('hidden')) {
                 if (e.key === 'Enter') {
-                    ui.sortingCompletionReplayBtn.click();
+                    ui.sortingCompletionBackToMenuBtn.click();
                 } else if (e.key === 'Escape') {
                     ui.sortingCompletionBackToMenuBtn.click();
                 }

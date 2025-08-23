@@ -33,7 +33,7 @@ class CompletionGame {
         }
     }
 
-    render(isUndo = false) {
+    render() {
         if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
             console.error("Completion module data is invalid or empty.");
             this.gameCallbacks.renderMenu();
@@ -155,7 +155,7 @@ class CompletionGame {
             }
             this.currentIndex = lastAction.index;
             this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
-            this.render(true); // Re-render the UI for the undone question
+            this.render(); // Re-render the UI for the undone question
         }
     }
 
