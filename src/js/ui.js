@@ -160,12 +160,14 @@ export const ui = {
     // Specific UI setup methods
     setupConfirmationModalListeners() {
         if (this.yesButton) {
+            this.yesButton.textContent = MESSAGES.get('yesButton');
             this.yesButton.addEventListener('click', () => {
                 auth.logout();
                 this.toggleModal(this.modal, false);
             });
         }
         if (this.noButton) {
+            this.noButton.textContent = MESSAGES.get('noButton');
             this.noButton.addEventListener('click', () => {
                 this.toggleModal(this.modal, false);
             });
@@ -194,6 +196,7 @@ export const ui = {
         if (this.menuLogoutBtn) {
             this.menuLogoutBtn.addEventListener('click', () => {
                 this.toggleHamburgerMenu(false);
+                this.messageElement.textContent = MESSAGES.get('confirmLogoutMessage');
                 this.toggleModal(this.modal, true);
             });
         }

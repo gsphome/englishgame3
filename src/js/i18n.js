@@ -39,9 +39,12 @@ export const MESSAGES = {
         definitions: "Definiciones",
         resetButton: "Reiniciar",
         moreInfoButton: "Más Información",
-        showExplanation: "Mostrar Explicación"
+        showExplanation: "Mostrar Explicación",
+        yesButton: "Sí",
+        noButton: "No"
     },
     en: {
+        loginTitle: "Welcome",
         loginTitle: "Welcome",
         welcomeTitle: "Start Your English Journey!",
         welcomeSubtitle: "Practice, learn, and master English with fun exercises.",
