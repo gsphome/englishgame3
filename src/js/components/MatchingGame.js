@@ -147,29 +147,7 @@ class MatchingGame {
         }
     }
 
-    resetGame() {
-        this.matchedPairs = [];
-        this.sessionScore = { correct: 0, incorrect: 0 };
-        this.feedbackActive = false;
-
-        // Re-enable all terms and definitions
-        document.querySelectorAll('.matching-item').forEach(element => {
-            element.classList.remove('matched', 'bg-green-200', 'incorrect', 'bg-red-200', 'cursor-default', 'selected');
-            element.classList.add('bg-gray-100', 'hover:bg-gray-200', 'cursor-pointer');
-            element.innerHTML = element.textContent; // Remove SVG
-            element.addEventListener('click', (e) => this.handleItemClick(e.target));
-        });
-        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
-    }
-
-    checkAnswers() {
-        if (this.matchedPairs.length === this.moduleData.data.length) {
-            this.gameCallbacks.showMatchingSummary();
-        } else {
-            // Optionally, provide feedback to the user that not all pairs are matched yet.
-            // For now, it will just do nothing if not all pairs are matched.
-        }
-    }
+    
 
     render() {
         if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
@@ -198,12 +176,8 @@ class MatchingGame {
                         <!-- Definitions will be rendered here -->
                     </div>
                 </div>
-                <div class="flex justify-between mt-4">
+                <div class="flex justify-end mt-4">
                     <button id="undo-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${this.MESSAGES.get('undoButton')}</button>
-                    <div>
-                        <button id="check-matching-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">${this.MESSAGES.get('checkButton')}</button>
-                        <button id="reset-matching-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">${this.MESSAGES.get('resetButton')}</button>
-                    </div>
                 </div>
                 <button id="back-to-menu-matching-btn" class="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">${this.MESSAGES.get('backToMenu')}</button>
             </div>
@@ -235,8 +209,6 @@ class MatchingGame {
         });
 
         document.getElementById('undo-matching-btn').addEventListener('click', () => this.undo());
-        document.getElementById('check-matching-btn').addEventListener('click', () => this.checkAnswers());
-        document.getElementById('reset-matching-btn').addEventListener('click', () => this.resetGame());
         document.getElementById('back-to-menu-matching-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
         this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
     }
@@ -244,8 +216,6 @@ class MatchingGame {
     updateText() {
         document.getElementById('back-to-menu-matching-btn').textContent = this.MESSAGES.get('backToMenu');
         document.getElementById('undo-matching-btn').textContent = this.MESSAGES.get('undoButton');
-        document.getElementById('check-matching-btn').textContent = this.MESSAGES.get('checkAnswers');
-        document.getElementById('reset-matching-btn').textContent = this.MESSAGES.get('resetButton');
         document.querySelector('#terms-column h3').textContent = this.MESSAGES.get('terms');
         document.querySelector('#definitions-column h3').textContent = this.MESSAGES.get('definitions');
     }
