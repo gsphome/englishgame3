@@ -41,7 +41,11 @@ export const MESSAGES = {
         moreInfoButton: "Más Información",
         showExplanation: "Mostrar Explicación",
         yesButton: "Sí",
-        noButton: "No"
+        noButton: "No",
+        aboutTitle: "Acerca de Esta Aplicación",
+        aboutText1: "Esta es una aplicación de aprendizaje avanzado diseñada para ayudarte a mejorar tu vocabulario y comprensión del inglés a través de ejercicios interactivos.",
+        aboutText2: "Desarrollado por Genil Suarez.",
+        closeButton: "Cerrar"
     },
     en: {
         loginTitle: "Welcome",
