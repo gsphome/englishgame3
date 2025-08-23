@@ -85,6 +85,7 @@ export const gameManager = {
                     this.appInstance.currentView = 'completion';
                     document.body.classList.add('module-active');
                     document.getElementById('app-container').classList.remove('main-menu-active');
+                    document.getElementById('app-container').innerHTML = ''; // Add this line
                     this.completionModule.init(moduleWithData);
                     ui.updateFooterVisibility(this.appInstance.currentView);
                     break;

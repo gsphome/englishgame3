@@ -223,16 +223,6 @@ export const app = {
                         button.click();
                     }
                 });
-            } else if (this.currentView === 'flashcard') {
-                gameManager.flashcardModule.addKeyboardListeners();
-            } else if (this.currentView === 'quiz') {
-                gameManager.quizModule.addKeyboardListeners();
-            } else if (this.currentView === 'completion') {
-                gameManager.completionModule.addKeyboardListeners();
-            } else if (this.currentView === 'matching') {
-                gameManager.matchingModule.addKeyboardListeners();
-            } else if (this.currentView === 'sorting') {
-                gameManager.sortingModule.addKeyboardListeners();
             }
         });
     },

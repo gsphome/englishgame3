@@ -21,6 +21,7 @@ class CompletionGame {
     init(module) {
         this.currentIndex = 0;
         this.sessionScore = { correct: 0, incorrect: 0 };
+        this.history = []; // Clear history on init
         this.moduleData = module;
         this.appContainer = document.getElementById('app-container');
         if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
