@@ -24,6 +24,7 @@ export const ui = {
     aboutBtn: null,
     aboutModal: null,
     closeAboutModalBtn: null,
+    menuSettingsBtn: null,
 
     init(appInstance) { // Pass app instance to allow calling app methods
         this.app = appInstance; // Store app instance
@@ -48,6 +49,7 @@ export const ui = {
         this.aboutBtn = document.getElementById('menu-about-btn');
         this.aboutModal = document.getElementById('about-modal');
         this.closeAboutModalBtn = document.getElementById('close-about-modal-btn');
+        this.menuSettingsBtn = document.getElementById('menu-settings-btn');
 
 
         // Setup all event listeners
@@ -297,6 +299,9 @@ export const ui = {
         }
         if (this.aboutBtn) {
             this.aboutBtn.innerHTML = `${MESSAGES.get('aboutButton')}`;
+        }
+        if (this.menuSettingsBtn) {
+            this.menuSettingsBtn.innerHTML = `${MESSAGES.get('settingsButton')}`;
         }
 
         // Update sorting completion modal text if visible
