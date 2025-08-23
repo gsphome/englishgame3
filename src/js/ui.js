@@ -2,10 +2,16 @@
 import { MESSAGES } from './i18n.js'; // Assuming i18n.js is the new name for messages
 import { auth } from './auth.js'; // For renderHeader and logout
 import { gameManager } from './gameManager.js'; // Import gameManager module
+import { settingsManager } from './settingsManager.js'; // Import settingsManager module
 
 export const ui = {
     // Properties (will be initialized in init)
     modal: null,
+    settingsModal: null,
+    settingsFormContainer: null,
+    settingsEditBtn: null,
+    settingsCancelBtn: null,
+    settingsSaveBtn: null,
     yesButton: null,
     noButton: null,
     messageElement: null,
@@ -50,6 +56,11 @@ export const ui = {
         this.aboutModal = document.getElementById('about-modal');
         this.closeAboutModalBtn = document.getElementById('close-about-modal-btn');
         this.menuSettingsBtn = document.getElementById('menu-settings-btn');
+        this.settingsModal = document.getElementById('settings-modal');
+        this.settingsFormContainer = document.getElementById('settings-form-container');
+        this.settingsEditBtn = document.getElementById('settings-edit-btn');
+        this.settingsCancelBtn = document.getElementById('settings-cancel-btn');
+        this.settingsSaveBtn = document.getElementById('settings-save-btn');
 
 
         // Setup all event listeners
@@ -58,6 +69,7 @@ export const ui = {
         this.setupSortingCompletionModalListeners();
         this.setupExplanationModalListeners();
         this.setupAboutModalListeners();
+        this.setupSettingsModalListeners();
 
         // Initial UI updates
         MESSAGES.addListener(this.renderHeader.bind(this));
@@ -279,6 +291,109 @@ export const ui = {
                 }
             });
         }
+    },
+
+    setupSettingsModalListeners() {
+        if (this.menuSettingsBtn) {
+            this.menuSettingsBtn.addEventListener('click', () => {
+                this.toggleHamburgerMenu(false);
+                this.toggleModal(this.settingsModal, true);
+                this.renderSettingsForm(false); // Render in read-only mode initially
+            });
+        }
+
+        if (this.settingsEditBtn) {
+            this.settingsEditBtn.addEventListener('click', () => {
+                this.renderSettingsForm(true); // Render in editable mode
+            });
+        }
+
+        if (this.settingsCancelBtn) {
+            this.settingsCancelBtn.addEventListener('click', () => {
+                this.toggleModal(this.settingsModal, false);
+                this.renderSettingsForm(false); // Revert to read-only and close
+            });
+        }
+
+        if (this.settingsSaveBtn) {
+            this.settingsSaveBtn.addEventListener('click', () => {
+                const formData = this.getSettingsFormData();
+                this.applySettingsChanges(formData);
+                this.toggleModal(this.settingsModal, false);
+            });
+        }
+    },
+
+    renderSettingsForm(editable) {
+        this.settingsFormContainer.innerHTML = ''; // Clear previous form
+        const settings = settingsManager.settings; // Get current settings
+
+        // Helper to create input fields
+        const createInputField = (keyPath, value, type = 'number') => {
+            const div = document.createElement('div');
+            div.className = 'mb-4';
+            const label = document.createElement('label');
+            label.className = 'block text-gray-700 text-sm font-bold mb-2';
+            label.textContent = keyPath; // Use keyPath as label for now
+            div.appendChild(label);
+
+            const input = document.createElement('input');
+            input.type = type;
+            input.className = 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline';
+            input.value = value;
+            input.dataset.keyPath = keyPath; // Store keyPath for easy retrieval
+            input.readOnly = !editable;
+            input.disabled = !editable;
+            div.appendChild(input);
+            return div;
+        };
+
+        // Recursively build form fields
+        const buildForm = (obj, prefix = '') => {
+            for (const key in obj) {
+                const keyPath = prefix ? `${prefix}.${key}` : key;
+                if (typeof obj[key] === 'object' && obj[key] !== null) {
+                    // If it's an object, create a section or just recurse
+                    const sectionTitle = document.createElement('h3');
+                    sectionTitle.className = 'text-lg font-semibold mt-4 mb-2';
+                    sectionTitle.textContent = keyPath;
+                    this.settingsFormContainer.appendChild(sectionTitle);
+                    buildForm(obj[key], keyPath);
+                } else {
+                    // Assume it's a simple setting (number, string, boolean)
+                    // For simplicity, treating all as numbers for now based on app-config.json
+                    this.settingsFormContainer.appendChild(createInputField(keyPath, obj[key]));
+                }
+            }
+        };
+
+        buildForm(settings);
+
+        // Adjust button visibility
+        this.settingsEditBtn.classList.toggle('hidden', editable);
+        this.settingsCancelBtn.classList.toggle('hidden', !editable);
+        this.settingsSaveBtn.classList.toggle('hidden', !editable);
+    },
+
+    getSettingsFormData() {
+        const formData = {};
+        this.settingsFormContainer.querySelectorAll('input[data-key-path]').forEach(input => {
+            const keyPath = input.dataset.keyPath;
+            let value = input.value;
+            // Convert to number if it was originally a number
+            if (!isNaN(value) && !isNaN(parseFloat(value))) {
+                value = parseFloat(value);
+            }
+            formData[keyPath] = value;
+        });
+        return formData;
+    },
+
+    applySettingsChanges(formData) {
+        for (const keyPath in formData) {
+            settingsManager.setSetting(keyPath, formData[keyPath]);
+        }
+        this.renderSettingsForm(false); // Re-render in read-only mode after saving
     },
 
     // UI update methods (moved from app.js)
