@@ -150,7 +150,7 @@ class CompletionGame {
     }
 
     undo() {
-        console.log('undo() method called');
+        
         const lastAction = this.history.pop();
         if (lastAction) {
             if (lastAction.isCorrect) {

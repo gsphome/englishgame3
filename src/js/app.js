@@ -187,10 +187,7 @@ export const app = {
                                    (!modal.classList.contains('hidden'));
 
             if (e.key === 'Escape') {
-                console.log('Escape key pressed!');
-                console.log('isMainMenuActive:', isMainMenuActive);
-                console.log('isAnyModalOpen:', isAnyModalOpen);
-                console.log('hamburger-menu-open:', document.body.classList.contains('hamburger-menu-open'));
+                
 
                 if (isMainMenuActive && !isAnyModalOpen && !document.body.classList.contains('hamburger-menu-open')) {
                     // If main menu is active and no other modals/menus are open, trigger logout
