@@ -44,6 +44,8 @@ export const app = {
         // All game module instantiation moved to gameManager.init()
         // All gameCallbacks are now handled by gameManager
 
+        this.addKeyboardListeners(); // Add this line to initialize global keyboard listeners
+
         // Initial user check and rendering
         auth.user = JSON.parse(localStorage.getItem('user'));
         ui.renderHeader();
@@ -166,6 +168,11 @@ export const app = {
 
     // startModule method moved to gameManager.js
 
+    handleEscapeKeyForMainMenu() {
+        ui.messageElement.textContent = MESSAGES.get('confirmLogoutMessage');
+        ui.toggleModal(ui.modal, true);
+    },
+
     addKeyboardListeners() {
         const modal = ui.modal;
         const yesButton = ui.yesButton;
@@ -173,49 +180,35 @@ export const app = {
 
         document.addEventListener('keydown', (e) => {
             const explanationModal = ui.explanationModal;
-            if (explanationModal && !explanationModal.classList.contains('hidden')) {
-                if (e.key === 'Enter' || e.key === 'Escape') {
-                    explanationModal.classList.add('hidden'); // Directly hide the modal
-                    if (this.currentView === 'sorting') {
-                        this.renderMenu(); // Return to main menu if in SortingGame
-                    }
-                    e.stopPropagation(); // Stop event propagation
-                }
-                return;
-            }
-
             const sortingCompletionModal = ui.sortingCompletionModal;
-            if (sortingCompletionModal && !sortingCompletionModal.classList.contains('hidden')) {
-                if (e.key === 'Enter') {
-                    ui.sortingCompletionBackToMenuBtn.click();
-                } else if (e.key === 'Escape') {
-                    ui.sortingCompletionBackToMenuBtn.click();
-                }
-                return;
-            }
-
-            if (!modal.classList.contains('hidden')) {
-                if (e.key === 'Enter') {
-                    yesButton.click();
-                }
-                else if (e.key === 'Escape') {
-                    ui.toggleModal(modal, false);
-                }
-                return;
-            }
-
-            if (document.body.classList.contains('hamburger-menu-open')) {
-                if (e.key === 'Escape') {
-                    ui.toggleHamburgerMenu(false);
-                }
-                return;
-            }
+            const isMainMenuActive = document.getElementById('app-container').classList.contains('main-menu-active');
+            const isAnyModalOpen = (explanationModal && !explanationModal.classList.contains('hidden')) ||
+                                   (sortingCompletionModal && !sortingCompletionModal.classList.contains('hidden')) ||
+                                   (!modal.classList.contains('hidden'));
 
             if (e.key === 'Escape') {
-                if (this.currentView === 'sorting') {
+                console.log('Escape key pressed!');
+                console.log('isMainMenuActive:', isMainMenuActive);
+                console.log('isAnyModalOpen:', isAnyModalOpen);
+                console.log('hamburger-menu-open:', document.body.classList.contains('hamburger-menu-open'));
+
+                if (isMainMenuActive && !isAnyModalOpen && !document.body.classList.contains('hamburger-menu-open')) {
+                    // If main menu is active and no other modals/menus are open, trigger logout
+                    this.handleEscapeKeyForMainMenu();
+                } else if (explanationModal && !explanationModal.classList.contains('hidden')) {
+                    explanationModal.classList.add('hidden');
+                    if (this.currentView === 'sorting') {
+                        this.renderMenu();
+                    }
+                    e.stopPropagation();
+                } else if (sortingCompletionModal && !sortingCompletionModal.classList.contains('hidden')) {
+                    ui.sortingCompletionBackToMenuBtn.click();
+                } else if (!modal.classList.contains('hidden')) {
+                    ui.toggleModal(modal, false);
+                } else if (document.body.classList.contains('hamburger-menu-open')) {
+                    ui.toggleHamburgerMenu(false);
+                } else if (this.currentView === 'sorting') {
                     this.renderMenu();
-                } else if (document.getElementById('app-container').classList.contains('main-menu-active')) {
-                    ui.toggleModal(modal, true);
                 } else {
                     this.renderMenu();
                 }
@@ -234,15 +227,15 @@ export const app = {
                     }
                 });
             } else if (this.currentView === 'flashcard') {
-                gameManager.flashcardModule.addKeyboardListeners(); // Use gameManager's module
+                gameManager.flashcardModule.addKeyboardListeners();
             } else if (this.currentView === 'quiz') {
-                gameManager.quizModule.addKeyboardListeners(); // Use gameManager's module
+                gameManager.quizModule.addKeyboardListeners();
             } else if (this.currentView === 'completion') {
-                gameManager.completionModule.addKeyboardListeners(); // Use gameManager's module
+                gameManager.completionModule.addKeyboardListeners();
             } else if (this.currentView === 'matching') {
-                gameManager.matchingModule.addKeyboardListeners(); // Use gameManager's module
+                gameManager.matchingModule.addKeyboardListeners();
             } else if (this.currentView === 'sorting') {
-                gameManager.sortingModule.addKeyboardListeners(); // Use gameManager's module
+                gameManager.sortingModule.addKeyboardListeners();
             }
         });
     },
