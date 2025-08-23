@@ -1,6 +1,6 @@
 // src/js/modules/SortingModule.js
 
-class SortingGame {
+class SortingMode {
     constructor(authInstance, messagesInstance, gameCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
@@ -516,4 +516,4 @@ class SortingGame {
     }
 }
 
-export default SortingGame;
+export default SortingMode;

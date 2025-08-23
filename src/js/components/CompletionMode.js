@@ -1,6 +1,6 @@
 // src/js/modules/CompletionModule.js
 
-class CompletionGame {
+class CompletionMode {
     constructor(authInstance, messagesInstance, gameCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
@@ -320,4 +320,4 @@ class CompletionGame {
     }
 }
 
-export default CompletionGame;
+export default CompletionMode;

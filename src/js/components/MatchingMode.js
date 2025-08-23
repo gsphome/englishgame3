@@ -1,6 +1,6 @@
 // src/js/modules/MatchingModule.js
 
-class MatchingGame {
+class MatchingMode {
     constructor(authInstance, messagesInstance, gameCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
@@ -256,4 +256,4 @@ class MatchingGame {
     }
 }
 
-export default MatchingGame;
+export default MatchingMode;

@@ -35,7 +35,7 @@ export function getAppConfig() {
  */
 export async function fetchAllLearningModules() {
     try {
-        const response = await fetch('src/assets/data/game-db.json');
+        const response = await fetch('src/assets/data/learningModules.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

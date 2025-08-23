@@ -1,6 +1,6 @@
 // src/js/modules/QuizModule.js
 
-class QuizGame {
+class QuizMode {
     constructor(authInstance, messagesInstance, gameCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
@@ -559,4 +559,4 @@ class QuizGame {
     }
 }
 
-export default QuizGame;
+export default QuizMode;

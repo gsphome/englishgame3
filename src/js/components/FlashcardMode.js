@@ -1,6 +1,6 @@
 // src/js/modules/FlashcardModule.js
 
-class FlashcardGame {
+class FlashcardMode {
     constructor(authInstance, messagesInstance, gameCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
@@ -303,4 +303,4 @@ class FlashcardGame {
     }
 }
 
-export default FlashcardGame;
+export default FlashcardMode;

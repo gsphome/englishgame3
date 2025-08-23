@@ -32,7 +32,7 @@ The Advanced Learning App is an interactive web application designed to enhance 
 │   │   ├───data/           # JSON files for game content (quizzes, flashcards, etc.)
 │   │   └───images/         # Application images (e.g., logo.png)
 │   ├───css/
-│   │   └───game.css        # Custom CSS styles
+│   │   └───app.css         # Custom CSS styles
 │   └───js/
 │       ├───app.js          # Main application logic
 │       ├───auth.js         # Authentication related logic
@@ -41,7 +41,7 @@ The Advanced Learning App is an interactive web application designed to enhance 
 │       ├───i18n.js         # Internationalization utilities
 │       ├───ui.js           # User interface rendering and manipulation
 │       ├───utils.js        # General utility functions
-│       └───components/     # Individual game components (CompletionGame, FlashcardGame, etc.)
+│       └───components/     # Individual game components (CompletionMode, FlashcardMode, MatchingMode, QuizMode, SortingMode, etc.)
 └───... (other config files like .eslintrc.cjs, jest.config.js, etc.)
 ```
 
