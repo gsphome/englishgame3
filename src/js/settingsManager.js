@@ -92,7 +92,6 @@ class SettingsManager {
         if (current !== null && typeof current === 'object') {
             current[path[lastKeyIndex]] = value;
             this.emit(`setting:${keyPath}`, value);
-            console.log(`Setting updated: ${keyPath} = ${value}`);
         } else {
             console.error(`Cannot set setting at ${keyPath}: path is not an object.`);
         }
