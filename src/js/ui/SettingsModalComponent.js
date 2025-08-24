@@ -176,12 +176,12 @@ export class SettingsModalComponent extends ModalComponent {
         
         const enOption = document.createElement('option');
         enOption.value = 'en';
-        enOption.textContent = MESSAGES.get('languageEn');
+        enOption.textContent = '🇬🇧 English';
         select.appendChild(enOption);
         
         const esOption = document.createElement('option');
         esOption.value = 'es';
-        esOption.textContent = MESSAGES.get('languageEs');
+        esOption.textContent = '🇪🇸 Español';
         select.appendChild(esOption);
         
         select.value = value;
