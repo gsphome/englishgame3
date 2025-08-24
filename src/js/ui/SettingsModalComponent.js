@@ -94,6 +94,7 @@ export class SettingsModalComponent extends ModalComponent {
         this.formContainer.appendChild(mainTitle);
         
         this.createGroupTitle('General');
+        this.currentGroupContainer = this.createGroupContainer();
 
         this.buildForm(settings);
         
@@ -102,7 +103,7 @@ export class SettingsModalComponent extends ModalComponent {
 
     buildForm(obj, prefix = '') {
         // Define order for learningSettings properties
-        const learningOrder = ['flashcardMode', 'quizMode', 'completionMode', 'sortingMode', 'matchingMode'];
+        const learningOrder = ['categories', 'flashcardMode', 'quizMode', 'completionMode', 'sortingMode', 'matchingMode'];
         // Define order for root level properties
         const rootOrder = ['defaultLanguage', 'level', 'learningSettings'];
         
@@ -140,6 +141,7 @@ export class SettingsModalComponent extends ModalComponent {
             } else if (typeof obj[key] === 'object' && obj[key] !== null) {
                 if (keyPath === 'learningSettings') {
                     this.createGroupTitle('Items');
+                    this.currentGroupContainer = this.createGroupContainer();
                 }
                 this.buildForm(obj[key], keyPath);
             } else {
@@ -170,7 +172,7 @@ export class SettingsModalComponent extends ModalComponent {
         
         inputElement.disabled = !this.isEditMode;
         settingRow.appendChild(inputElement);
-        this.formContainer.appendChild(settingRow);
+        (this.currentGroupContainer || this.formContainer).appendChild(settingRow);
     }
 
     createLanguageSelect(value, keyPath) {
@@ -260,6 +262,13 @@ export class SettingsModalComponent extends ModalComponent {
         groupTitle.className = 'text-xs font-semibold text-gray-500 mt-2 mb-1 uppercase tracking-wide';
         groupTitle.textContent = title;
         this.formContainer.appendChild(groupTitle);
+    }
+
+    createGroupContainer() {
+        const container = document.createElement('div');
+        container.className = 'bg-gray-50 rounded p-2 mb-2 border border-gray-200';
+        this.formContainer.appendChild(container);
+        return container;
     }
 
     createArrayDisplay(keyPath, array) {
@@ -431,6 +440,6 @@ export class SettingsModalComponent extends ModalComponent {
         
         select.disabled = !this.isEditMode;
         settingRow.appendChild(select);
-        this.formContainer.appendChild(settingRow);
+        (this.currentGroupContainer || this.formContainer).appendChild(settingRow);
     }
 }
