@@ -132,7 +132,9 @@ export class SettingsModalComponent extends ModalComponent {
             const keyPath = prefix ? `${prefix}.${key}` : key;
             
             if (Array.isArray(obj[key])) {
-                if (keyPath.startsWith('learningSettings.')) {
+                if (keyPath === 'learningSettings.categories') {
+                    this.createCategoriesSelect(keyPath, obj[key]);
+                } else if (keyPath.startsWith('learningSettings.')) {
                     this.createArrayDisplay(keyPath, obj[key]);
                 }
             } else if (typeof obj[key] === 'object' && obj[key] !== null) {
@@ -193,6 +195,8 @@ export class SettingsModalComponent extends ModalComponent {
         const select = document.createElement('select');
         select.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-24';
         select.style.textAlign = 'center';
+        select.style.textAlignLast = 'center';
+        select.style.webkitAppearance = 'none';
         select.dataset.keyPath = keyPath;
         
         const levels = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
@@ -305,11 +309,18 @@ export class SettingsModalComponent extends ModalComponent {
         const formData = {};
         this.formContainer.querySelectorAll('input[data-key-path], select[data-key-path]').forEach(input => {
             const keyPath = input.dataset.keyPath;
-            let value = input.value;
-            if (input.type === 'number' && !isNaN(value) && !isNaN(parseFloat(value))) {
-                value = parseFloat(value);
+            
+            if (input.multiple) {
+                // Handle multiple select (categories)
+                const selectedValues = Array.from(input.selectedOptions).map(option => option.value);
+                formData[keyPath] = selectedValues;
+            } else {
+                let value = input.value;
+                if (input.type === 'number' && !isNaN(value) && !isNaN(parseFloat(value))) {
+                    value = parseFloat(value);
+                }
+                formData[keyPath] = value;
             }
-            formData[keyPath] = value;
         });
         return formData;
     }
@@ -381,5 +392,41 @@ export class SettingsModalComponent extends ModalComponent {
                 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200' :
                 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200';
         }
+    }
+
+    createCategoriesSelect(keyPath, selectedCategories) {
+        const settingRow = document.createElement('div');
+        settingRow.className = 'flex justify-between items-center mb-2';
+
+        const label = document.createElement('label');
+        label.className = 'text-gray-700 text-sm font-semibold flex-1';
+        label.textContent = MESSAGES.get('settingsCategories');
+        settingRow.appendChild(label);
+
+        const select = document.createElement('select');
+        select.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-32';
+        select.dataset.keyPath = keyPath;
+        select.multiple = true;
+        select.size = 4;
+
+        const allCategories = ['Vocabulary', 'Grammar', 'PhrasalVerbs', 'Idioms'];
+        const categoryLabels = {
+            'Vocabulary': '📚 Vocabulary',
+            'Grammar': '📝 Grammar', 
+            'PhrasalVerbs': '🔗 Phrasal Verbs',
+            'Idioms': '💭 Idioms'
+        };
+        
+        allCategories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = categoryLabels[category] || category;
+            option.selected = selectedCategories.includes(category);
+            select.appendChild(option);
+        });
+        
+        select.disabled = !this.isEditMode;
+        settingRow.appendChild(select);
+        this.formContainer.appendChild(settingRow);
     }
 }
