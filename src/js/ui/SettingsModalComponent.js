@@ -89,7 +89,7 @@ export class SettingsModalComponent extends ModalComponent {
         const settings = settingsManager.settings;
 
         const mainTitle = document.createElement('h2');
-        mainTitle.className = 'text-lg font-bold mb-2 text-center';
+        mainTitle.className = 'text-base font-semibold mb-3 text-center text-gray-800';
         mainTitle.textContent = MESSAGES.get('settingsTitle');
         this.formContainer.appendChild(mainTitle);
 
@@ -148,10 +148,10 @@ export class SettingsModalComponent extends ModalComponent {
 
     createInputField(keyPath, value) {
         const settingRow = document.createElement('div');
-        settingRow.className = 'flex justify-between items-center mb-2';
+        settingRow.className = 'flex justify-between items-center py-1 px-2 hover:bg-gray-50 rounded';
 
         const label = document.createElement('label');
-        label.className = 'text-gray-700 text-sm font-semibold flex-1';
+        label.className = 'text-gray-700 text-xs font-medium flex-1';
         label.textContent = MESSAGES.get(this.keyPathToI18nKey(keyPath));
         settingRow.appendChild(label);
 
@@ -173,7 +173,7 @@ export class SettingsModalComponent extends ModalComponent {
 
     createLanguageSelect(value, keyPath) {
         const select = document.createElement('select');
-        select.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-24 text-center';
+        select.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-20 text-center focus:ring-1 focus:ring-blue-400';
         select.dataset.keyPath = keyPath;
         
         const enOption = document.createElement('option');
@@ -193,10 +193,7 @@ export class SettingsModalComponent extends ModalComponent {
 
     createLevelSelect(value, keyPath) {
         const select = document.createElement('select');
-        select.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-24';
-        select.style.textAlign = 'center';
-        select.style.textAlignLast = 'center';
-        select.style.webkitAppearance = 'none';
+        select.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-20 text-center focus:ring-1 focus:ring-blue-400';
         select.dataset.keyPath = keyPath;
         
         const levels = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
@@ -215,7 +212,7 @@ export class SettingsModalComponent extends ModalComponent {
     createNumberInput(value, keyPath) {
         const input = document.createElement('input');
         input.type = 'number';
-        input.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-24 text-center';
+        input.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-20 text-center focus:ring-1 focus:ring-blue-400';
         input.value = value;
         input.dataset.keyPath = keyPath;
         input.min = "1";
@@ -253,7 +250,7 @@ export class SettingsModalComponent extends ModalComponent {
 
     createSectionTitle(keyPath) {
         const sectionTitle = document.createElement('h3');
-        sectionTitle.className = 'text-base font-bold mt-2 mb-1 pb-0.5 border-b border-gray-200';
+        sectionTitle.className = 'text-sm font-semibold text-gray-600 mt-3 mb-1 pb-1 border-b border-gray-200';
         sectionTitle.textContent = MESSAGES.get(this.keyPathToI18nKey(keyPath));
         this.formContainer.appendChild(sectionTitle);
     }
@@ -396,18 +393,18 @@ export class SettingsModalComponent extends ModalComponent {
 
     createCategoriesSelect(keyPath, selectedCategories) {
         const settingRow = document.createElement('div');
-        settingRow.className = 'flex justify-between items-center mb-2';
+        settingRow.className = 'flex justify-between items-center py-1 px-2 hover:bg-gray-50 rounded';
 
         const label = document.createElement('label');
-        label.className = 'text-gray-700 text-sm font-semibold flex-1';
-        label.textContent = MESSAGES.get('settingsCategories');
+        label.className = 'text-gray-700 text-xs font-medium flex-1';
+        label.textContent = 'Categories';
         settingRow.appendChild(label);
 
         const select = document.createElement('select');
-        select.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-32';
+        select.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-20 focus:ring-1 focus:ring-blue-400';
         select.dataset.keyPath = keyPath;
         select.multiple = true;
-        select.size = 4;
+        select.size = 3;
 
         const allCategories = ['Vocabulary', 'Grammar', 'PhrasalVerbs', 'Idioms'];
         const categoryLabels = {
