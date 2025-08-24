@@ -191,7 +191,8 @@ export class SettingsModalComponent extends ModalComponent {
 
     createLevelSelect(value, keyPath) {
         const select = document.createElement('select');
-        select.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-24 text-center';
+        select.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-24';
+        select.style.textAlign = 'center';
         select.dataset.keyPath = keyPath;
         
         const levels = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
@@ -199,7 +200,6 @@ export class SettingsModalComponent extends ModalComponent {
             const option = document.createElement('option');
             option.value = level;
             option.textContent = level.toUpperCase();
-            option.style.textAlign = 'center';
             select.appendChild(option);
         });
         
