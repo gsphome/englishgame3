@@ -144,6 +144,8 @@ export class SettingsModalComponent extends ModalComponent {
         let inputElement;
         if (keyPath === 'defaultLanguage') {
             inputElement = this.createLanguageSelect(value, keyPath);
+        } else if (keyPath === 'level') {
+            inputElement = this.createLevelSelect(value, keyPath);
         } else if (typeof value === 'number') {
             inputElement = this.createNumberInput(value, keyPath);
         } else {
@@ -169,6 +171,24 @@ export class SettingsModalComponent extends ModalComponent {
         esOption.value = 'es';
         esOption.textContent = MESSAGES.get('languageEs');
         select.appendChild(esOption);
+        
+        select.value = value;
+        select.disabled = !this.isEditMode;
+        return select;
+    }
+
+    createLevelSelect(value, keyPath) {
+        const select = document.createElement('select');
+        select.className = 'shadow appearance-none border rounded w-full py-0.5 px-1 text-gray-700 text-sm leading-tight focus:outline-none focus:shadow-outline';
+        select.dataset.keyPath = keyPath;
+        
+        const levels = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
+        levels.forEach(level => {
+            const option = document.createElement('option');
+            option.value = level;
+            option.textContent = level.toUpperCase();
+            select.appendChild(option);
+        });
         
         select.value = value;
         select.disabled = !this.isEditMode;
