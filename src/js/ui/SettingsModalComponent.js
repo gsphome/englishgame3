@@ -26,10 +26,39 @@ export class SettingsModalComponent extends ModalComponent {
         super.show();
     }
 
-    handleSave() {
-        const formData = this.getFormData();
-        this.applyChanges(formData);
-        this.hide();
+    async handleSave() {
+        try {
+            // Visual feedback
+            this.saveBtn.textContent = MESSAGES.get('saving') || 'Saving...';
+            this.saveBtn.disabled = true;
+            
+            const formData = this.getFormData();
+            await this.applyChanges(formData);
+            
+            // Success feedback
+            this.saveBtn.textContent = MESSAGES.get('saved') || 'Saved!';
+            this.saveBtn.className = 'bg-green-600 text-white font-bold py-2 px-4 rounded';
+            
+            setTimeout(() => {
+                this.hide();
+                this.resetSaveButton();
+            }, 1000);
+            
+        } catch (error) {
+            console.error('Error saving settings:', error);
+            this.saveBtn.textContent = MESSAGES.get('errorSaving') || 'Error!';
+            this.saveBtn.className = 'bg-red-600 text-white font-bold py-2 px-4 rounded';
+            
+            setTimeout(() => {
+                this.resetSaveButton();
+            }, 2000);
+        }
+    }
+
+    resetSaveButton() {
+        this.saveBtn.textContent = MESSAGES.get('saveButton');
+        this.saveBtn.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200';
+        this.saveBtn.disabled = false;
     }
 
     renderForm() {
@@ -58,29 +87,27 @@ export class SettingsModalComponent extends ModalComponent {
                 this.createSectionTitle(keyPath);
                 this.buildForm(obj[key], keyPath);
             } else {
-                if (keyPath.startsWith('gameSettings.')) {
-                    this.createReadOnlyField(keyPath, obj[key]);
-                } else {
-                    this.createInputField(keyPath, obj[key]);
-                }
+                this.createInputField(keyPath, obj[key]);
             }
         }
     }
 
     createInputField(keyPath, value) {
         const settingRow = document.createElement('div');
-        settingRow.className = 'flex flex-col mb-1';
+        settingRow.className = 'flex justify-between items-center mb-2';
 
         const label = document.createElement('label');
-        label.className = 'text-gray-700 text-sm font-semibold';
+        label.className = 'text-gray-700 text-sm font-semibold flex-1';
         label.textContent = MESSAGES.get(this.keyPathToI18nKey(keyPath));
         settingRow.appendChild(label);
 
         let inputElement;
         if (keyPath === 'defaultLanguage') {
             inputElement = this.createLanguageSelect(value, keyPath);
-        } else {
+        } else if (typeof value === 'number') {
             inputElement = this.createNumberInput(value, keyPath);
+        } else {
+            inputElement = this.createTextInput(value, keyPath);
         }
         
         settingRow.appendChild(inputElement);
@@ -109,11 +136,20 @@ export class SettingsModalComponent extends ModalComponent {
     createNumberInput(value, keyPath) {
         const input = document.createElement('input');
         input.type = 'number';
-        input.className = 'shadow appearance-none border rounded py-0.5 px-1 text-gray-700 text-sm leading-tight focus:outline-none focus:shadow-outline w-16 text-center';
+        input.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-20 text-center';
         input.value = value;
         input.dataset.keyPath = keyPath;
         input.min = "1";
         input.max = "50";
+        return input;
+    }
+
+    createTextInput(value, keyPath) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-32';
+        input.value = value;
+        input.dataset.keyPath = keyPath;
         return input;
     }
 
@@ -201,19 +237,30 @@ export class SettingsModalComponent extends ModalComponent {
         return formData;
     }
 
-    applyChanges(formData) {
+    async applyChanges(formData) {
+        // Validate data before saving
         for (const keyPath in formData) {
-            settingsManager.setSetting(keyPath, formData[keyPath]);
+            const value = formData[keyPath];
+            
+            // Validate numeric values
+            if (typeof value === 'number' && (value < 1 || value > 50)) {
+                throw new Error(`Invalid value for ${keyPath}: ${value}`);
+            }
+            
+            settingsManager.setSetting(keyPath, value);
         }
+        
+        // Save to localStorage for persistence
+        localStorage.setItem('userSettings', JSON.stringify(settingsManager.settings));
     }
 
     updateText() {
         if (this.saveBtn) {
             this.saveBtn.textContent = MESSAGES.get('saveButton');
+            this.saveBtn.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200';
         }
         if (this.closeBtn) {
             this.closeBtn.textContent = MESSAGES.get('closeButton');
-            // Ensure proper contrast regardless of theme
             this.closeBtn.className = 'bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200';
         }
     }

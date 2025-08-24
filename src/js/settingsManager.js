@@ -8,11 +8,19 @@ class SettingsManager {
 
     async loadSettings() {
         try {
+            // Load default settings from config
             const response = await fetch('src/assets/data/app-config.json');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             this.settings = await response.json();
+            
+            // Override with user settings from localStorage
+            const userSettings = localStorage.getItem('userSettings');
+            if (userSettings) {
+                const parsedUserSettings = JSON.parse(userSettings);
+                this.mergeSettings(parsedUserSettings);
+            }
             
         } catch (error) {
             console.error('Failed to load settings, using default:', error);
@@ -38,6 +46,21 @@ class SettingsManager {
                 }
             };
         }
+    }
+
+    mergeSettings(userSettings) {
+        // Deep merge user settings with default settings
+        const merge = (target, source) => {
+            for (const key in source) {
+                if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                    if (!target[key]) target[key] = {};
+                    merge(target[key], source[key]);
+                } else {
+                    target[key] = source[key];
+                }
+            }
+        };
+        merge(this.settings, userSettings);
     }
 
     getSetting(keyPath) {
