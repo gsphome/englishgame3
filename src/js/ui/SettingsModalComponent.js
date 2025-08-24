@@ -100,9 +100,9 @@ export class SettingsModalComponent extends ModalComponent {
 
     buildForm(obj, prefix = '') {
         // Define order for learningSettings properties
-        const learningOrder = ['flashcardMode', 'quizMode', 'completionMode', 'sortingMode', 'matchingMode'];
+        const learningOrder = ['categories', 'flashcardMode', 'quizMode', 'completionMode', 'sortingMode', 'matchingMode'];
         // Define order for root level properties
-        const rootOrder = ['defaultLanguage', 'level', 'learningSettings'];
+        const rootOrder = ['defaultLanguage', 'categories', 'level', 'learningSettings'];
         
         let keys = Object.keys(obj);
         
@@ -134,11 +134,8 @@ export class SettingsModalComponent extends ModalComponent {
             if (Array.isArray(obj[key])) {
                 if (keyPath === 'learningSettings.categories') {
                     this.createCategoriesSelect(keyPath, obj[key]);
-                } else if (keyPath.startsWith('learningSettings.')) {
-                    this.createArrayDisplay(keyPath, obj[key]);
                 }
             } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-                this.createSectionTitle(keyPath);
                 this.buildForm(obj[key], keyPath);
             } else {
                 this.createInputField(keyPath, obj[key]);
@@ -148,10 +145,10 @@ export class SettingsModalComponent extends ModalComponent {
 
     createInputField(keyPath, value) {
         const settingRow = document.createElement('div');
-        settingRow.className = 'flex justify-between items-center py-1 px-2 hover:bg-gray-50 rounded';
+        settingRow.className = 'flex justify-between items-center py-1';
 
         const label = document.createElement('label');
-        label.className = 'text-gray-700 text-xs font-medium flex-1';
+        label.className = 'text-gray-600 text-xs flex-1';
         label.textContent = MESSAGES.get(this.keyPathToI18nKey(keyPath));
         settingRow.appendChild(label);
 
@@ -249,10 +246,8 @@ export class SettingsModalComponent extends ModalComponent {
     }
 
     createSectionTitle(keyPath) {
-        const sectionTitle = document.createElement('h3');
-        sectionTitle.className = 'text-sm font-semibold text-gray-600 mt-3 mb-1 pb-1 border-b border-gray-200';
-        sectionTitle.textContent = MESSAGES.get(this.keyPathToI18nKey(keyPath));
-        this.formContainer.appendChild(sectionTitle);
+        // Skip section titles for cleaner look
+        return;
     }
 
     createArrayDisplay(keyPath, array) {
@@ -393,10 +388,10 @@ export class SettingsModalComponent extends ModalComponent {
 
     createCategoriesSelect(keyPath, selectedCategories) {
         const settingRow = document.createElement('div');
-        settingRow.className = 'flex justify-between items-center py-1 px-2 hover:bg-gray-50 rounded';
+        settingRow.className = 'flex justify-between items-center py-1';
 
         const label = document.createElement('label');
-        label.className = 'text-gray-700 text-xs font-medium flex-1';
+        label.className = 'text-gray-600 text-xs flex-1';
         label.textContent = 'Categories';
         settingRow.appendChild(label);
 
@@ -404,7 +399,7 @@ export class SettingsModalComponent extends ModalComponent {
         select.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-20 focus:ring-1 focus:ring-blue-400';
         select.dataset.keyPath = keyPath;
         select.multiple = true;
-        select.size = 3;
+        select.size = 2;
 
         const allCategories = ['Vocabulary', 'Grammar', 'PhrasalVerbs', 'Idioms'];
         const categoryLabels = {
