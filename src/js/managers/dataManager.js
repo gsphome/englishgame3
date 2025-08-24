@@ -76,3 +76,26 @@ export async function fetchModuleData(moduleId) {
         return null;
     }
 }
+
+/**
+ * Filters learning modules based on user settings (level and categories).
+ * @param {Array} modules - Array of learning modules to filter.
+ * @param {object} settings - User settings containing level and categories.
+ * @returns {Array} Filtered array of modules.
+ */
+export function filterModulesBySettings(modules, settings) {
+    if (!modules || !settings) return modules;
+    
+    const userLevel = settings.level;
+    const selectedCategories = settings.learningSettings?.categories || [];
+    
+    return modules.filter(module => {
+        // Filter by level
+        const levelMatch = !userLevel || userLevel === 'all' || !module.level || module.level.includes(userLevel);
+        
+        // Filter by category
+        const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(module.category);
+        
+        return levelMatch && categoryMatch;
+    });
+}

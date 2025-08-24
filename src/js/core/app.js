@@ -5,7 +5,7 @@ import { learningManager } from './learningManager.js'; // Import learningManage
 import { settingsManager } from '../managers/settingsManager.js'; // Import settingsManager module
 
 import { shuffleArray, getLearningModeIconSvg } from '../utils/utils.js';
-import { fetchAllLearningModules, fetchAppConfig, getAppConfig } from '../managers/dataManager.js'; // fetchModuleData moved to learningManager
+import { fetchAllLearningModules, fetchAppConfig, getAppConfig, filterModulesBySettings } from '../managers/dataManager.js'; // fetchModuleData moved to learningManager
 
 /**
  * @file Manages the main application flow, module initialization, and global state.
@@ -114,7 +114,10 @@ export const app = {
         const moduleButtonsContainer = menuContent.getElementById('module-buttons-container');
         const colors = ['bg-indigo-600', 'bg-purple-600', 'bg-pink-600', 'bg-teal-600', 'bg-cyan-600', 'bg-emerald-600'];
 
-        this.allLearningModules.forEach((module, index) => {
+        // Filter modules based on current settings
+        const filteredModules = filterModulesBySettings(this.allLearningModules, settingsManager.settings);
+        
+        filteredModules.forEach((module, index) => {
             const colorClass = colors[index % colors.length];
             const icon = module.icon || MESSAGES.get('defaultModuleIcon');
             const description = module.description || '';

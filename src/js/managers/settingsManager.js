@@ -27,7 +27,7 @@ class SettingsManager {
             // Fallback to default settings if loading fails
             this.settings = {
                 "defaultLanguage": "en",
-                "level": "b2",
+                "level": "all",
                 "learningSettings": {
                     "matchingMode": {
                         "wordCount": 3

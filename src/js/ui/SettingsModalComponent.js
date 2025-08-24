@@ -205,11 +205,11 @@ export class SettingsModalComponent extends ModalComponent {
         select.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-28 text-center focus:ring-1 focus:ring-blue-400';
         select.dataset.keyPath = keyPath;
         
-        const levels = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
+        const levels = ['all', 'a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
         levels.forEach(level => {
             const option = document.createElement('option');
             option.value = level;
-            option.textContent = level.toUpperCase();
+            option.textContent = level === 'all' ? 'All' : level.toUpperCase();
             select.appendChild(option);
         });
         
@@ -367,6 +367,11 @@ export class SettingsModalComponent extends ModalComponent {
             if (window.app && window.app.currentModule) {
                 window.learningManager.startModule(window.app.currentModule.id);
             }
+        }
+        
+        // Refresh menu to apply filters
+        if (window.app && window.app.currentView === 'menu') {
+            window.app.renderMenu();
         }
     }
 
