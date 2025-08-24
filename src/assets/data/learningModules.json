@@ -159,6 +159,7 @@
     {
         "id": "quiz-advanced-grammar-subjunctive",
         "name": "Quiz: Grammar Subjunctive",
+        "gameMode": "quiz",
         "dataPath": "src/assets/data/quiz-advanced-grammar-subjunctive.json",
         "level": [
             "c1"
