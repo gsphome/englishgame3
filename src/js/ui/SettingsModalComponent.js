@@ -23,6 +23,15 @@ export class SettingsModalComponent extends ModalComponent {
         if (this.editBtn) {
             this.addListener(this.editBtn, 'click', () => this.toggleEditMode());
         }
+        
+        // Keyboard listener for Enter key
+        this.keyboardHandler = (e) => {
+            if (this.element && !this.element.classList.contains('hidden') && e.key === 'Enter' && !this.isEditMode) {
+                this.hide();
+                e.preventDefault();
+            }
+        };
+        this.addListener(document, 'keydown', this.keyboardHandler);
     }
 
     show() {
