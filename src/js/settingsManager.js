@@ -27,20 +27,20 @@ class SettingsManager {
             // Fallback to default settings if loading fails
             this.settings = {
                 "defaultLanguage": "en",
-                "gameSettings": {
-                    "matchingGame": {
+                "learningSettings": {
+                    "matchingMode": {
                         "wordCount": 3
                     },
-                    "sortingGame": {
+                    "sortingMode": {
                         "wordCount": 3
                     },
-                    "flashcardGame": {
+                    "flashcardMode": {
                         "wordCount": 10
                     },
-                    "quizGame": {
+                    "quizMode": {
                         "questionCount": 10
                     },
-                    "completionGame": {
+                    "completionMode": {
                         "itemCount": 10
                     }
                 }
