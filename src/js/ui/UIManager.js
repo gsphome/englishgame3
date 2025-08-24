@@ -4,6 +4,7 @@ import { HamburgerMenuComponent } from './HamburgerMenuComponent.js';
 import { ConfirmationModalComponent } from './ConfirmationModalComponent.js';
 import { GameSummaryComponent } from './GameSummaryComponent.js';
 import { FooterComponent } from './FooterComponent.js';
+import { SortingCompletionComponent } from './SortingCompletionComponent.js';
 import { MESSAGES } from '../i18n.js';
 
 export class UIManager {
@@ -22,6 +23,7 @@ export class UIManager {
         this.components.confirmationModal = new ConfirmationModalComponent(this.auth);
         this.components.gameSummary = new GameSummaryComponent(this.gameManager, this.app);
         this.components.footer = new FooterComponent();
+        this.components.sortingCompletion = new SortingCompletionComponent(this.gameManager, this.app);
 
         // Setup i18n listeners
         this.setupI18nListeners();
@@ -68,6 +70,10 @@ export class UIManager {
 
     updateFooterVisibility(currentView) {
         this.components.footer.updateVisibility(currentView);
+    }
+
+    showSortingCompletionModal(moduleData) {
+        this.components.sortingCompletion.show(moduleData);
     }
 
     // Utility methods

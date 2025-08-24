@@ -64,10 +64,8 @@ export const ui = {
         return uiManager?.showExplanationModal(modalElement, wordData);
     },
 
-    // Methods that still need to be implemented in components
     showSortingCompletionModal(moduleData) {
-        // TODO: Move to SortingComponent
-        console.log('showSortingCompletionModal not yet implemented in new UI');
+        return uiManager?.showSortingCompletionModal(moduleData);
     },
 
     updateMenuText() {
@@ -92,7 +90,7 @@ export const ui = {
     },
 
     updateSortingCompletionModalText() {
-        // TODO: Move to SortingComponent
+        // Handled by SortingCompletionComponent
     },
 
     updateSettingsModalText() {
