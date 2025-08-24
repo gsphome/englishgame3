@@ -104,7 +104,8 @@ export class SettingsModalComponent extends ModalComponent {
         // Define order for learningSettings properties  
         const learningOrder = ['flashcardMode', 'quizMode', 'completionMode', 'sortingMode', 'matchingMode'];
         // Define order for root level properties
-        const rootOrder = ['defaultLanguage', 'level', 'categories', 'learningSettings'];
+        const rootOrder = ['defaultLanguage', 'level', 'learningSettings'];
+        // Handle categories separately in learningSettings
         
         let keys = Object.keys(obj);
         
@@ -139,6 +140,10 @@ export class SettingsModalComponent extends ModalComponent {
                 }
             } else if (typeof obj[key] === 'object' && obj[key] !== null) {
                 if (keyPath === 'learningSettings') {
+                    // Add categories first in learningSettings but show in General group
+                    if (obj[key].categories) {
+                        this.createCategoriesSelect('learningSettings.categories', obj[key].categories);
+                    }
                     this.createGroupTitle('Items');
                     this.currentGroupContainer = this.createGroupContainer();
                 }
@@ -412,14 +417,15 @@ export class SettingsModalComponent extends ModalComponent {
 
         const label = document.createElement('label');
         label.className = 'text-gray-600 text-xs flex-1';
-        label.textContent = 'Categories';
+        label.textContent = MESSAGES.get('settingsCategories');
         settingRow.appendChild(label);
 
         const select = document.createElement('select');
         select.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-28 focus:ring-1 focus:ring-blue-400';
         select.dataset.keyPath = keyPath;
         select.multiple = true;
-        select.size = 2;
+        select.size = 4;
+        select.style.overflowY = 'scroll';
 
         const allCategories = ['Vocabulary', 'Grammar', 'PhrasalVerbs', 'Idioms'];
         const categoryLabels = {
