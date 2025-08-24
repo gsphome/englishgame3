@@ -2,7 +2,7 @@
 import { HeaderComponent } from './HeaderComponent.js';
 import { HamburgerMenuComponent } from './HamburgerMenuComponent.js';
 import { ConfirmationModalComponent } from './ConfirmationModalComponent.js';
-import { GameSummaryComponent } from './GameSummaryComponent.js';
+import { LearningSummaryComponent } from './LearningSummaryComponent.js';
 import { FooterComponent } from './FooterComponent.js';
 import { SortingCompletionComponent } from './SortingCompletionComponent.js';
 import { ExplanationModalComponent } from './ExplanationModalComponent.js';
@@ -24,7 +24,7 @@ export class UIManager {
         this.components.header = new HeaderComponent(this.auth);
         this.components.hamburgerMenu = new HamburgerMenuComponent(this.app);
         this.components.confirmationModal = new ConfirmationModalComponent(this.auth);
-        this.components.gameSummary = new GameSummaryComponent(this.learningManager, this.app);
+        this.components.learningSummary = new LearningSummaryComponent(this.learningManager, this.app);
         this.components.footer = new FooterComponent();
         this.components.sortingCompletion = new SortingCompletionComponent(this.learningManager, this.app);
         this.components.explanationModal = new ExplanationModalComponent();
@@ -67,11 +67,11 @@ export class UIManager {
     }
 
     showFlashcardSummary(count) {
-        this.components.gameSummary.showFlashcardSummary(count);
+        this.components.learningSummary.showFlashcardSummary(count);
     }
 
     showMatchingSummary(matchedPairs, moduleData) {
-        this.components.gameSummary.showMatchingSummary(matchedPairs, moduleData);
+        this.components.learningSummary.showMatchingSummary(matchedPairs, moduleData);
     }
 
     updateFooterVisibility(currentView) {

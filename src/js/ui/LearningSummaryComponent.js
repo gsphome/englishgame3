@@ -1,7 +1,7 @@
 import { BaseComponent } from './BaseComponent.js';
 import { MESSAGES } from '../i18n.js';
 
-export class GameSummaryComponent extends BaseComponent {
+export class LearningSummaryComponent extends BaseComponent {
     constructor(learningManager, app) {
         super();
         this.learningManager = learningManager;
