@@ -16,6 +16,7 @@ export class SortingCompletionComponent extends BaseComponent {
         wordsContainer.id = 'sorting-completion-words-container';
 
         this.updateText();
+        this.setupButtonListeners();
 
         const existingContainer = this.modal.querySelector('#sorting-completion-words-container');
         if (existingContainer) {
@@ -62,6 +63,25 @@ export class SortingCompletionComponent extends BaseComponent {
         if (message) message.textContent = MESSAGES.get('sortingCompletionMessage');
         if (replayBtn) replayBtn.textContent = MESSAGES.get('replayButton');
         if (backToMenuBtn) backToMenuBtn.textContent = MESSAGES.get('backToMenu');
+    }
+
+    setupButtonListeners() {
+        const replayBtn = document.getElementById('sorting-completion-replay-btn');
+        const backToMenuBtn = document.getElementById('sorting-completion-back-to-menu-btn');
+
+        if (replayBtn) {
+            this.addListener(replayBtn, 'click', () => {
+                this.modal.classList.add('hidden');
+                this.learningManager.replayModule();
+            });
+        }
+
+        if (backToMenuBtn) {
+            this.addListener(backToMenuBtn, 'click', () => {
+                this.modal.classList.add('hidden');
+                this.app.renderMenu();
+            });
+        }
     }
 
     showExplanationModal(modalElement, wordData) {
