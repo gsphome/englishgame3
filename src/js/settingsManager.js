@@ -44,7 +44,7 @@ class SettingsManager {
         let current = this.settings;
         const path = keyPath.split('.');
         for (let i = 0; i < path.length; i++) {
-            if (current === null || typeof current !== 'object' || !current.hasOwnProperty(path[i])) {
+            if (current === null || typeof current !== 'object' || !Object.prototype.hasOwnProperty.call(current, path[i])) {
                 return undefined; // Or throw an error, depending on desired behavior
             }
             current = current[path[i]];
@@ -59,7 +59,7 @@ class SettingsManager {
 
         for (let i = 0; i < lastKeyIndex; i++) {
             const key = path[i];
-            if (current === null || typeof current !== 'object' || !current.hasOwnProperty(key)) {
+            if (current === null || typeof current !== 'object' || !Object.prototype.hasOwnProperty.call(current, key)) {
                 // Create the path if it doesn't exist
                 current[key] = {};
             }

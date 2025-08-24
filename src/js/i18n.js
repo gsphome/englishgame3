@@ -76,6 +76,8 @@ export const MESSAGES = {
         // Game Modes - Sorting
         sortingGameTitle: "Juego de Clasificación de Palabras",
         sortingCompletionTitle: "¡Modo de Clasificación Completado!",
+        flashcardSummaryTitle: "Resumen de Flashcards",
+        matchingSummaryTitle: "Resumen de Emparejamiento",
         sortingCompletionMessage: "¡Has clasificado todas las palabras correctamente!",
 
         // Game Modes - Matching
@@ -183,6 +185,8 @@ export const MESSAGES = {
         // Game Modes - Sorting
         sortingGameTitle: "Word Sorting Game",
         sortingCompletionTitle: "Sorting Mode Completed!",
+        flashcardSummaryTitle: "Flashcard Summary",
+        matchingSummaryTitle: "Matching Summary",
         sortingCompletionMessage: "You have sorted all the words correctly!",
 
         // Game Modes - Matching

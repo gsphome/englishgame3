@@ -179,9 +179,6 @@ export const app = {
 
     addKeyboardListeners() {
         const modal = ui.modal;
-        const yesButton = ui.yesButton;
-        
-
         document.addEventListener('keydown', (e) => {
             const explanationModal = ui.explanationModal;
             const sortingCompletionModal = ui.sortingCompletionModal;
