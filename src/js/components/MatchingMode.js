@@ -77,7 +77,9 @@ class MatchingMode {
             // Correct match
             this.matchedPairs.push({
                 termId: this.selectedTerm.id,
-                definitionId: this.selectedDefinition.id
+                definitionId: this.selectedDefinition.id,
+                term: this.selectedTerm.element.textContent,
+                definition: this.selectedDefinition.element.textContent
             });
 
             // Visually confirm match and disable elements

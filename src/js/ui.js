@@ -40,7 +40,7 @@ export const ui = {
         // Initialize DOM elements
         this.modal = document.getElementById('confirmation-modal');
         this.flashcardSummaryContainer = document.getElementById('flashcard-summary-container');
-        this.matchingSummaryContainer = document.getElementById('matching-summary-container');
+        
         this.yesButton = document.getElementById('confirm-yes');
         this.noButton = document.getElementById('confirm-no');
         this.messageElement = document.getElementById('confirmation-message');
@@ -531,19 +531,24 @@ export const ui = {
         }
     },
 
-    updateMatchingSummaryText() {
-        const messageElement = document.getElementById('matching-summary-message');
-        const replayBtn = document.getElementById('matching-summary-replay-btn');
-        const backToMenuBtn = document.getElementById('matching-summary-back-to-menu-btn');
+    updateMatchingSummaryText(matchedPairs, moduleData) {
+        const modal = document.getElementById('matching-completion-modal');
+        if (!modal) return; // If modal doesn't exist, nothing to update
 
-        if (messageElement) {
-            messageElement.textContent = MESSAGES.get('matchingCompletionMessage');
-        }
-        if (replayBtn) {
-            replayBtn.textContent = MESSAGES.get('replayButton');
-        }
-        if (backToMenuBtn) {
-            backToMenuBtn.textContent = MESSAGES.get('backToMenu');
+        modal.querySelector('#matching-completion-title').textContent = MESSAGES.get('sessionScore');
+        modal.querySelector('#matching-completion-message').textContent = MESSAGES.get('matchingCompletionMessage');
+        modal.querySelector('#matching-completion-replay-btn').textContent = MESSAGES.get('replayButton');
+        modal.querySelector('#matching-completion-back-to-menu-btn').textContent = MESSAGES.get('backToMenu');
+        modal.querySelector('.grid.grid-cols-2.gap-2.font-bold.border-b-2.border-gray-300.pb-2.mb-2 > span:first-child').textContent = MESSAGES.get('terms');
+        modal.querySelector('.grid.grid-cols-2.gap-2.font-bold.border-b-2.border-gray-300.pb-2.mb-2 > span:last-child').textContent = MESSAGES.get('translationLabel');
+
+        // Update explanation buttons within the matched pairs grid
+        const matchedPairsGrid = document.getElementById('matched-pairs-grid');
+        if (matchedPairsGrid) {
+            matchedPairsGrid.querySelectorAll('.explanation-btn').forEach(button => {
+                button.title = MESSAGES.get('showExplanation');
+                button.ariaLabel = MESSAGES.get('showExplanation');
+            });
         }
     },
 
@@ -653,44 +658,87 @@ export const ui = {
     },
 
     showMatchingSummary(matchedPairs, moduleData) {
-        if (this.matchingSummaryContainer) {
-            const messageElement = document.getElementById('matching-summary-message');
-            const replayBtn = document.getElementById('matching-summary-replay-btn');
-            const backToMenuBtn = document.getElementById('matching-summary-back-to-menu-btn');
-            const pairsContainer = document.getElementById('matching-summary-pairs-container');
+        const appContainer = document.getElementById('app-container');
+        appContainer.classList.remove('main-menu-active');
 
-            if (messageElement) {
-                messageElement.textContent = MESSAGES.get('matchingCompletionMessage');
-            }
+        let modal = document.getElementById('matching-completion-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            
+            modal.id = 'matching-completion-modal';
+            modal.className = 'fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden';
+            modal.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-xl max-w-xl w-full text-center">
+                    <h2 id="matching-completion-title" class="text-2xl font-bold mb-4"></h2>
+                    <p id="matching-completion-message" class="text-xl mb-4"></p>
+                    <div class="mb-4 text-left max-h-60 overflow-y-auto pr-2">
+                        <div class="grid grid-cols-2 gap-2 font-bold border-b-2 border-gray-300 pb-2 mb-2">
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div id="matched-pairs-grid" class="grid grid-cols-2 gap-2">
+                            <!-- Matched pairs and explanation buttons will be listed here -->
+                        </div>
+                    </div>
+                    <div class="flex justify-center space-x-4">
+                        <button id="matching-completion-replay-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                        </button>
+                        <button id="matching-completion-back-to-menu-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
 
-            if (pairsContainer) {
-                pairsContainer.innerHTML = ''; // Clear previous content
-                matchedPairs.forEach(pair => {
-                    const pairElement = document.createElement('div');
-                    pairElement.className = 'text-lg mb-2';
-                    pairElement.textContent = `${pair.term} - ${pair.definition}`;
-                    pairsContainer.appendChild(pairElement);
-                });
-            }
-
-            if (replayBtn) {
-                replayBtn.textContent = MESSAGES.get('replayButton');
-                replayBtn.onclick = () => {
-                    this.toggleModal(this.matchingSummaryContainer, false);
-                    gameManager.replayModule();
-                };
-            }
-
-            if (backToMenuBtn) {
-                backToMenuBtn.textContent = MESSAGES.get('backToMenu');
-                backToMenuBtn.onclick = () => {
-                    this.toggleModal(this.matchingSummaryContainer, false);
-                    this.app.renderMenu();
-                };
-            }
-
-            this.toggleModal(this.matchingSummaryContainer, true);
+            document.getElementById('matching-completion-replay-btn').addEventListener('click', () => {
+                modal.classList.add('hidden');
+                gameManager.startModule(this.app.currentModule.id);
+            });
+            document.getElementById('matching-completion-back-to-menu-btn').addEventListener('click', () => {
+                modal.classList.add('hidden');
+                this.app.renderMenu();
+            });
         }
+
+        this.updateMatchingSummaryText(matchedPairs, moduleData);
+
+        const matchedPairsGrid = document.getElementById('matched-pairs-grid');
+        matchedPairsGrid.innerHTML = '';
+
+        matchedPairs.forEach(pair => {
+            const termData = moduleData.data.find(item => item.id === pair.termId);
+            if (termData) {
+                const termSpan = document.createElement('span');
+                termSpan.className = 'font-semibold';
+                termSpan.textContent = termData.term;
+                matchedPairsGrid.appendChild(termSpan);
+
+                const translationContainer = document.createElement('div');
+                translationContainer.className = 'flex items-center justify-between';
+
+                const translationSpan = document.createElement('span');
+                translationSpan.textContent = termData.term_es;
+                translationContainer.appendChild(translationSpan);
+
+                const explanationButton = document.createElement('button');
+                explanationButton.className = 'explanation-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-md text-sm justify-self-center mr-1';
+                explanationButton.innerHTML = '&#x2139;';
+                explanationButton.title = MESSAGES.get('showExplanation');
+                explanationButton.ariaLabel = MESSAGES.get('showExplanation');
+                explanationButton.addEventListener('click', () => {
+                    this.showExplanationModal(this.explanationModal, {
+                        word: termData.term,
+                        translation_es: termData.term_es,
+                        example: termData.explanation,
+                        example_es: termData.explanation_es
+                    });
+                });
+                translationContainer.appendChild(explanationButton);
+                matchedPairsGrid.appendChild(translationContainer);
+            }
+        });
+
+        modal.classList.remove('hidden');
     },
 
     updateSettingsModalText() {

@@ -142,5 +142,11 @@ export const gameManager = {
                 }
                 break;
         }
+    },
+
+    replayModule() {
+        if (this.currentModule) {
+            this.startModule(this.currentModule.id);
+        }
     }
 };
