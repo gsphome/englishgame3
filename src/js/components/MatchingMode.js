@@ -242,6 +242,8 @@ class MatchingMode {
         if (explanationModal && !explanationModal.classList.contains('hidden')) {
             if (e.key === 'Enter' || e.key === 'Escape') {
                 document.getElementById('close-explanation-modal-btn').click();
+                e.preventDefault();
+                e.stopPropagation();
             }
             return; // Consume event if explanation modal is handled
         }
