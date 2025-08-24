@@ -92,6 +92,8 @@ export class SettingsModalComponent extends ModalComponent {
         mainTitle.className = 'text-base font-semibold mb-3 text-center text-gray-800';
         mainTitle.textContent = MESSAGES.get('settingsTitle');
         this.formContainer.appendChild(mainTitle);
+        
+        this.createGroupTitle('General');
 
         this.buildForm(settings);
         
@@ -100,9 +102,9 @@ export class SettingsModalComponent extends ModalComponent {
 
     buildForm(obj, prefix = '') {
         // Define order for learningSettings properties
-        const learningOrder = ['categories', 'flashcardMode', 'quizMode', 'completionMode', 'sortingMode', 'matchingMode'];
+        const learningOrder = ['flashcardMode', 'quizMode', 'completionMode', 'sortingMode', 'matchingMode'];
         // Define order for root level properties
-        const rootOrder = ['defaultLanguage', 'categories', 'level', 'learningSettings'];
+        const rootOrder = ['defaultLanguage', 'level', 'learningSettings'];
         
         let keys = Object.keys(obj);
         
@@ -136,6 +138,9 @@ export class SettingsModalComponent extends ModalComponent {
                     this.createCategoriesSelect(keyPath, obj[key]);
                 }
             } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                if (keyPath === 'learningSettings') {
+                    this.createGroupTitle('Items');
+                }
                 this.buildForm(obj[key], keyPath);
             } else {
                 this.createInputField(keyPath, obj[key]);
@@ -170,7 +175,7 @@ export class SettingsModalComponent extends ModalComponent {
 
     createLanguageSelect(value, keyPath) {
         const select = document.createElement('select');
-        select.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-20 text-center focus:ring-1 focus:ring-blue-400';
+        select.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-28 text-center focus:ring-1 focus:ring-blue-400';
         select.dataset.keyPath = keyPath;
         
         const enOption = document.createElement('option');
@@ -190,7 +195,7 @@ export class SettingsModalComponent extends ModalComponent {
 
     createLevelSelect(value, keyPath) {
         const select = document.createElement('select');
-        select.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-20 text-center focus:ring-1 focus:ring-blue-400';
+        select.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-28 text-center focus:ring-1 focus:ring-blue-400';
         select.dataset.keyPath = keyPath;
         
         const levels = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
@@ -209,7 +214,7 @@ export class SettingsModalComponent extends ModalComponent {
     createNumberInput(value, keyPath) {
         const input = document.createElement('input');
         input.type = 'number';
-        input.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-20 text-center focus:ring-1 focus:ring-blue-400';
+        input.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-28 text-center focus:ring-1 focus:ring-blue-400';
         input.value = value;
         input.dataset.keyPath = keyPath;
         input.min = "1";
@@ -248,6 +253,13 @@ export class SettingsModalComponent extends ModalComponent {
     createSectionTitle(keyPath) {
         // Skip section titles for cleaner look
         return;
+    }
+
+    createGroupTitle(title) {
+        const groupTitle = document.createElement('h3');
+        groupTitle.className = 'text-xs font-semibold text-gray-500 mt-2 mb-1 uppercase tracking-wide';
+        groupTitle.textContent = title;
+        this.formContainer.appendChild(groupTitle);
     }
 
     createArrayDisplay(keyPath, array) {
@@ -396,7 +408,7 @@ export class SettingsModalComponent extends ModalComponent {
         settingRow.appendChild(label);
 
         const select = document.createElement('select');
-        select.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-20 focus:ring-1 focus:ring-blue-400';
+        select.className = 'border border-gray-300 rounded px-2 py-1 text-xs w-28 focus:ring-1 focus:ring-blue-400';
         select.dataset.keyPath = keyPath;
         select.multiple = true;
         select.size = 2;
