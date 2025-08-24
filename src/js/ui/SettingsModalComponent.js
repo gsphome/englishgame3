@@ -213,13 +213,8 @@ export class SettingsModalComponent extends ModalComponent {
         }
         if (this.closeBtn) {
             this.closeBtn.textContent = MESSAGES.get('closeButton');
-            // Fix dark mode visibility
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            if (isDarkMode) {
-                this.closeBtn.classList.add('text-white');
-            } else {
-                this.closeBtn.classList.remove('text-white');
-            }
+            // Ensure proper contrast regardless of theme
+            this.closeBtn.className = 'bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200';
         }
     }
 }
