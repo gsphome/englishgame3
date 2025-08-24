@@ -5,6 +5,16 @@ export class HeaderComponent extends BaseComponent {
     constructor(auth) {
         super();
         this.auth = auth;
+        this.setupHamburgerListener();
+    }
+
+    setupHamburgerListener() {
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        if (hamburgerBtn) {
+            this.addListener(hamburgerBtn, 'click', () => {
+                document.body.classList.add('hamburger-menu-open');
+            });
+        }
     }
 
     render() {
@@ -25,6 +35,7 @@ export class HeaderComponent extends BaseComponent {
         scoreContainer?.classList.remove('hidden');
         usernameDisplay?.classList.remove('hidden');
         hamburgerBtn?.classList.remove('hidden');
+        this.setupHamburgerListener(); // Re-setup listener
     }
 
     hideUserElements(scoreContainer, usernameDisplay, hamburgerBtn) {
