@@ -101,6 +101,8 @@ export class SettingsModalComponent extends ModalComponent {
     buildForm(obj, prefix = '') {
         // Define order for learningSettings properties
         const learningOrder = ['flashcardMode', 'quizMode', 'completionMode', 'sortingMode', 'matchingMode'];
+        // Define order for root level properties
+        const rootOrder = ['defaultLanguage', 'level', 'learningSettings'];
         
         let keys = Object.keys(obj);
         
@@ -109,6 +111,16 @@ export class SettingsModalComponent extends ModalComponent {
             keys = keys.sort((a, b) => {
                 const aIndex = learningOrder.indexOf(a);
                 const bIndex = learningOrder.indexOf(b);
+                if (aIndex === -1 && bIndex === -1) return 0;
+                if (aIndex === -1) return 1;
+                if (bIndex === -1) return -1;
+                return aIndex - bIndex;
+            });
+        } else if (prefix === '') {
+            // Sort root level keys
+            keys = keys.sort((a, b) => {
+                const aIndex = rootOrder.indexOf(a);
+                const bIndex = rootOrder.indexOf(b);
                 if (aIndex === -1 && bIndex === -1) return 0;
                 if (aIndex === -1) return 1;
                 if (bIndex === -1) return -1;
