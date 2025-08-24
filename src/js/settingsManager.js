@@ -13,7 +13,7 @@ class SettingsManager {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             this.settings = await response.json();
-            console.log('Settings loaded:', this.settings);
+            
         } catch (error) {
             console.error('Failed to load settings, using default:', error);
             // Fallback to default settings if loading fails
