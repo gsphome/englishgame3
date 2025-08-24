@@ -101,7 +101,7 @@ export class SettingsModalComponent extends ModalComponent {
     }
 
     buildForm(obj, prefix = '') {
-        // Define order for learningSettings properties  
+        // Define order for learningSettings properties (exclude categories)
         const learningOrder = ['flashcardMode', 'quizMode', 'completionMode', 'sortingMode', 'matchingMode'];
         // Define order for root level properties
         const rootOrder = ['defaultLanguage', 'level', 'learningSettings'];
@@ -135,8 +135,9 @@ export class SettingsModalComponent extends ModalComponent {
             const keyPath = prefix ? `${prefix}.${key}` : key;
             
             if (Array.isArray(obj[key])) {
-                if (keyPath === 'learningSettings.categories' || keyPath === 'categories') {
-                    this.createCategoriesSelect(keyPath, obj[key]);
+                // Skip categories array in learningSettings as it's handled separately
+                if (keyPath === 'learningSettings.categories') {
+                    continue;
                 }
             } else if (typeof obj[key] === 'object' && obj[key] !== null) {
                 if (keyPath === 'learningSettings') {
