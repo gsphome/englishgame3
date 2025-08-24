@@ -1,8 +1,8 @@
 // src/js/ui.js
-import { MESSAGES } from './i18n.js'; // Assuming i18n.js is the new name for messages
-import { auth } from './auth.js'; // For renderHeader and logout
-import { gameManager } from './gameManager.js'; // Import gameManager module
-import { settingsManager } from './settingsManager.js'; // Import settingsManager module
+import { MESSAGES } from './i18n.js';
+import { auth } from './auth.js';
+import { gameManager } from './gameManager.js';
+import { settingsManager } from './settingsManager.js';
 
 export const ui = {
     // Properties (will be initialized in init)
@@ -34,8 +34,8 @@ export const ui = {
     flashcardSummaryContainer: null,
     matchingSummaryContainer: null,
 
-    init(appInstance) { // Pass app instance to allow calling app methods
-        this.app = appInstance; // Store app instance
+    init(appInstance) {
+        this.app = appInstance;
 
         // Initialize DOM elements
         this.modal = document.getElementById('confirmation-modal');
@@ -64,7 +64,6 @@ export const ui = {
         this.settingsFormContainer = document.getElementById('settings-form-container');
         this.settingsCloseBtn = document.getElementById('settings-close-btn');
         this.settingsSaveBtn = document.getElementById('settings-save-btn');
-
 
         // Setup all event listeners
         this.setupConfirmationModalListeners();
@@ -136,9 +135,7 @@ export const ui = {
             usernameDisplay.classList.remove('hidden');
             hamburgerBtn.classList.remove('hidden');
             hamburgerBtn.addEventListener('click', () => this.toggleHamburgerMenu(true));
-            // Original renderHeaderUtil from utils.js is now this.renderHeader
-            // This function is now part of ui.js, so it will handle its own rendering.
-            // The app.js will call ui.renderHeader()
+            
             const isDarkMode = document.body.classList.contains('dark-mode');
             const correctColor = isDarkMode ? 'text-green-400' : 'text-green-700';
             const incorrectColor = isDarkMode ? 'text-red-400' : 'text-red-700';
@@ -226,7 +223,7 @@ export const ui = {
         }
         if (this.menuRandomModeBtn) {
             this.menuRandomModeBtn.addEventListener('click', () => {
-                this.app.randomMode = !this.app.randomMode; // Update app's randomMode
+                this.app.randomMode = !this.app.randomMode;
                 localStorage.setItem('randomMode', this.app.randomMode);
                 this.updateMenuText();
             });
@@ -271,7 +268,7 @@ export const ui = {
         if (this.aboutBtn && this.aboutModal && this.closeAboutModalBtn) {
             this.aboutBtn.addEventListener('click', () => {
                 this.aboutModal.classList.remove('hidden');
-                if (this.hamburgerMenu) { // Ensure hamburger menu is defined
+                if (this.hamburgerMenu) {
                     this.hamburgerMenu.classList.remove('translate-x-0');
                     this.hamburgerMenu.classList.add('translate-x-full');
                 }
@@ -280,15 +277,6 @@ export const ui = {
             this.closeAboutModalBtn.addEventListener('click', () => {
                 this.aboutModal.classList.add('hidden');
             });
-
-            // This listener was on menuOverlay in app.js, but it's more specific to aboutModal here
-            // if (this.menuOverlay) {
-            //     this.menuOverlay.addEventListener('click', () => {
-            //         if (!this.aboutModal.classList.contains('hidden')) {
-            //             this.aboutModal.classList.add('hidden');
-            //         }
-            //     });
-            // }
 
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter' && !this.aboutModal.classList.contains('hidden')) {
@@ -303,7 +291,7 @@ export const ui = {
             this.menuSettingsBtn.addEventListener('click', () => {
                 this.toggleHamburgerMenu(false);
                 this.toggleModal(this.settingsModal, true);
-                this.renderSettingsForm(false); // Render in read-only mode initially
+                this.renderSettingsForm();
                 this.updateSettingsModalText();
             });
         }
@@ -327,14 +315,12 @@ export const ui = {
     keyPathToI18nKey(keyPath) {
         const parts = keyPath.split('.');
         if (parts[0] === 'gameSettings' && parts.length > 1) {
-            // For game settings, remove 'gameSettings' prefix and capitalize the rest
             let i18nKey = 'settings';
             for (let i = 1; i < parts.length; i++) {
                 i18nKey += parts[i].charAt(0).toUpperCase() + parts[i].slice(1);
             }
             return i18nKey;
         } else {
-            // For other settings, prepend 'settings' and capitalize each part
             let i18nKey = 'settings';
             for (const part of parts) {
                 i18nKey += part.charAt(0).toUpperCase() + part.slice(1);
@@ -343,34 +329,28 @@ export const ui = {
         }
     },
 
-    
-
     renderSettingsForm() {
-        this.settingsFormContainer.innerHTML = ''; // Clear previous form
-        const settings = settingsManager.settings; // Get current settings
+        this.settingsFormContainer.innerHTML = '';
+        const settings = settingsManager.settings;
 
-        // Add main title
         const mainTitle = document.createElement('h2');
-        mainTitle.className = 'text-lg font-bold mb-2 text-center'; // Smaller title, reduced mb
+        mainTitle.className = 'text-lg font-bold mb-2 text-center';
         mainTitle.textContent = MESSAGES.get('settingsTitle');
         this.settingsFormContainer.appendChild(mainTitle);
 
-        // Helper to create input fields
         const createInputField = (keyPath, value, type = 'number') => {
             const settingRow = document.createElement('div');
-            settingRow.className = 'flex flex-col mb-1'; // Reduced mb
+            settingRow.className = 'flex flex-col mb-1';
 
             const label = document.createElement('label');
-            label.className = 'text-gray-700 text-sm font-semibold'; // Removed mb-0.5
+            label.className = 'text-gray-700 text-sm font-semibold';
             label.textContent = MESSAGES.get(this.keyPathToI18nKey(keyPath));
             settingRow.appendChild(label);
-
-            
 
             let inputElement;
             if (keyPath === 'defaultLanguage') {
                 inputElement = document.createElement('select');
-                inputElement.className = 'shadow appearance-none border rounded w-full py-0.5 px-1 text-gray-700 text-sm leading-tight focus:outline-none focus:shadow-outline'; // Reduced padding
+                inputElement.className = 'shadow appearance-none border rounded w-full py-0.5 px-1 text-gray-700 text-sm leading-tight focus:outline-none focus:shadow-outline';
                 inputElement.dataset.keyPath = keyPath;
                 const enOption = document.createElement('option');
                 enOption.value = 'en';
@@ -380,12 +360,12 @@ export const ui = {
                 esOption.value = 'es';
                 esOption.textContent = MESSAGES.get('languageEs');
                 inputElement.appendChild(esOption);
-                inputElement.value = value; // Set selected value
+                inputElement.value = value;
                 settingRow.appendChild(inputElement);
             } else {
                 inputElement = document.createElement('input');
                 inputElement.type = type;
-                inputElement.className = 'shadow appearance-none border rounded py-0.5 px-1 text-gray-700 text-sm leading-tight focus:outline-none focus:shadow-outline ' + (type === 'number' ? 'w-16 text-center' : 'w-full'); // Reduced padding, width
+                inputElement.className = 'shadow appearance-none border rounded py-0.5 px-1 text-gray-700 text-sm leading-tight focus:outline-none focus:shadow-outline ' + (type === 'number' ? 'w-16 text-center' : 'w-full');
                 inputElement.value = value;
                 inputElement.dataset.keyPath = keyPath;
 
@@ -398,22 +378,50 @@ export const ui = {
             return settingRow;
         };
 
-        // Recursively build form fields
         const buildForm = (obj, prefix = '') => {
             for (const key in obj) {
                 const keyPath = prefix ? `${prefix}.${key}` : key;
-                if (typeof obj[key] === 'object' && obj[key] !== null) {
-                    // If it's an object, create a section
+                
+                if (Array.isArray(obj[key])) {
+                    if (keyPath.startsWith('gameSettings.')) {
+                        const settingRow = document.createElement('div');
+                        settingRow.className = 'mb-2';
+
+                        const label = document.createElement('div');
+                        label.className = 'text-gray-700 text-sm font-semibold mb-1';
+                        label.textContent = keyPath === 'gameSettings.categories' ? MESSAGES.get('settingsCategories') : MESSAGES.get(this.keyPathToI18nKey(keyPath));
+                        settingRow.appendChild(label);
+
+                        const valueContainer = document.createElement('div');
+                        valueContainer.className = 'grid grid-cols-2 gap-1 text-xs';
+                        
+                        const categoryLabels = {
+                            'Vocabulary': '📚 Vocabulary',
+                            'Grammar': '📝 Grammar', 
+                            'PhrasalVerbs': '🔗 Phrasal Verbs',
+                            'Idioms': '💭 Idioms'
+                        };
+                        
+                        obj[key].forEach(item => {
+                            const itemSpan = document.createElement('span');
+                            itemSpan.className = 'bg-gray-100 text-gray-700 px-2 py-1 rounded text-center';
+                            itemSpan.textContent = categoryLabels[item] || item;
+                            valueContainer.appendChild(itemSpan);
+                        });
+                        
+                        settingRow.appendChild(valueContainer);
+                        this.settingsFormContainer.appendChild(settingRow);
+                    }
+                } else if (typeof obj[key] === 'object' && obj[key] !== null) {
                     const sectionTitle = document.createElement('h3');
-                    sectionTitle.className = 'text-base font-bold mt-2 mb-1 pb-0.5 border-b border-gray-200'; // Smaller font, reduced padding/margin, lighter border
+                    sectionTitle.className = 'text-base font-bold mt-2 mb-1 pb-0.5 border-b border-gray-200';
                     sectionTitle.textContent = MESSAGES.get(this.keyPathToI18nKey(keyPath));
                     this.settingsFormContainer.appendChild(sectionTitle);
                     buildForm(obj[key], keyPath);
                 } else {
-                    // Check if it's a game setting (e.g., matchingGame.wordCount)
                     if (keyPath.startsWith('gameSettings.')) {
                         const settingRow = document.createElement('div');
-                        settingRow.className = 'flex justify-between items-center mb-1'; // Flex to align label and value
+                        settingRow.className = 'flex justify-between items-center mb-1';
 
                         const label = document.createElement('span');
                         label.className = 'text-gray-700 text-sm font-semibold';
@@ -422,12 +430,11 @@ export const ui = {
 
                         const valueSpan = document.createElement('span');
                         valueSpan.className = 'text-gray-600 text-sm';
-                        valueSpan.textContent = obj[key]; // Display the current value
+                        valueSpan.textContent = obj[key];
                         settingRow.appendChild(valueSpan);
 
                         this.settingsFormContainer.appendChild(settingRow);
                     } else {
-                        // Assume it's a simple setting (number, string, boolean)
                         this.settingsFormContainer.appendChild(createInputField(keyPath, obj[key]));
                     }
                 }
@@ -436,8 +443,6 @@ export const ui = {
 
         buildForm(settings);
 
-        // Adjust button visibility - Save and Close are always visible
-        // The edit button is removed from the DOM entirely.
         this.settingsSaveBtn.classList.remove('hidden');
         this.settingsCloseBtn.classList.remove('hidden');
     },
@@ -447,7 +452,6 @@ export const ui = {
         this.settingsFormContainer.querySelectorAll('input[data-key-path], select[data-key-path]').forEach(input => {
             const keyPath = input.dataset.keyPath;
             let value = input.value;
-            // Convert to number if it was originally a number and not defaultLanguage
             if (input.type === 'number' && !isNaN(value) && !isNaN(parseFloat(value))) {
                 value = parseFloat(value);
             }
@@ -460,10 +464,8 @@ export const ui = {
         for (const keyPath in formData) {
             settingsManager.setSetting(keyPath, formData[keyPath]);
         }
-        // No need to re-render in read-only mode, just close the modal
     },
 
-    // UI update methods (moved from app.js)
     updateMenuText() {
         if (this.menuLangToggleBtn) {
             const currentLang = MESSAGES.getLanguage();
@@ -477,7 +479,7 @@ export const ui = {
             this.menuDarkModeToggleBtn.innerHTML = isDarkMode ? `${MESSAGES.get('lightMode')}${MESSAGES.get('lightModeIcon')}` : `${MESSAGES.get('darkMode')}${MESSAGES.get('darkModeIcon')}`;
         }
         if (this.menuRandomModeBtn) {
-            this.menuRandomModeBtn.innerHTML = `${MESSAGES.get('randomMode')} ${this.app.randomMode ? MESSAGES.get('onText') : MESSAGES.get('offText')}`; // Use this.app.randomMode
+            this.menuRandomModeBtn.innerHTML = `${MESSAGES.get('randomMode')} ${this.app.randomMode ? MESSAGES.get('onText') : MESSAGES.get('offText')}`;
         }
         if (this.aboutBtn) {
             this.aboutBtn.innerHTML = `${MESSAGES.get('aboutButton')} ${MESSAGES.aboutIcon}`;
@@ -486,7 +488,6 @@ export const ui = {
             this.menuSettingsBtn.innerHTML = `${MESSAGES.get('settingsButton')} ${MESSAGES.settingsIcon}`;
         }
 
-        // Update sorting completion modal text if visible
         if (this.sortingCompletionModal && !this.sortingCompletionModal.classList.contains('hidden')) {
             document.getElementById('sorting-completion-title').textContent = MESSAGES.get('sortingCompletionTitle');
             document.getElementById('sorting-completion-message').textContent = MESSAGES.get('sortingCompletionMessage');
@@ -519,10 +520,6 @@ export const ui = {
         const replayBtn = document.getElementById('flashcard-summary-replay-btn');
         const backToMenuBtn = document.getElementById('flashcard-summary-back-to-menu-btn');
 
-        if (messageElement) {
-            // The actual message with count is set in showFlashcardSummary
-            // This function primarily updates static text like button labels
-        }
         if (replayBtn) {
             replayBtn.textContent = MESSAGES.get('replayButton');
         }
@@ -533,7 +530,7 @@ export const ui = {
 
     updateMatchingSummaryText(matchedPairs, moduleData) {
         const modal = document.getElementById('matching-completion-modal');
-        if (!modal) return; // If modal doesn't exist, nothing to update
+        if (!modal) return;
 
         modal.querySelector('#matching-completion-title').textContent = MESSAGES.get('sessionScore');
         modal.querySelector('#matching-completion-message').textContent = MESSAGES.get('matchingCompletionMessage');
@@ -542,7 +539,6 @@ export const ui = {
         modal.querySelector('.grid.grid-cols-2.gap-2.font-bold.border-b-2.border-gray-300.pb-2.mb-2 > span:first-child').textContent = MESSAGES.get('terms');
         modal.querySelector('.grid.grid-cols-2.gap-2.font-bold.border-b-2.border-gray-300.pb-2.mb-2 > span:last-child').textContent = MESSAGES.get('translationLabel');
 
-        // Update explanation buttons within the matched pairs grid
         const matchedPairsGrid = document.getElementById('matched-pairs-grid');
         if (matchedPairsGrid) {
             matchedPairsGrid.querySelectorAll('.explanation-btn').forEach(button => {
@@ -571,7 +567,6 @@ export const ui = {
             backToMenuBtn.textContent = MESSAGES.get('backToMenu');
         }
 
-        // Update explanation buttons within the words container
         const wordsContainer = document.getElementById('sorting-completion-words-container');
         if (wordsContainer) {
             wordsContainer.querySelectorAll('.explanation-btn').forEach(button => {
@@ -594,9 +589,6 @@ export const ui = {
             existingWordsContainer.remove();
         }
 
-        // This part needs access to app.sortingModule, which is in app.js.
-        // We need to pass app.sortingModule or the relevant data to ui.js
-        // For now, I'll assume app.sortingModule is accessible via this.app
         const presentedWords = gameManager.sortingModule.words;
         const wordsToExplain = moduleData.data.filter(item => presentedWords.includes(item.word));
 

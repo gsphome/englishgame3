@@ -111,6 +111,7 @@ export const MESSAGES = {
         settingsQuizGameQuestionCount: "Quiz: #Preguntas",
         settingsSortingGameWordCount: "Sorting: #Elementos",
         settingsCompletionGameItemCount: "Completation: #Elementos",
+        settingsCategories: "Categorías Disponibles",
         settingsTitle: "Ajustes",
     },
     en: {
@@ -220,6 +221,7 @@ export const MESSAGES = {
         settingsMatchingGameWordCount: "Matching: #Words",
         settingsQuizGameQuestionCount: "Quiz: #Questions",
         settingsSortingGameWordCount: "Sorting: #Items",
+        settingsCategories: "Available Categories",
         settingsTitle: "Settings",
     },
 
