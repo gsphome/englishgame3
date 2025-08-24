@@ -11,9 +11,9 @@ import { SettingsModalComponent } from './SettingsModalComponent.js';
 import { MESSAGES } from '../i18n.js';
 
 export class UIManager {
-    constructor(auth, gameManager, app) {
+    constructor(auth, learningManager, app) {
         this.auth = auth;
-        this.gameManager = gameManager;
+        this.learningManager = learningManager;
         this.app = app;
         this.components = {};
         this.init();
@@ -24,9 +24,9 @@ export class UIManager {
         this.components.header = new HeaderComponent(this.auth);
         this.components.hamburgerMenu = new HamburgerMenuComponent(this.app);
         this.components.confirmationModal = new ConfirmationModalComponent(this.auth);
-        this.components.gameSummary = new GameSummaryComponent(this.gameManager, this.app);
+        this.components.gameSummary = new GameSummaryComponent(this.learningManager, this.app);
         this.components.footer = new FooterComponent();
-        this.components.sortingCompletion = new SortingCompletionComponent(this.gameManager, this.app);
+        this.components.sortingCompletion = new SortingCompletionComponent(this.learningManager, this.app);
         this.components.explanationModal = new ExplanationModalComponent();
         this.components.aboutModal = new AboutModalComponent();
         this.components.settingsModal = new SettingsModalComponent();

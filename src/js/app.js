@@ -1,22 +1,22 @@
 import { auth } from './auth.js';
 import { MESSAGES } from './i18n.js';
 import { ui } from './ui.js';
-import { gameManager } from './gameManager.js'; // Import gameManager module
+import { learningManager } from './learningManager.js'; // Import learningManager module
 import { settingsManager } from './settingsManager.js'; // Import settingsManager module
 
 import { shuffleArray, getGameModeIconSvg } from './utils.js';
-import { fetchAllLearningModules, fetchAppConfig, getAppConfig } from './dataManager.js'; // fetchModuleData moved to gameManager
+import { fetchAllLearningModules, fetchAppConfig, getAppConfig } from './dataManager.js'; // fetchModuleData moved to learningManager
 
 /**
  * @file Manages the main application flow, module initialization, and global state.
  * @namespace app
  */
 export const app = {
-    shuffleArray: shuffleArray, // Still a property of app, used by gameManager
+    shuffleArray: shuffleArray, // Still a property of app, used by learningManager
     modal: null, // Confirmation modal reference
     menuScrollPosition: 0,
     currentView: null,
-    currentModule: null, // Now updated by gameManager
+    currentModule: null, // Now updated by learningManager
     randomMode: true,
     startX: 0, // For swipe listeners
     startY: 0, // For swipe listeners
@@ -44,11 +44,11 @@ export const app = {
 
         ui.init(this); // Initialize UI module, pass app instance
         this.ui = ui; // Add reference for components to access
-        gameManager.init(this, appConfig.gameSettings); // Initialize GameManager, pass app instance and game settings
-        window.gameManager = gameManager; // Expose globally for settings updates
+        learningManager.init(this, appConfig.learningSettings); // Initialize LearningManager, pass app instance and learning settings
+        window.learningManager = learningManager; // Expose globally for settings updates
 
-        // All game module instantiation moved to gameManager.init()
-        // All gameCallbacks are now handled by gameManager
+        // All game module instantiation moved to learningManager.init()
+        // All gameCallbacks are now handled by learningManager
 
         this.addKeyboardListeners(); // Add this line to initialize global keyboard listeners
 
@@ -69,36 +69,36 @@ export const app = {
                 this.renderMenu();
                 break;
             case 'flashcard':
-                // Delegated to gameManager.startModule
-                gameManager.startModule(this.currentModule.id);
+                // Delegated to learningManager.startModule
+                learningManager.startModule(this.currentModule.id);
                 break;
             case 'quiz':
-                // Delegated to gameManager.startModule
-                gameManager.startModule(this.currentModule.id);
+                // Delegated to learningManager.startModule
+                learningManager.startModule(this.currentModule.id);
                 break;
             case 'completion':
-                // Delegated to gameManager.startModule
-                gameManager.startModule(this.currentModule.id);
+                // Delegated to learningManager.startModule
+                learningManager.startModule(this.currentModule.id);
                 break;
             case 'sorting':
-                // Delegated to gameManager.startModule
-                gameManager.startModule(this.currentModule.id);
+                // Delegated to learningManager.startModule
+                learningManager.startModule(this.currentModule.id);
                 break;
             case 'matching':
-                // Delegated to gameManager.startModule
-                gameManager.startModule(this.currentModule.id);
+                // Delegated to learningManager.startModule
+                learningManager.startModule(this.currentModule.id);
                 break;
         }
     },
 
-    // renderFlashcard method moved to gameManager.startModule
-    // renderQuiz method moved to gameManager.startModule
-    // renderCompletion method moved to gameManager.startModule
-    // renderSorting method moved to gameManager.startModule
-    // renderMatching method moved to gameManager.startModule
+    // renderFlashcard method moved to learningManager.startModule
+    // renderQuiz method moved to learningManager.startModule
+    // renderCompletion method moved to learningManager.startModule
+    // renderSorting method moved to learningManager.startModule
+    // renderMatching method moved to learningManager.startModule
 
     renderMenu() {
-        gameManager.removeCurrentModuleKeyboardListeners(); // Use gameManager's method
+        learningManager.removeCurrentModuleKeyboardListeners(); // Use learningManager's method
         document.body.classList.remove('module-active');
         this.currentView = 'menu';
         const sessionScoreDisplay = document.getElementById('session-score-display');
@@ -130,7 +130,7 @@ export const app = {
                 button.querySelector('[data-module-index]').textContent = `${String.fromCharCode(65 + index)}.`;
             }
             button.querySelector('[data-module-name]').textContent = module.name.replace(MESSAGES.get('flashcardPrefix'), '').replace(MESSAGES.get('quizPrefix'), '').replace(MESSAGES.get('completionPrefix'), '');
-            button.querySelector('[data-game-mode-icon]').innerHTML = getGameModeIconSvg(module.gameMode);
+            button.querySelector('[data-game-mode-icon]').innerHTML = getGameModeIconSvg(module.learningMode);
 
             moduleButtonsContainer.appendChild(button);
         });
@@ -155,7 +155,7 @@ export const app = {
                     this.menuScrollPosition = currentScrollWrapper.scrollTop;
                 }
                 const moduleId = button.dataset.moduleId;
-                gameManager.startModule(moduleId); // Use gameManager's method
+                learningManager.startModule(moduleId); // Use learningManager's method
             });
         });
         ui.updateFooterVisibility(this.currentView);
@@ -172,7 +172,7 @@ export const app = {
         return '760px';
     },
 
-    // startModule method moved to gameManager.js
+    // startModule method moved to learningManager.js
 
     handleEscapeKeyForMainMenu() {
         ui.messageElement.textContent = MESSAGES.get('confirmLogoutMessage');
@@ -251,25 +251,25 @@ export const app = {
                 if (Math.abs(diffX) > SWIPE_THRESHOLD) {
                     if (diffX > 0) { // Swiped right (prev)
                         if (this.currentView === 'flashcard') {
-                            gameManager.flashcardModule.prev(); // Use gameManager's module
+                            learningManager.flashcardModule.prev(); // Use learningManager's module
                         }
                     } else { // Swiped left (next)
                         if (this.currentView === 'flashcard') {
-                            gameManager.flashcardModule.next(); // Use gameManager's module
+                            learningManager.flashcardModule.next(); // Use learningManager's module
                         }
                     }
                 }
             } else { // Vertical swipe (for flashcard flip)
                 if (Math.abs(diffY) > SWIPE_THRESHOLD) {
                     if (this.currentView === 'flashcard') {
-                        gameManager.flashcardModule.flip(); // Use gameManager's module
+                        learningManager.flashcardModule.flip(); // Use learningManager's module
                     }
                 }
             }
         });
     },
 
-    // removeCurrentModuleKeyboardListeners method moved to gameManager.js
+    // removeCurrentModuleKeyboardListeners method moved to learningManager.js
 };
 
 document.addEventListener('DOMContentLoaded', () => {

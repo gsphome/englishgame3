@@ -1,7 +1,7 @@
 // src/js/ui.js
 import { MESSAGES } from './i18n.js';
 import { auth } from './auth.js';
-import { gameManager } from './gameManager.js';
+import { learningManager } from './learningManager.js';
 import { settingsManager } from './settingsManager.js';
 
 export const ui = {
@@ -245,7 +245,7 @@ export const ui = {
         if (this.sortingCompletionReplayBtn) {
             this.sortingCompletionReplayBtn.addEventListener('click', () => {
                 this.sortingCompletionModal.classList.add('hidden');
-                gameManager.startModule(this.app.currentModule.id);
+                learningManager.startModule(this.app.currentModule.id);
             });
         }
         if (this.sortingCompletionBackToMenuBtn) {
@@ -589,11 +589,11 @@ export const ui = {
             existingWordsContainer.remove();
         }
 
-        const presentedWords = gameManager.sortingModule.words;
+        const presentedWords = learningManager.sortingModule.words;
         const wordsToExplain = moduleData.data.filter(item => presentedWords.includes(item.word));
 
         const categoryMap = new Map();
-        gameManager.sortingModule.categories.forEach(cat => {
+        learningManager.sortingModule.categories.forEach(cat => {
             categoryMap.set(cat.category_id, cat.category_show);
         });
 
@@ -633,7 +633,7 @@ export const ui = {
                 replayBtn.textContent = MESSAGES.get('replayButton');
                 replayBtn.onclick = () => {
                     this.toggleModal(this.flashcardSummaryContainer, false);
-                    gameManager.replayModule();
+                    learningManager.replayModule();
                 };
             }
 
@@ -684,7 +684,7 @@ export const ui = {
 
             document.getElementById('matching-completion-replay-btn').addEventListener('click', () => {
                 modal.classList.add('hidden');
-                gameManager.startModule(this.app.currentModule.id);
+                learningManager.startModule(this.app.currentModule.id);
             });
             document.getElementById('matching-completion-back-to-menu-btn').addEventListener('click', () => {
                 modal.classList.add('hidden');

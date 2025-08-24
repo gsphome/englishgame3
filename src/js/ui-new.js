@@ -1,13 +1,13 @@
 // New UI implementation using SOLID principles
 import { UIManager } from './ui/UIManager.js';
 import { auth } from './auth.js';
-import { gameManager } from './gameManager.js';
+import { learningManager } from './learningManager.js';
 
 let uiManager = null;
 
 export const ui = {
     init(appInstance) {
-        uiManager = new UIManager(auth, gameManager, appInstance);
+        uiManager = new UIManager(auth, learningManager, appInstance);
     },
 
     // Delegate all methods to UIManager

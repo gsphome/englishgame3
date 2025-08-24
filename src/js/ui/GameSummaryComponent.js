@@ -2,9 +2,9 @@ import { BaseComponent } from './BaseComponent.js';
 import { MESSAGES } from '../i18n.js';
 
 export class GameSummaryComponent extends BaseComponent {
-    constructor(gameManager, app) {
+    constructor(learningManager, app) {
         super();
-        this.gameManager = gameManager;
+        this.learningManager = learningManager;
         this.app = app;
     }
 
@@ -32,7 +32,7 @@ export class GameSummaryComponent extends BaseComponent {
             replayBtn.textContent = MESSAGES.get('replayButton');
             replayBtn.onclick = () => {
                 container.classList.add('hidden');
-                this.gameManager.replayModule();
+                this.learningManager.replayModule();
             };
         }
 
@@ -90,7 +90,7 @@ export class GameSummaryComponent extends BaseComponent {
         if (replayBtn) {
             this.addListener(replayBtn, 'click', () => {
                 modal.classList.add('hidden');
-                this.gameManager.startModule(this.app.currentModule.id);
+                this.learningManager.startModule(this.app.currentModule.id);
             });
         }
 

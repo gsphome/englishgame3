@@ -9,7 +9,7 @@ import { auth } from './auth.js';
 import { ui } from './ui.js'; // Asumiendo que ui.js ya está disponible
 import { settingsManager } from './settingsManager.js';
 
-export const gameManager = {
+export const learningManager = {
     flashcardModule: null,
     quizModule: null,
     completionModule: null,
@@ -17,13 +17,13 @@ export const gameManager = {
     matchingModule: null,
     currentModule: null, // Referencia a los datos del módulo actualmente cargado
     appInstance: null, // Referencia a la instancia principal de app
-    gameSettings: null, // New: Store game settings
+    learningSettings: null, // Store learning settings
 
     init(appInstance, gameSettings) {
         this.appInstance = appInstance; // Almacenar la instancia de app para callbacks
-        this.gameSettings = gameSettings; // Store initial game settings
+        this.learningSettings = learningSettings; // Store initial learning settings
 
-        this.gameCallbacks = {
+        this.learningCallbacks = {
             renderMenu: this.appInstance.renderMenu.bind(this.appInstance), // Llamar al renderMenu de app
             showFlashcardSummary: ui.showFlashcardSummary.bind(ui),
             updateSessionScoreDisplay: ui.updateSessionScoreDisplay.bind(ui),
@@ -42,13 +42,13 @@ export const gameManager = {
 
     initializeModules() {
         // Get current settings from settingsManager
-        const currentSettings = settingsManager.settings.gameSettings;
+        const currentSettings = settingsManager.settings.learningSettings;
         
-        this.flashcardModule = new FlashcardModule(auth, MESSAGES, this.gameCallbacks, currentSettings.flashcardGame);
-        this.quizModule = new QuizModule(auth, MESSAGES, this.gameCallbacks, currentSettings.quizGame);
-        this.completionModule = new CompletionModule(auth, MESSAGES, this.gameCallbacks, currentSettings.completionGame);
-        this.sortingModule = new SortingModule(auth, MESSAGES, this.gameCallbacks, currentSettings.sortingGame);
-        this.matchingModule = new MatchingModule(auth, MESSAGES, this.gameCallbacks, currentSettings.matchingGame);
+        this.flashcardModule = new FlashcardModule(auth, MESSAGES, this.learningCallbacks, currentSettings.flashcardMode);
+        this.quizModule = new QuizModule(auth, MESSAGES, this.learningCallbacks, currentSettings.quizMode);
+        this.completionModule = new CompletionModule(auth, MESSAGES, this.learningCallbacks, currentSettings.completionMode);
+        this.sortingModule = new SortingModule(auth, MESSAGES, this.learningCallbacks, currentSettings.sortingMode);
+        this.matchingModule = new MatchingModule(auth, MESSAGES, this.learningCallbacks, currentSettings.matchingMode);
     },
 
     refreshModuleSettings() {
@@ -79,7 +79,7 @@ export const gameManager = {
             // Update gameCallbacks with the current isHistoryMode state
             this.gameCallbacks.isHistoryMode = isHistoryMode; // Set the history mode
 
-            switch (moduleWithData.gameMode) {
+            switch (moduleWithData.learningMode) {
                 case 'flashcard':
                     this.appInstance.currentView = 'flashcard';
                     document.body.classList.add('module-active');

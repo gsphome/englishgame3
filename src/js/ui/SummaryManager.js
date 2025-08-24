@@ -37,7 +37,7 @@ class FlashcardSummary extends BaseComponent {
         if (replayBtn) {
             this.addListener(replayBtn, 'click', () => {
                 this.hide();
-                this.app.gameManager.replayModule();
+                this.app.learningManager.replayModule();
             });
         }
         if (backToMenuBtn) {
@@ -108,7 +108,7 @@ class MatchingSummary {
     setupModalListeners(modal) {
         modal.querySelector('#matching-completion-replay-btn').addEventListener('click', () => {
             modal.classList.add('hidden');
-            this.app.gameManager.startModule(this.app.currentModule.id);
+            this.app.learningManager.startModule(this.app.currentModule.id);
         });
         modal.querySelector('#matching-completion-back-to-menu-btn').addEventListener('click', () => {
             modal.classList.add('hidden');
@@ -159,7 +159,7 @@ class SortingSummary extends BaseComponent {
         if (replayBtn) {
             this.addListener(replayBtn, 'click', () => {
                 this.hide();
-                this.app.gameManager.startModule(this.app.currentModule.id);
+                this.app.learningManager.startModule(this.app.currentModule.id);
             });
         }
         if (backToMenuBtn) {
@@ -196,7 +196,7 @@ class SortingSummary extends BaseComponent {
         wordsContainer.id = 'sorting-completion-words-container';
         wordsContainer.className = 'mt-4 mb-4 text-left pr-4';
 
-        const presentedWords = this.app.gameManager.sortingModule.words;
+        const presentedWords = this.app.learningManager.sortingModule.words;
         const wordsToExplain = moduleData.data.filter(item => presentedWords.includes(item.word));
 
         wordsToExplain.forEach(item => {

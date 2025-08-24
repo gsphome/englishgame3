@@ -253,13 +253,13 @@ export class SettingsModalComponent extends ModalComponent {
         // Save to localStorage for persistence
         localStorage.setItem('userSettings', JSON.stringify(settingsManager.settings));
         
-        // Notify gameManager to refresh module settings
-        if (window.gameManager && typeof window.gameManager.refreshModuleSettings === 'function') {
-            window.gameManager.refreshModuleSettings();
+        // Notify learningManager to refresh module settings
+        if (window.learningManager && typeof window.learningManager.refreshModuleSettings === 'function') {
+            window.learningManager.refreshModuleSettings();
             
             // If currently in a game, restart it with new settings
             if (window.app && window.app.currentModule) {
-                window.gameManager.startModule(window.app.currentModule.id);
+                window.learningManager.startModule(window.app.currentModule.id);
             }
         }
     }

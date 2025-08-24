@@ -2,9 +2,9 @@ import { BaseComponent } from './BaseComponent.js';
 import { MESSAGES } from '../i18n.js';
 
 export class SortingCompletionComponent extends BaseComponent {
-    constructor(gameManager, app) {
+    constructor(learningManager, app) {
         super();
-        this.gameManager = gameManager;
+        this.learningManager = learningManager;
         this.app = app;
         this.modal = document.getElementById('sorting-completion-modal');
     }
@@ -22,11 +22,11 @@ export class SortingCompletionComponent extends BaseComponent {
             existingContainer.remove();
         }
 
-        const presentedWords = this.gameManager.sortingModule.words;
+        const presentedWords = this.learningManager.sortingModule.words;
         const wordsToExplain = moduleData.data.filter(item => presentedWords.includes(item.word));
 
         const categoryMap = new Map();
-        this.gameManager.sortingModule.categories.forEach(cat => {
+        this.learningManager.sortingModule.categories.forEach(cat => {
             categoryMap.set(cat.category_id, cat.category_show);
         });
 
