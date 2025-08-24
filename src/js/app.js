@@ -45,6 +45,7 @@ export const app = {
         ui.init(this); // Initialize UI module, pass app instance
         this.ui = ui; // Add reference for components to access
         gameManager.init(this, appConfig.gameSettings); // Initialize GameManager, pass app instance and game settings
+        window.gameManager = gameManager; // Expose globally for settings updates
 
         // All game module instantiation moved to gameManager.init()
         // All gameCallbacks are now handled by gameManager

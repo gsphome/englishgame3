@@ -252,6 +252,11 @@ export class SettingsModalComponent extends ModalComponent {
         
         // Save to localStorage for persistence
         localStorage.setItem('userSettings', JSON.stringify(settingsManager.settings));
+        
+        // Notify gameManager to refresh module settings
+        if (window.gameManager && typeof window.gameManager.refreshModuleSettings === 'function') {
+            window.gameManager.refreshModuleSettings();
+        }
     }
 
     updateText() {

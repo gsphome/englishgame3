@@ -225,8 +225,15 @@ export const MESSAGES = {
         settingsTitle: "Settings",
     },
 
-    get(key) {
-        return this[this._currentLanguage][key];
+    get(key, variables = {}) {
+        let message = this[this._currentLanguage][key];
+        if (message && variables) {
+            // Replace {variable} with actual values
+            Object.keys(variables).forEach(variable => {
+                message = message.replace(new RegExp(`\{${variable}\}`, 'g'), variables[variable]);
+            });
+        }
+        return message;
     },
 
     setLanguage(lang) {

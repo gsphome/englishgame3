@@ -7,6 +7,7 @@ import { fetchModuleData } from './dataManager.js';
 import { MESSAGES } from './i18n.js';
 import { auth } from './auth.js';
 import { ui } from './ui.js'; // Asumiendo que ui.js ya está disponible
+import { settingsManager } from './settingsManager.js';
 
 export const gameManager = {
     flashcardModule: null,
@@ -20,7 +21,7 @@ export const gameManager = {
 
     init(appInstance, gameSettings) {
         this.appInstance = appInstance; // Almacenar la instancia de app para callbacks
-        this.gameSettings = gameSettings; // Store game settings
+        this.gameSettings = gameSettings; // Store initial game settings
 
         this.gameCallbacks = {
             renderMenu: this.appInstance.renderMenu.bind(this.appInstance), // Llamar al renderMenu de app
@@ -35,11 +36,24 @@ export const gameManager = {
             isHistoryMode: false, // Default to false
         };
 
-        this.flashcardModule = new FlashcardModule(auth, MESSAGES, this.gameCallbacks, this.gameSettings.flashcardGame);
-        this.quizModule = new QuizModule(auth, MESSAGES, this.gameCallbacks, this.gameSettings.quizGame);
-        this.completionModule = new CompletionModule(auth, MESSAGES, this.gameCallbacks, this.gameSettings.completionGame);
-        this.sortingModule = new SortingModule(auth, MESSAGES, this.gameCallbacks, this.gameSettings.sortingGame);
-        this.matchingModule = new MatchingModule(auth, MESSAGES, this.gameCallbacks, this.gameSettings.matchingGame);
+        // Initialize modules with dynamic settings
+        this.initializeModules();
+    },
+
+    initializeModules() {
+        // Get current settings from settingsManager
+        const currentSettings = settingsManager.settings.gameSettings;
+        
+        this.flashcardModule = new FlashcardModule(auth, MESSAGES, this.gameCallbacks, currentSettings.flashcardGame);
+        this.quizModule = new QuizModule(auth, MESSAGES, this.gameCallbacks, currentSettings.quizGame);
+        this.completionModule = new CompletionModule(auth, MESSAGES, this.gameCallbacks, currentSettings.completionGame);
+        this.sortingModule = new SortingModule(auth, MESSAGES, this.gameCallbacks, currentSettings.sortingGame);
+        this.matchingModule = new MatchingModule(auth, MESSAGES, this.gameCallbacks, currentSettings.matchingGame);
+    },
+
+    refreshModuleSettings() {
+        // Re-initialize modules with updated settings
+        this.initializeModules();
     },
 
     async startModule(moduleId, isHistoryMode = false) { // Added isHistoryMode parameter
