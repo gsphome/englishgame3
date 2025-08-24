@@ -1,10 +1,10 @@
 // src/js/modules/SortingModule.js
 
 class SortingMode {
-    constructor(authInstance, messagesInstance, gameCallbacks, settings) {
+    constructor(authInstance, messagesInstance, learningCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
-        this.gameCallbacks = gameCallbacks; // Object containing specific game functions
+        this.learningCallbacks = learningCallbacks; // Object containing specific game functions
         this.settings = settings; // New: Store game settings
 
         this.moduleData = null;
@@ -34,7 +34,7 @@ class SortingMode {
         this.appContainer = document.getElementById('app-container');
         // Determine the categories that will actually be rendered
         // this.categories now stores objects { category_id, category_show }
-        this.categories = this.gameCallbacks.shuffleArray([...module.categories]).slice(0, this.maxCategoriesToRender);
+        this.categories = this.learningCallbacks.shuffleArray([...module.categories]).slice(0, this.maxCategoriesToRender);
         this.userAnswers = {};
         this.originalWordPositions = {};
         this.sessionScore = { correct: 0, incorrect: 0 };
@@ -62,7 +62,7 @@ class SortingMode {
         });
 
         // Shuffle all words from the selected categories
-        allWordsFromSelectedCategories = this.gameCallbacks.shuffleArray(allWordsFromSelectedCategories);
+        allWordsFromSelectedCategories = this.learningCallbacks.shuffleArray(allWordsFromSelectedCategories);
 
         // Select a subset of these words for the game
         // Ensure at least one word from each *displayed* category if possible, then fill up to a total
@@ -91,7 +91,7 @@ class SortingMode {
         for (const categoryId in wordsPerCategory) { // Iterate over category_ids
             remainingWords = remainingWords.concat(wordsPerCategory[categoryId]);
         }
-        remainingWords = this.gameCallbacks.shuffleArray(remainingWords); // Shuffle remaining words
+        remainingWords = this.learningCallbacks.shuffleArray(remainingWords); // Shuffle remaining words
 
         let i = 0;
         while (selectedWords.length < this.settings.wordCount && i < remainingWords.length) {
@@ -102,7 +102,7 @@ class SortingMode {
             i++;
         }
 
-        this.words = this.gameCallbacks.shuffleArray(selectedWords); // Final shuffle of the words to be displayed
+        this.words = this.learningCallbacks.shuffleArray(selectedWords); // Final shuffle of the words to be displayed
         this.renderInitialView();
         this.render(); // Call the new render method after initial view is set up
         this.addKeyboardListeners();
@@ -144,7 +144,7 @@ class SortingMode {
         this.renderWords();
         this.renderCategories();
         this.addEventListeners();
-        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
+        this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
         this.updateText(); // Call updateText after rendering HTML
     }
 
@@ -179,11 +179,11 @@ class SortingMode {
         });
 
         if (allCorrect && this.sessionScore.correct === this.words.length) {
-            this.gameCallbacks.showSortingCompletionModal(this.moduleData);
+            this.learningCallbacks.showSortingCompletionModal(this.moduleData);
         }
         this.auth.updateGlobalScore(this.sessionScore); // Update global score on every check
         this.feedbackActive = true;
-        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
+        this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
     }
 
     undo() {
@@ -211,7 +211,7 @@ class SortingMode {
                 //     this.sessionScore.incorrect--;
                 //     auth.updateGlobalScore({ correct: 0, incorrect: -1 });
                 // }
-                this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
+                this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.words.length);
             }
         }
     }
@@ -388,7 +388,7 @@ class SortingMode {
         const categoriesContainer = document.getElementById('categories-container');
         categoriesContainer.innerHTML = ''; // Clear existing categories
         // Shuffle categories and then take the first 'maxCategoriesToRender'
-        const categoriesToRender = this.gameCallbacks.shuffleArray([...this.categories]).slice(0, this.maxCategoriesToRender);
+        const categoriesToRender = this.learningCallbacks.shuffleArray([...this.categories]).slice(0, this.maxCategoriesToRender);
         categoriesToRender.forEach(categoryObj => { // Changed 'category' to 'categoryObj'
             const categoryElem = document.createElement('div');
             categoryElem.id = 'category-' + categoryObj.category_id; // Use category_id for ID
@@ -403,7 +403,7 @@ class SortingMode {
     addEventListeners() {
         document.getElementById('check-btn').addEventListener('click', () => this.checkAnswers());
         document.getElementById('undo-btn').addEventListener('click', () => this.undo());
-        document.getElementById('back-to-menu-sorting-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
+        document.getElementById('back-to-menu-sorting-btn').addEventListener('click', () => this.learningCallbacks.renderMenu());
 
         // Add event listeners for word-bank
         const wordBank = document.getElementById('word-bank');

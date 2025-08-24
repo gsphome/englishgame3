@@ -1,10 +1,10 @@
 // src/js/modules/FlashcardModule.js
 
 class FlashcardMode {
-    constructor(authInstance, messagesInstance, gameCallbacks, settings) {
+    constructor(authInstance, messagesInstance, learningCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
-        this.gameCallbacks = gameCallbacks; // Object containing specific game functions
+        this.learningCallbacks = learningCallbacks; // Object containing specific game functions
         this.settings = settings; // New: Store game settings
 
         this.currentIndex = 0;
@@ -24,8 +24,8 @@ class FlashcardMode {
         this.appContainer = document.getElementById('app-container');
         this.isTransitioning = false;
         this.sessionScore = { correct: 0, incorrect: 0 }; // Initialize session score
-        if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
-            this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
+        if (this.learningCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
+            this.moduleData.data = this.learningCallbacks.shuffleArray([...this.moduleData.data]);
         }
         // Limit the number of flashcards based on settings
         if (this.settings && this.settings.wordCount && this.moduleData.data.length > this.settings.wordCount) {
@@ -39,7 +39,7 @@ class FlashcardMode {
     render() {
         if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
             console.error("Flashcard module data is invalid or empty.");
-            this.gameCallbacks.renderMenu();
+            this.learningCallbacks.renderMenu();
             return;
         }
         const cardData = this.moduleData.data[this.currentIndex];
@@ -81,7 +81,7 @@ class FlashcardMode {
             // Event listeners should be attached here, inside this if block
             document.getElementById('prev-btn').addEventListener('click', () => this.prev());
             document.getElementById('next-btn').addEventListener('click', () => this.next());
-            document.getElementById('back-to-menu-flashcard-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
+            document.getElementById('back-to-menu-flashcard-btn').addEventListener('click', () => this.learningCallbacks.renderMenu());
 
             const flashcardElement = document.querySelector('.flashcard');
             if (flashcardElement) {
@@ -112,7 +112,7 @@ class FlashcardMode {
             `;
         }
 
-        this.gameCallbacks.updateSessionScoreDisplay(0, 0, this.moduleData.data.length);
+        this.learningCallbacks.updateSessionScoreDisplay(0, 0, this.moduleData.data.length);
 
         // Update button texts regardless of whether the container was just created or already existed
         document.getElementById('prev-btn').textContent = this.MESSAGES.get('prevButton');
@@ -162,7 +162,7 @@ class FlashcardMode {
         if (this.isTransitioning) return;
 
         if (this.currentIndex >= this.moduleData.data.length - 1) {
-            this.gameCallbacks.showFlashcardSummary(this.moduleData.data.length);
+            this.learningCallbacks.showFlashcardSummary(this.moduleData.data.length);
             return;
         }
 
@@ -212,10 +212,10 @@ class FlashcardMode {
             this.sessionScore.incorrect++;
             this.auth.updateGlobalScore({ correct: 0, incorrect: 1 });
         }
-        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
 
         if (this.currentIndex >= this.moduleData.data.length - 1) {
-            this.gameCallbacks.showFlashcardSummary(this.moduleData.data.length);
+            this.learningCallbacks.showFlashcardSummary(this.moduleData.data.length);
         } else {
             this.next();
         }
@@ -278,7 +278,7 @@ class FlashcardMode {
                     card.classList.remove('flipped'); // Unflip the card
                     setTimeout(() => {
                         if (this.currentIndex === this.moduleData.data.length - 1) {
-                            this.gameCallbacks.showFlashcardSummary(this.moduleData.data.length);
+                            this.learningCallbacks.showFlashcardSummary(this.moduleData.data.length);
                         } else {
                             this.next();
                         }

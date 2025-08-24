@@ -1,10 +1,10 @@
 // src/js/modules/CompletionModule.js
 
 class CompletionMode {
-    constructor(authInstance, messagesInstance, gameCallbacks, settings) {
+    constructor(authInstance, messagesInstance, learningCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
-        this.gameCallbacks = gameCallbacks; // Object containing specific game functions
+        this.learningCallbacks = learningCallbacks; // Object containing specific game functions
         this.settings = settings; // New: Store game settings
 
         this.currentIndex = 0;
@@ -24,8 +24,8 @@ class CompletionMode {
         this.history = []; // Clear history on init
         this.moduleData = module;
         this.appContainer = document.getElementById('app-container');
-        if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
-            this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
+        if (this.learningCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
+            this.moduleData.data = this.learningCallbacks.shuffleArray([...this.moduleData.data]);
         }
         // Limit the number of items based on settings
         if (this.settings && this.settings.itemCount && this.moduleData.data.length > this.settings.itemCount) {
@@ -59,7 +59,7 @@ class CompletionMode {
     render() {
         if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
             console.error("Completion module data is invalid or empty.");
-            this.gameCallbacks.renderMenu();
+            this.learningCallbacks.renderMenu();
             return;
         }
         const questionData = this.moduleData.data[this.currentIndex];
@@ -74,7 +74,7 @@ class CompletionMode {
                         <div id="feedback-container" class="mt-6" style="min-height: 5rem;"></div>
                     </div>
                     <div class="flex justify-between mt-4">
-                        <button id="undo-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4" ${this.gameCallbacks.isHistoryMode ? 'disabled' : ''}></button>
+                        <button id="undo-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-lg md:py-2 md:px-4" ${this.learningCallbacks.isHistoryMode ? 'disabled' : ''}></button>
                         <div>
                             <button id="prev-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-l md:py-2 md:px-4"></button>
                             <button id="next-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded-r md:py-2 md:px-4"></button>
@@ -89,7 +89,7 @@ class CompletionMode {
             document.getElementById('prev-btn').addEventListener('click', () => this.prev());
             document.getElementById('next-btn').addEventListener('click', () => this.handleNextAction());
             document.getElementById('undo-btn').addEventListener('click', () => this.undo());
-            document.getElementById('back-to-menu-completion-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
+            document.getElementById('back-to-menu-completion-btn').addEventListener('click', () => this.learningCallbacks.renderMenu());
 
             // const inputElement = document.getElementById('completion-input'); // Moved outside
             // setTimeout(() => {
@@ -165,7 +165,7 @@ class CompletionMode {
         }
         inputElement.disabled = true;
         inputElement.classList.add('answered-input'); // Add this line
-        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
     }
 
     undo() {
@@ -180,7 +180,7 @@ class CompletionMode {
                 this.auth.updateGlobalScore({ correct: 0, incorrect: -1 });
             }
             this.currentIndex = lastAction.index;
-            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
             this.render(); // Re-render the UI for the undone question
         }
     }
@@ -229,7 +229,7 @@ class CompletionMode {
 
     showFinalScore() {
         this.auth.updateGlobalScore(this.sessionScore);
-        this.gameCallbacks.renderHeader();
+        this.learningCallbacks.renderHeader();
 
         this.appContainer.innerHTML = `
              <div id="completion-summary-container" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
@@ -245,7 +245,7 @@ class CompletionMode {
 
         const backToMenuButton = document.getElementById('completion-summary-back-to-menu-btn');
         if (backToMenuButton) {
-            backToMenuButton.addEventListener('click', () => this.gameCallbacks.renderMenu());
+            backToMenuButton.addEventListener('click', () => this.learningCallbacks.renderMenu());
         }
     }
 

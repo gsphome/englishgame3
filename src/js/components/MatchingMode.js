@@ -1,10 +1,10 @@
 // src/js/modules/MatchingModule.js
 
 class MatchingMode {
-    constructor(authInstance, messagesInstance, gameCallbacks, settings) {
+    constructor(authInstance, messagesInstance, learningCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
-        this.gameCallbacks = gameCallbacks; // Object containing specific game functions
+        this.learningCallbacks = learningCallbacks; // Object containing specific game functions
         this.settings = settings; // New: Store game settings
 
         this.currentIndex = 0;
@@ -33,8 +33,8 @@ class MatchingMode {
         this.selectedDefinition = null;
         this.matchedPairs = [];
         this.feedbackActive = false;
-        if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
-            this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
+        if (this.learningCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
+            this.moduleData.data = this.learningCallbacks.shuffleArray([...this.moduleData.data]);
         }
         // Limit the number of items based on settings
         if (this.settings && this.settings.wordCount && this.moduleData.data.length > this.settings.wordCount) {
@@ -95,12 +95,12 @@ class MatchingMode {
 
             // Update score (optional, can be done on final check)
             this.sessionScore.correct++;
-            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
 
         } else {
             // Incorrect match - provide temporary feedback
             this.sessionScore.incorrect++;
-            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
 
             const termElement = this.selectedTerm.element;
             const defElement = this.selectedDefinition.element;
@@ -126,7 +126,7 @@ class MatchingMode {
             this.feedbackActive = true; // Disable further interaction
             // Show the matching summary modal
             setTimeout(() => {
-                this.gameCallbacks.showMatchingSummary(this.matchedPairs, this.moduleData);
+                this.learningCallbacks.showMatchingSummary(this.matchedPairs, this.moduleData);
             }, 500);
         }
     }
@@ -150,7 +150,7 @@ class MatchingMode {
                 defElement.addEventListener('click', (e) => this.handleItemClick(e.target));
             }
             this.sessionScore.correct--;
-            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         }
     }
 
@@ -159,16 +159,16 @@ class MatchingMode {
     render() {
         if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
             console.error("Matching module data is invalid or empty.");
-            this.gameCallbacks.renderMenu();
+            this.learningCallbacks.renderMenu();
             return;
         }
         this.appContainer.classList.remove('main-menu-active');
         let terms = this.moduleData.data.map(item => ({ id: item.id, text: item.term, type: 'term' }));
         let definitions = this.moduleData.data.map(item => ({ id: item.id, text: item.definition, type: 'definition' }));
 
-        if (this.gameCallbacks.randomMode) {
-            terms = this.gameCallbacks.shuffleArray(terms);
-            definitions = this.gameCallbacks.shuffleArray(definitions);
+        if (this.learningCallbacks.randomMode) {
+            terms = this.learningCallbacks.shuffleArray(terms);
+            definitions = this.learningCallbacks.shuffleArray(definitions);
         }
 
         this.appContainer.innerHTML = `
@@ -218,8 +218,8 @@ class MatchingMode {
         });
 
         document.getElementById('undo-matching-btn').addEventListener('click', () => this.undo());
-        document.getElementById('back-to-menu-matching-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
-        this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+        document.getElementById('back-to-menu-matching-btn').addEventListener('click', () => this.learningCallbacks.renderMenu());
+        this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         this.updateText(); // Call updateText after rendering HTML
     }
 

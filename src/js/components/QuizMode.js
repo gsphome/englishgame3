@@ -1,10 +1,10 @@
 // src/js/modules/QuizModule.js
 
 class QuizMode {
-    constructor(authInstance, messagesInstance, gameCallbacks, settings) {
+    constructor(authInstance, messagesInstance, learningCallbacks, settings) {
         this.auth = authInstance;
         this.MESSAGES = messagesInstance;
-        this.gameCallbacks = gameCallbacks; // Object containing specific game functions
+        this.learningCallbacks = learningCallbacks; // Object containing specific game functions
         this.settings = settings; // New: Store game settings
 
         this.currentIndex = 0;
@@ -31,8 +31,8 @@ class QuizMode {
         this.scoreFrozen = false;
         this.isViewingHistory = false; // Reset on init
 
-        if (this.gameCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
-            this.moduleData.data = this.gameCallbacks.shuffleArray([...this.moduleData.data]);
+        if (this.learningCallbacks.randomMode && Array.isArray(this.moduleData.data)) {
+            this.moduleData.data = this.learningCallbacks.shuffleArray([...this.moduleData.data]);
         }
         // Limit the number of questions based on settings
         if (this.settings && this.settings.questionCount && this.moduleData.data.length > this.settings.questionCount) {
@@ -48,7 +48,7 @@ class QuizMode {
     render(historyEntry = null) {
         if (!this.moduleData || !Array.isArray(this.moduleData.data) || this.moduleData.data.length === 0) {
             console.error("Quiz module data is invalid or empty.");
-            this.gameCallbacks.renderMenu();
+            this.learningCallbacks.renderMenu();
             return;
         }
         const questionData = this.moduleData.data[this.currentIndex];
@@ -77,7 +77,7 @@ class QuizMode {
             document.getElementById('prev-btn').addEventListener('click', () => this.prev());
             document.getElementById('next-btn').addEventListener('click', () => this.next());
             document.getElementById('undo-btn').addEventListener('click', () => this.undo());
-            document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
+            document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.learningCallbacks.renderMenu());
         }
 
     this.appContainer.classList.remove('main-menu-active');
@@ -85,8 +85,8 @@ class QuizMode {
         
         let optionsToRender = [...questionData.options];
         // Only shuffle if not viewing history AND not rendering a specific history entry
-        if (this.gameCallbacks.randomMode && !this.isViewingHistory && !historyEntry) {
-            optionsToRender = this.gameCallbacks.shuffleArray(optionsToRender);
+        if (this.learningCallbacks.randomMode && !this.isViewingHistory && !historyEntry) {
+            optionsToRender = this.learningCallbacks.shuffleArray(optionsToRender);
         } else if (historyEntry && historyEntry.shuffledOptions) {
             // If rendering a history entry, use its shuffled options to maintain order
             optionsToRender = historyEntry.shuffledOptions.map(opt => opt.option);
@@ -150,10 +150,10 @@ class QuizMode {
         const feedbackContainer = document.getElementById('feedback-container');
         if (historyEntry) {
             feedbackContainer.innerHTML = historyEntry.feedbackHtml;
-            this.gameCallbacks.updateSessionScoreDisplay(historyEntry.sessionScoreBefore.correct, historyEntry.sessionScoreBefore.incorrect, this.moduleData.data.length);
+            this.learningCallbacks.updateSessionScoreDisplay(historyEntry.sessionScoreBefore.correct, historyEntry.sessionScoreBefore.incorrect, this.moduleData.data.length);
         } else {
             feedbackContainer.innerHTML = ''; // Clear feedback for normal unanswered state
-            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         }
         // Defer updateNavigationButtons to ensure DOM is fully updated
         setTimeout(() => {
@@ -232,7 +232,7 @@ class QuizMode {
         document.getElementById('feedback-container').innerHTML = feedbackHtml;
         
         if (!this.scoreFrozen) { 
-            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         }
         this.updateNavigationButtons(); // Update buttons after handling answer
     }
@@ -337,7 +337,7 @@ class QuizMode {
 
             document.getElementById('feedback-container').innerHTML = ''; // Clear feedback
 
-            this.gameCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
+            this.learningCallbacks.updateSessionScoreDisplay(this.sessionScore.correct, this.sessionScore.incorrect, this.moduleData.data.length);
         }
         this.updateNavigationButtons(); // Update buttons after undo
     }
@@ -388,7 +388,7 @@ class QuizMode {
         document.getElementById('feedback-container').innerHTML = historyEntry.feedbackHtml;
 
         // Update score display to reflect the score at the time of this history entry
-        this.gameCallbacks.updateSessionScoreDisplay(historyEntry.sessionScoreBefore.correct, historyEntry.sessionScoreBefore.incorrect, this.moduleData.data.length);
+        this.learningCallbacks.updateSessionScoreDisplay(historyEntry.sessionScoreBefore.correct, historyEntry.sessionScoreBefore.incorrect, this.moduleData.data.length);
     }
 
     updateQuizSummaryText() {
@@ -405,7 +405,7 @@ class QuizMode {
 
     showFinalScore() {
         this.auth.updateGlobalScore(this.sessionScore);
-        this.gameCallbacks.renderHeader();
+        this.learningCallbacks.renderHeader();
 
         if (!document.getElementById('quiz-summary-container')) {
             this.appContainer.innerHTML = `
@@ -418,7 +418,7 @@ class QuizMode {
                     </div>
                  </div>
             `;
-            document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.gameCallbacks.renderMenu());
+            document.getElementById('quiz-summary-back-to-menu-btn').addEventListener('click', () => this.learningCallbacks.renderMenu());
         }
         this.updateQuizSummaryText(); // Call to update text after rendering HTML
     }
@@ -523,7 +523,7 @@ class QuizMode {
         const quizSummaryContainer = document.getElementById('quiz-summary-container');
         if (quizSummaryContainer && !quizSummaryContainer.classList.contains('hidden')) {
             if (e.key === 'Enter') {
-                this.gameCallbacks.renderMenu(); // Go back to menu from summary
+                this.learningCallbacks.renderMenu(); // Go back to menu from summary
             }
             return; // Exit early if summary handled
         }
