@@ -240,9 +240,16 @@ class MatchingMode {
         const matchingCompletionModal = document.getElementById('matching-completion-modal');
         if (matchingCompletionModal && !matchingCompletionModal.classList.contains('hidden')) {
             if (e.key === 'Enter') {
-                e.preventDefault(); // Prevent default action (e.g., form submission)
+                const backToMenuBtn = document.getElementById('matching-completion-back-to-menu-btn');
+                if (backToMenuBtn) {
+                    backToMenuBtn.click();
+                }
+                e.preventDefault();
             } else if (e.key === 'Escape') {
-                document.getElementById('matching-completion-back-to-menu-btn').click();
+                const backToMenuBtn = document.getElementById('matching-completion-back-to-menu-btn');
+                if (backToMenuBtn) {
+                    backToMenuBtn.click();
+                }
             }
             return; // Consume event if modal is handled
         }
