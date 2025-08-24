@@ -80,7 +80,7 @@ export class SettingsModalComponent extends ModalComponent {
             const keyPath = prefix ? `${prefix}.${key}` : key;
             
             if (Array.isArray(obj[key])) {
-                if (keyPath.startsWith('gameSettings.')) {
+                if (keyPath.startsWith('learningSettings.')) {
                     this.createArrayDisplay(keyPath, obj[key]);
                 }
             } else if (typeof obj[key] === 'object' && obj[key] !== null) {
@@ -183,7 +183,7 @@ export class SettingsModalComponent extends ModalComponent {
 
         const label = document.createElement('div');
         label.className = 'text-gray-700 text-sm font-semibold mb-1';
-        label.textContent = keyPath === 'gameSettings.categories' ? MESSAGES.get('settingsCategories') : MESSAGES.get(this.keyPathToI18nKey(keyPath));
+        label.textContent = keyPath === 'learningSettings.categories' ? MESSAGES.get('settingsCategories') : MESSAGES.get(this.keyPathToI18nKey(keyPath));
         settingRow.appendChild(label);
 
         const valueContainer = document.createElement('div');
@@ -209,7 +209,7 @@ export class SettingsModalComponent extends ModalComponent {
 
     keyPathToI18nKey(keyPath) {
         const parts = keyPath.split('.');
-        if (parts[0] === 'gameSettings' && parts.length > 1) {
+        if (parts[0] === 'learningSettings' && parts.length > 1) {
             let i18nKey = 'settings';
             for (let i = 1; i < parts.length; i++) {
                 i18nKey += parts[i].charAt(0).toUpperCase() + parts[i].slice(1);

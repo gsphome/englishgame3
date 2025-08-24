@@ -47,8 +47,8 @@ export const app = {
         learningManager.init(this, appConfig.learningSettings); // Initialize LearningManager, pass app instance and learning settings
         window.learningManager = learningManager; // Expose globally for settings updates
 
-        // All game module instantiation moved to learningManager.init()
-        // All gameCallbacks are now handled by learningManager
+        // All learning module instantiation moved to learningManager.init()
+        // All learningCallbacks are now handled by learningManager
 
         this.addKeyboardListeners(); // Add this line to initialize global keyboard listeners
 

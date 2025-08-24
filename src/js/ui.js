@@ -121,7 +121,7 @@ export const ui = {
 
     keyPathToI18nKey(keyPath) {
         const parts = keyPath.split('.');
-        if (parts[0] === 'gameSettings' && parts.length > 1) {
+        if (parts[0] === 'learningSettings' && parts.length > 1) {
             let i18nKey = 'settings';
             for (let i = 1; i < parts.length; i++) {
                 i18nKey += parts[i].charAt(0).toUpperCase() + parts[i].slice(1);

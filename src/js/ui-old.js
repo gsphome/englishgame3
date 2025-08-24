@@ -314,7 +314,7 @@ export const ui = {
     // Helper to convert keyPath to i18n key
     keyPathToI18nKey(keyPath) {
         const parts = keyPath.split('.');
-        if (parts[0] === 'gameSettings' && parts.length > 1) {
+        if (parts[0] === 'learningSettings' && parts.length > 1) {
             let i18nKey = 'settings';
             for (let i = 1; i < parts.length; i++) {
                 i18nKey += parts[i].charAt(0).toUpperCase() + parts[i].slice(1);
@@ -383,13 +383,13 @@ export const ui = {
                 const keyPath = prefix ? `${prefix}.${key}` : key;
                 
                 if (Array.isArray(obj[key])) {
-                    if (keyPath.startsWith('gameSettings.')) {
+                    if (keyPath.startsWith('learningSettings.')) {
                         const settingRow = document.createElement('div');
                         settingRow.className = 'mb-2';
 
                         const label = document.createElement('div');
                         label.className = 'text-gray-700 text-sm font-semibold mb-1';
-                        label.textContent = keyPath === 'gameSettings.categories' ? MESSAGES.get('settingsCategories') : MESSAGES.get(this.keyPathToI18nKey(keyPath));
+                        label.textContent = keyPath === 'learningSettings.categories' ? MESSAGES.get('settingsCategories') : MESSAGES.get(this.keyPathToI18nKey(keyPath));
                         settingRow.appendChild(label);
 
                         const valueContainer = document.createElement('div');
@@ -419,7 +419,7 @@ export const ui = {
                     this.settingsFormContainer.appendChild(sectionTitle);
                     buildForm(obj[key], keyPath);
                 } else {
-                    if (keyPath.startsWith('gameSettings.')) {
+                    if (keyPath.startsWith('learningSettings.')) {
                         const settingRow = document.createElement('div');
                         settingRow.className = 'flex justify-between items-center mb-1';
 

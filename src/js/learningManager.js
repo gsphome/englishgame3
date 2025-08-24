@@ -19,7 +19,7 @@ export const learningManager = {
     appInstance: null, // Referencia a la instancia principal de app
     learningSettings: null, // Store learning settings
 
-    init(appInstance, gameSettings) {
+    init(appInstance, learningSettings) {
         this.appInstance = appInstance; // Almacenar la instancia de app para callbacks
         this.learningSettings = learningSettings; // Store initial learning settings
 
