@@ -189,18 +189,21 @@ export const app = {
                                    (sortingCompletionModal && !sortingCompletionModal.classList.contains('hidden')) ||
                                    (!modal.classList.contains('hidden'));
 
+            if (e.key === 'Escape' || e.key === 'Enter') {
+                // Check explanation modal first (highest priority)
+                const explanationModalElement = document.getElementById('explanation-modal');
+                if (explanationModalElement && !explanationModalElement.classList.contains('hidden')) {
+                    explanationModalElement.classList.add('hidden');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+            }
+            
             if (e.key === 'Escape') {
-                
-
                 if (isMainMenuActive && !isAnyModalOpen && !document.body.classList.contains('hamburger-menu-open')) {
                     // If main menu is active and no other modals/menus are open, trigger logout
                     this.handleEscapeKeyForMainMenu();
-                } else if (explanationModal && !explanationModal.classList.contains('hidden')) {
-                    explanationModal.classList.add('hidden');
-                    if (this.currentView === 'sorting') {
-                        this.renderMenu();
-                    }
-                    e.stopPropagation();
                 } else if (sortingCompletionModal && !sortingCompletionModal.classList.contains('hidden')) {
                     ui.sortingCompletionBackToMenuBtn.click();
                 } else if (!modal.classList.contains('hidden')) {

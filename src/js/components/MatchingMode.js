@@ -243,6 +243,7 @@ class MatchingMode {
             if (e.key === 'Enter' || e.key === 'Escape') {
                 explanationModal.classList.add('hidden');
                 e.preventDefault();
+                e.stopPropagation();
             }
             return; // Consume event if explanation modal is handled
         }
