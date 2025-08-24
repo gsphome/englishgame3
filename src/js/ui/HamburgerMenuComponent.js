@@ -37,6 +37,9 @@ export class HamburgerMenuComponent extends BaseComponent {
         if (this.menuDarkModeToggleBtn) {
             this.addListener(this.menuDarkModeToggleBtn, 'click', () => this.toggleDarkMode());
         }
+        if (this.menuLogoutBtn) {
+            this.addListener(this.menuLogoutBtn, 'click', () => this.handleLogout());
+        }
     }
 
     toggle(show) {
@@ -64,6 +67,16 @@ export class HamburgerMenuComponent extends BaseComponent {
         const isDarkMode = document.body.classList.contains('dark-mode');
         localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
         this.updateText();
+    }
+
+    handleLogout() {
+        this.toggle(false);
+        const messageElement = document.getElementById('confirmation-message');
+        const modal = document.getElementById('confirmation-modal');
+        if (messageElement && modal) {
+            messageElement.textContent = MESSAGES.get('confirmLogoutMessage');
+            modal.classList.remove('hidden');
+        }
     }
 
     updateText() {

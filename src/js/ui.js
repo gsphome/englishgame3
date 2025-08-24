@@ -6,8 +6,24 @@ import { gameManager } from './gameManager.js';
 let uiManager = null;
 
 export const ui = {
+    // Properties for backward compatibility
+    modal: null,
+    explanationModal: null,
+    sortingCompletionModal: null,
+    hamburgerMenu: null,
+    messageElement: null,
+    sortingCompletionBackToMenuBtn: null,
+
     init(appInstance) {
         uiManager = new UIManager(auth, gameManager, appInstance);
+        
+        // Initialize DOM references for backward compatibility
+        this.modal = document.getElementById('confirmation-modal');
+        this.explanationModal = document.getElementById('explanation-modal');
+        this.sortingCompletionModal = document.getElementById('sorting-completion-modal');
+        this.hamburgerMenu = document.getElementById('hamburger-menu');
+        this.messageElement = document.getElementById('confirmation-message');
+        this.sortingCompletionBackToMenuBtn = document.getElementById('sorting-completion-back-to-menu-btn');
     },
 
     // Delegate all methods to UIManager
@@ -55,7 +71,8 @@ export const ui = {
     },
 
     updateMenuText() {
-        // Handled by UIManager automatically
+        // Delegate to UIManager
+        uiManager?.updateAllTexts();
     },
 
     updateConfirmationModalText() {
