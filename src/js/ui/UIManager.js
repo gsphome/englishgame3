@@ -5,6 +5,7 @@ import { ConfirmationModalComponent } from './ConfirmationModalComponent.js';
 import { GameSummaryComponent } from './GameSummaryComponent.js';
 import { FooterComponent } from './FooterComponent.js';
 import { SortingCompletionComponent } from './SortingCompletionComponent.js';
+import { ExplanationModalComponent } from './ExplanationModalComponent.js';
 import { MESSAGES } from '../i18n.js';
 
 export class UIManager {
@@ -24,6 +25,7 @@ export class UIManager {
         this.components.gameSummary = new GameSummaryComponent(this.gameManager, this.app);
         this.components.footer = new FooterComponent();
         this.components.sortingCompletion = new SortingCompletionComponent(this.gameManager, this.app);
+        this.components.explanationModal = new ExplanationModalComponent();
 
         // Setup i18n listeners
         this.setupI18nListeners();
@@ -89,14 +91,7 @@ export class UIManager {
     }
 
     showExplanationModal(modalElement, wordData) {
-        if (!modalElement) return;
-        
-        document.getElementById('explanation-word').textContent = wordData.word;
-        document.getElementById('explanation-word-translation').textContent = wordData.translation_es;
-        document.getElementById('explanation-example-en').textContent = `"${wordData.example}"`;
-        document.getElementById('explanation-example-es').textContent = `"${wordData.example_es}"`;
-        document.body.appendChild(modalElement);
-        modalElement.classList.remove('hidden');
+        this.components.explanationModal.show(wordData);
     }
 
     // Cleanup method

@@ -8,6 +8,14 @@ export class GameSummaryComponent extends BaseComponent {
         this.app = app;
     }
 
+    showExplanationModal(modalElement, wordData) {
+        document.getElementById('explanation-word').textContent = wordData.word || wordData.term;
+        document.getElementById('explanation-word-translation').textContent = wordData.translation_es || wordData.term_es;
+        document.getElementById('explanation-example-en').textContent = `"${wordData.example || wordData.explanation}"`;
+        document.getElementById('explanation-example-es').textContent = `"${wordData.example_es || wordData.explanation_es}"`;
+        modalElement.classList.remove('hidden');
+    }
+
     showFlashcardSummary(count) {
         const container = document.getElementById('flashcard-summary-container');
         if (!container) return;
@@ -124,8 +132,8 @@ export class GameSummaryComponent extends BaseComponent {
         explanationButton.ariaLabel = MESSAGES.get('showExplanation');
         
         this.addListener(explanationButton, 'click', () => {
-            // This would need to be connected to the explanation modal
-            console.log('Show explanation for:', termData);
+            const explanationModal = document.getElementById('explanation-modal');
+            this.showExplanationModal(explanationModal, termData);
         });
 
         translationContainer.appendChild(explanationButton);
