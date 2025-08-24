@@ -24,18 +24,19 @@ export class SettingsModalComponent extends ModalComponent {
             this.addListener(this.editBtn, 'click', () => this.toggleEditMode());
         }
         
-        // Keyboard listener for Enter key
+        // Initialize keyboard handler
         this.keyboardHandler = (e) => {
-            if (this.element && !this.element.classList.contains('hidden') && e.key === 'Enter' && !this.isEditMode) {
+            if (this.element && !this.element.classList.contains('hidden') && e.key === 'Enter') {
                 this.hide();
                 e.preventDefault();
             }
         };
-        this.addListener(document, 'keydown', this.keyboardHandler);
     }
 
     show() {
         this.isEditMode = false;
+        // Add Enter listener for view mode
+        document.addEventListener('keydown', this.keyboardHandler);
         this.renderForm();
         this.updateText();
         super.show();
@@ -285,8 +286,22 @@ export class SettingsModalComponent extends ModalComponent {
 
     toggleEditMode() {
         this.isEditMode = !this.isEditMode;
+        
+        // Add/remove Enter listener based on edit mode
+        if (this.isEditMode) {
+            document.removeEventListener('keydown', this.keyboardHandler);
+        } else {
+            document.addEventListener('keydown', this.keyboardHandler);
+        }
+        
         this.renderForm();
         this.updateText();
+    }
+
+    hide() {
+        // Remove Enter listener when hiding
+        document.removeEventListener('keydown', this.keyboardHandler);
+        super.hide();
     }
 
     updateText() {
