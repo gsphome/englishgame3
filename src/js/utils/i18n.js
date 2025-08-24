@@ -114,6 +114,8 @@ export const MESSAGES = {
         settingsCompletionModeItemCount: "Completation",
         settingsCategories: "Categorías Disponibles",
         settingsTitle: "Ajustes",
+        editButton: "Editar",
+        cancelButton: "Cancelar",
     },
     en: {
         // General / App-wide
@@ -225,6 +227,8 @@ export const MESSAGES = {
         settingsSortingModeWordCount: "Sorting",
         settingsCategories: "Available Categories",
         settingsTitle: "Settings",
+        editButton: "Edit",
+        cancelButton: "Cancel",
     },
 
     get(key, variables = {}) {

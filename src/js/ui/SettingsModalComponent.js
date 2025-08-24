@@ -395,7 +395,7 @@ export class SettingsModalComponent extends ModalComponent {
             this.closeBtn.className = 'bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200';
         }
         if (this.editBtn) {
-            this.editBtn.textContent = this.isEditMode ? 'Cancel' : 'Edit';
+            this.editBtn.textContent = this.isEditMode ? MESSAGES.get('cancelButton') : MESSAGES.get('editButton');
             this.editBtn.className = this.isEditMode ? 
                 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200' :
                 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200';
