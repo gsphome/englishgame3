@@ -1,6 +1,6 @@
 import { MESSAGES } from './i18n.js';
 import { app } from './app.js';
-import { ui } from './ui.js'; // Import ui module
+// UI methods accessed through app instance
 
 export const auth = {
     user: null,
@@ -81,7 +81,7 @@ export const auth = {
             globalScore: { correct: 0, incorrect: 0 }
         };
         localStorage.setItem('user', JSON.stringify(this.user));
-        ui.renderHeader(); // Update header with logged-in user info
+        app.ui.renderHeader(); // Update header with logged-in user info
         // game.init(); // Removed: game.init() is now called directly in game.js after DOMContentLoaded
         app.renderMenu(); // Render the menu after login
     },
@@ -96,8 +96,9 @@ export const auth = {
 
     logout() {
         localStorage.removeItem('user');
-        if (ui.hamburgerMenu) {
-            ui.hamburgerMenu.classList.add('hidden'); // Hide hamburger menu on logout
+        const hamburgerMenu = document.getElementById('hamburger-menu');
+        if (hamburgerMenu) {
+            hamburgerMenu.classList.add('hidden'); // Hide hamburger menu on logout
         }
         this._reloadPage();
     },
@@ -110,6 +111,6 @@ export const auth = {
         this.user.globalScore.correct += sessionScore.correct;
         this.user.globalScore.incorrect += sessionScore.incorrect;
         localStorage.setItem('user', JSON.stringify(this.user));
-        ui.renderHeader();
+        app.ui.renderHeader();
     }
 };

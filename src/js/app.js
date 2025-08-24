@@ -1,6 +1,6 @@
 import { auth } from './auth.js';
 import { MESSAGES } from './i18n.js';
-import { ui } from './ui.js';
+import { UIManager } from './ui/UIManager.js';
 import { learningManager } from './learningManager.js'; // Import learningManager module
 import { settingsManager } from './settingsManager.js'; // Import settingsManager module
 
@@ -42,8 +42,7 @@ export const app = {
         auth.init();
         this.allLearningModules = await fetchAllLearningModules();
 
-        ui.init(this); // Initialize UI module, pass app instance
-        this.ui = ui; // Add reference for components to access
+        this.ui = new UIManager(auth, learningManager, this); // Initialize UI module
         learningManager.init(this, appConfig.learningSettings); // Initialize LearningManager, pass app instance and learning settings
         window.learningManager = learningManager; // Expose globally for settings updates
 
@@ -54,7 +53,7 @@ export const app = {
 
         // Initial user check and rendering
         auth.user = JSON.parse(localStorage.getItem('user'));
-        ui.renderHeader();
+        this.ui.renderHeader();
         if (!auth.user) {
             auth.renderLogin();
         } else {
@@ -139,8 +138,9 @@ export const app = {
         appContainer.appendChild(menuContent);
         appContainer.classList.add('main-menu-active');
 
-        if (ui.hamburgerMenu) {
-            ui.hamburgerMenu.classList.remove('hidden');
+        const hamburgerMenu = document.getElementById('hamburger-menu');
+        if (hamburgerMenu) {
+            hamburgerMenu.classList.remove('hidden');
         }
 
         const scrollWrapper = document.getElementById('main-menu-scroll-wrapper');
@@ -158,7 +158,7 @@ export const app = {
                 learningManager.startModule(moduleId); // Use learningManager's method
             });
         });
-        ui.updateFooterVisibility(this.currentView);
+        this.ui.updateFooterVisibility(this.currentView);
     },
 
     getMenuMaxWidth() {
@@ -175,15 +175,17 @@ export const app = {
     // startModule method moved to learningManager.js
 
     handleEscapeKeyForMainMenu() {
-        ui.messageElement.textContent = MESSAGES.get('confirmLogoutMessage');
-        ui.toggleModal(ui.modal, true);
+        const modal = document.getElementById('confirmation-modal');
+        const messageElement = document.getElementById('confirmation-message');
+        messageElement.textContent = MESSAGES.get('confirmLogoutMessage');
+        modal.classList.remove('hidden');
     },
 
     addKeyboardListeners() {
-        const modal = ui.modal;
         document.addEventListener('keydown', (e) => {
-            const explanationModal = ui.explanationModal;
-            const sortingCompletionModal = ui.sortingCompletionModal;
+            const explanationModal = document.getElementById('explanation-modal');
+            const sortingCompletionModal = document.getElementById('sorting-completion-modal');
+            const modal = document.getElementById('confirmation-modal');
             const isMainMenuActive = document.getElementById('app-container').classList.contains('main-menu-active');
             const isAnyModalOpen = (explanationModal && !explanationModal.classList.contains('hidden')) ||
                                    (sortingCompletionModal && !sortingCompletionModal.classList.contains('hidden')) ||
@@ -205,11 +207,11 @@ export const app = {
                     // If main menu is active and no other modals/menus are open, trigger logout
                     this.handleEscapeKeyForMainMenu();
                 } else if (sortingCompletionModal && !sortingCompletionModal.classList.contains('hidden')) {
-                    ui.sortingCompletionBackToMenuBtn.click();
+                    document.getElementById('sorting-completion-back-to-menu-btn').click();
                 } else if (!modal.classList.contains('hidden')) {
-                    ui.toggleModal(modal, false);
+                    modal.classList.add('hidden');
                 } else if (document.body.classList.contains('hamburger-menu-open')) {
-                    ui.toggleHamburgerMenu(false);
+                    this.ui.toggleHamburgerMenu(false);
                 } else if (this.currentView === 'sorting') {
                     this.renderMenu();
                 } else {
@@ -220,7 +222,7 @@ export const app = {
                 MESSAGES.setLanguage(newLang);
                 localStorage.setItem('appLang', newLang);
                 this.renderCurrentView();
-                ui.updateMenuText();
+                this.ui.updateAllTexts();
             } else if (this.currentView === 'menu') {
                 const pressedKey = e.key.toUpperCase();
                 const moduleButtons = document.querySelectorAll('[data-module-id]');

@@ -6,7 +6,7 @@ import MatchingModule from './components/MatchingMode.js';
 import { fetchModuleData } from './dataManager.js';
 import { MESSAGES } from './i18n.js';
 import { auth } from './auth.js';
-import { ui } from './ui.js'; // Asumiendo que ui.js ya está disponible
+// UI methods are now handled through callbacks
 import { settingsManager } from './settingsManager.js';
 
 export const learningManager = {
@@ -25,14 +25,14 @@ export const learningManager = {
 
         this.learningCallbacks = {
             renderMenu: this.appInstance.renderMenu.bind(this.appInstance), // Llamar al renderMenu de app
-            showFlashcardSummary: ui.showFlashcardSummary.bind(ui),
-            updateSessionScoreDisplay: ui.updateSessionScoreDisplay.bind(ui),
+            showFlashcardSummary: (count) => this.appInstance.ui.showFlashcardSummary(count),
+            updateSessionScoreDisplay: (correct, incorrect, total) => this.appInstance.ui.updateSessionScoreDisplay(correct, incorrect, total),
             randomMode: this.appInstance.randomMode, // Acceder a randomMode de app
             shuffleArray: this.appInstance.shuffleArray, // Acceder a shuffleArray de app
-            showSortingCompletionModal: ui.showSortingCompletionModal.bind(ui),
-            showMatchingSummary: ui.showMatchingSummary.bind(ui),
-            renderHeader: ui.renderHeader.bind(ui),
-            toggleHamburgerMenu: ui.toggleHamburgerMenu.bind(ui),
+            showSortingCompletionModal: (moduleData) => this.appInstance.ui.showSortingCompletionModal(moduleData),
+            showMatchingSummary: (matchedPairs, moduleData) => this.appInstance.ui.showMatchingSummary(matchedPairs, moduleData),
+            renderHeader: () => this.appInstance.ui.renderHeader(),
+            toggleHamburgerMenu: (show) => this.appInstance.ui.toggleHamburgerMenu(show),
             isHistoryMode: false, // Default to false
         };
 
@@ -86,14 +86,14 @@ export const learningManager = {
                     document.getElementById('app-container').classList.remove('main-menu-active');
                     document.getElementById('app-container').innerHTML = '';
                     this.flashcardModule.init(moduleWithData);
-                    ui.updateFooterVisibility(this.appInstance.currentView);
+                    this.appInstance.ui.updateFooterVisibility(this.appInstance.currentView);
                     break;
                 case 'quiz':
                     this.appInstance.currentView = 'quiz';
                     document.body.classList.add('module-active');
                     document.getElementById('app-container').classList.remove('main-menu-active');
                     this.quizModule.init(moduleWithData);
-                    ui.updateFooterVisibility(this.appInstance.currentView);
+                    this.appInstance.ui.updateFooterVisibility(this.appInstance.currentView);
                     break;
                 case 'completion':
                     this.appInstance.currentView = 'completion';
@@ -101,7 +101,7 @@ export const learningManager = {
                     document.getElementById('app-container').classList.remove('main-menu-active');
                     document.getElementById('app-container').innerHTML = ''; // Add this line
                     this.completionModule.init(moduleWithData);
-                    ui.updateFooterVisibility(this.appInstance.currentView);
+                    this.appInstance.ui.updateFooterVisibility(this.appInstance.currentView);
                     break;
                 case 'sorting':
                     // Si ya estamos en la vista de sorting y el contenedor existe, solo actualizar texto
@@ -113,14 +113,14 @@ export const learningManager = {
                     document.body.classList.add('module-active');
                     document.getElementById('app-container').classList.remove('main-menu-active');
                     this.sortingModule.init(moduleWithData);
-                    ui.updateFooterVisibility(this.appInstance.currentView);
+                    this.appInstance.ui.updateFooterVisibility(this.appInstance.currentView);
                     break;
                 case 'matching':
                     this.appInstance.currentView = 'matching';
                     document.body.classList.add('module-active');
                     document.getElementById('app-container').classList.remove('main-menu-active');
                     this.matchingModule.init(moduleWithData);
-                    ui.updateFooterVisibility(this.appInstance.currentView);
+                    this.appInstance.ui.updateFooterVisibility(this.appInstance.currentView);
                     break;
             }
         } catch (error) {
