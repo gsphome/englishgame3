@@ -69,15 +69,15 @@ export const learningManager = {
             }
 
             // Shuffle module data if random mode is enabled
-            if (this.gameCallbacks.randomMode && moduleWithData.data && Array.isArray(moduleWithData.data)) {
-                this.gameCallbacks.shuffleArray(moduleWithData.data);
+            if (this.learningCallbacks.randomMode && moduleWithData.data && Array.isArray(moduleWithData.data)) {
+                this.learningCallbacks.shuffleArray(moduleWithData.data);
             }
 
             this.currentModule = moduleWithData;
             this.appInstance.currentModule = moduleWithData; // Actualizar currentModule de app
 
-            // Update gameCallbacks with the current isHistoryMode state
-            this.gameCallbacks.isHistoryMode = isHistoryMode; // Set the history mode
+            // Update learningCallbacks with the current isHistoryMode state
+            this.learningCallbacks.isHistoryMode = isHistoryMode; // Set the history mode
 
             switch (moduleWithData.learningMode) {
                 case 'flashcard':
