@@ -1,6 +1,6 @@
 import { auth } from './auth.js';
 import { MESSAGES } from '../utils/i18n.js';
-import { UIManager } from './ui/UIManager.js';
+import { UIManager } from '../ui/UIManager.js';
 import { learningManager } from './learningManager.js'; // Import learningManager module
 import { settingsManager } from '../managers/settingsManager.js'; // Import settingsManager module
 
