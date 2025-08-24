@@ -80,7 +80,9 @@ export class SettingsModalComponent extends ModalComponent {
     renderForm() {
         if (!this.formContainer) return;
         
+        // Clear container completely
         this.formContainer.innerHTML = '';
+        
         const settings = settingsManager.settings;
 
         const mainTitle = document.createElement('h2');
