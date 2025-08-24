@@ -24,6 +24,7 @@ export const MESSAGES = {
         aboutButton: "Acerca de",
         settingsButton: "Ajustes",
         closeButton: "Cerrar",
+        saveButton: "Guardar",
         appLogoAlt: "App Logo",
         defaultModuleIcon: "📚",
         onText: "ON",

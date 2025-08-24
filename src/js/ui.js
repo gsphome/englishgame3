@@ -78,9 +78,11 @@ export const ui = {
         MESSAGES.addListener(this.updateFlashcardSummaryText.bind(this));
         MESSAGES.addListener(this.updateMatchingSummaryText.bind(this));
         MESSAGES.addListener(this.updateSortingCompletionModalText.bind(this));
+        MESSAGES.addListener(this.updateSettingsModalText.bind(this));
         this.updateMenuText();
         this.updateConfirmationModalText();
         this.updateAboutModalText();
+        this.updateSettingsModalText();
     },
 
     // Helper functions moved from utils.js
@@ -298,6 +300,7 @@ export const ui = {
                 this.toggleHamburgerMenu(false);
                 this.toggleModal(this.settingsModal, true);
                 this.renderSettingsForm(false); // Render in read-only mode initially
+                this.updateSettingsModalText();
             });
         }
 
@@ -819,5 +822,14 @@ export const ui = {
         });
 
         modal.classList.remove('hidden');
+    },
+
+    updateSettingsModalText() {
+        if (this.settingsSaveBtn) {
+            this.settingsSaveBtn.textContent = MESSAGES.get('saveButton');
+        }
+        if (this.settingsCloseBtn) {
+            this.settingsCloseBtn.textContent = MESSAGES.get('closeButton');
+        }
     },
 };
