@@ -322,21 +322,39 @@ export const ui = {
     // Helper to convert keyPath to i18n key
     keyPathToI18nKey(keyPath) {
         const parts = keyPath.split('.');
-        let i18nKey = 'settings';
-        for (const part of parts) {
-            i18nKey += part.charAt(0).toUpperCase() + part.slice(1);
+        if (parts[0] === 'gameSettings' && parts.length > 1) {
+            // For game settings, remove 'gameSettings' prefix and capitalize the rest
+            let i18nKey = 'settings';
+            for (let i = 1; i < parts.length; i++) {
+                i18nKey += parts[i].charAt(0).toUpperCase() + parts[i].slice(1);
+            }
+            return i18nKey;
+        } else {
+            // For other settings, prepend 'settings' and capitalize each part
+            let i18nKey = 'settings';
+            for (const part of parts) {
+                i18nKey += part.charAt(0).toUpperCase() + part.slice(1);
+            }
+            return i18nKey;
         }
-        return i18nKey;
     },
 
     // Helper to convert keyPath to i18n description key
     keyPathToDescriptionI18nKey(keyPath) {
         const parts = keyPath.split('.');
-        let i18nKey = 'settings';
-        for (const part of parts) {
-            i18nKey += part.charAt(0).toUpperCase() + part.slice(1);
+        if (parts[0] === 'gameSettings' && parts.length > 1) {
+            let i18nKey = 'settings';
+            for (let i = 1; i < parts.length; i++) {
+                i18nKey += parts[i].charAt(0).toUpperCase() + parts[i].slice(1);
+            }
+            return i18nKey + 'Description';
+        } else {
+            let i18nKey = 'settings';
+            for (const part of parts) {
+                i18nKey += part.charAt(0).toUpperCase() + part.slice(1);
+            }
+            return i18nKey + 'Description';
         }
-        return i18nKey + 'Description';
     },
 
     renderSettingsForm() {
@@ -410,8 +428,26 @@ export const ui = {
                     this.settingsFormContainer.appendChild(sectionTitle);
                     buildForm(obj[key], keyPath);
                 } else {
-                    // Assume it's a simple setting (number, string, boolean)
-                    this.settingsFormContainer.appendChild(createInputField(keyPath, obj[key]));
+                    // Check if it's a game setting (e.g., matchingGame.wordCount)
+                    if (keyPath.startsWith('gameSettings.')) {
+                        const settingRow = document.createElement('div');
+                        settingRow.className = 'flex justify-between items-center mb-1'; // Flex to align label and value
+
+                        const label = document.createElement('span');
+                        label.className = 'text-gray-700 text-sm font-semibold';
+                        label.textContent = MESSAGES.get(this.keyPathToI18nKey(keyPath));
+                        settingRow.appendChild(label);
+
+                        const valueSpan = document.createElement('span');
+                        valueSpan.className = 'text-gray-600 text-sm';
+                        valueSpan.textContent = obj[key]; // Display the current value
+                        settingRow.appendChild(valueSpan);
+
+                        this.settingsFormContainer.appendChild(settingRow);
+                    } else {
+                        // Assume it's a simple setting (number, string, boolean)
+                        this.settingsFormContainer.appendChild(createInputField(keyPath, obj[key]));
+                    }
                 }
             }
         };
