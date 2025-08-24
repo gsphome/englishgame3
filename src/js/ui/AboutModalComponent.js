@@ -12,6 +12,14 @@ export class AboutModalComponent extends ModalComponent {
         if (closeBtn) {
             this.addListener(closeBtn, 'click', () => this.hide());
         }
+        
+        // Add keyboard listener for Enter key
+        this.addListener(document, 'keydown', (e) => {
+            if (this.element && !this.element.classList.contains('hidden') && e.key === 'Enter') {
+                this.hide();
+                e.preventDefault();
+            }
+        });
     }
 
     show() {
