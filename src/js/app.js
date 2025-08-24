@@ -4,7 +4,7 @@ import { ui } from './ui.js';
 import { learningManager } from './learningManager.js'; // Import learningManager module
 import { settingsManager } from './settingsManager.js'; // Import settingsManager module
 
-import { shuffleArray, getGameModeIconSvg } from './utils.js';
+import { shuffleArray, getLearningModeIconSvg } from './utils.js';
 import { fetchAllLearningModules, fetchAppConfig, getAppConfig } from './dataManager.js'; // fetchModuleData moved to learningManager
 
 /**
@@ -130,7 +130,7 @@ export const app = {
                 button.querySelector('[data-module-index]').textContent = `${String.fromCharCode(65 + index)}.`;
             }
             button.querySelector('[data-module-name]').textContent = module.name.replace(MESSAGES.get('flashcardPrefix'), '').replace(MESSAGES.get('quizPrefix'), '').replace(MESSAGES.get('completionPrefix'), '');
-            button.querySelector('[data-game-mode-icon]').innerHTML = getGameModeIconSvg(module.learningMode);
+            button.querySelector('[data-game-mode-icon]').innerHTML = getLearningModeIconSvg(module.learningMode);
 
             moduleButtonsContainer.appendChild(button);
         });
