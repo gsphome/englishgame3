@@ -224,10 +224,15 @@ class MatchingMode {
     }
 
     updateText() {
-        document.getElementById('back-to-menu-matching-btn').textContent = this.MESSAGES.get('backToMenu');
-        document.getElementById('undo-matching-btn').textContent = this.MESSAGES.get('undoButton');
-        document.querySelector('#terms-column h3').textContent = this.MESSAGES.get('terms');
-        document.querySelector('#definitions-column h3').textContent = this.MESSAGES.get('definitions');
+        const backToMenuBtn = document.getElementById('back-to-menu-matching-btn');
+        const undoBtn = document.getElementById('undo-matching-btn');
+        const termsHeader = document.querySelector('#terms-column h3');
+        const definitionsHeader = document.querySelector('#definitions-column h3');
+
+        if (backToMenuBtn) backToMenuBtn.textContent = this.MESSAGES.get('backToMenu');
+        if (undoBtn) undoBtn.textContent = this.MESSAGES.get('undoButton');
+        if (termsHeader) termsHeader.textContent = this.MESSAGES.get('terms');
+        if (definitionsHeader) definitionsHeader.textContent = this.MESSAGES.get('definitions');
     }
 
     _handleKeyboardEvent(e) {
