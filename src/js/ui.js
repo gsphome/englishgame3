@@ -480,10 +480,10 @@ export const ui = {
             this.menuRandomModeBtn.innerHTML = `${MESSAGES.get('randomMode')} ${this.app.randomMode ? MESSAGES.get('onText') : MESSAGES.get('offText')}`; // Use this.app.randomMode
         }
         if (this.aboutBtn) {
-            this.aboutBtn.innerHTML = `${MESSAGES.get('aboutButton')}`;
+            this.aboutBtn.innerHTML = `${MESSAGES.get('aboutButton')} ${MESSAGES.aboutIcon}`;
         }
         if (this.menuSettingsBtn) {
-            this.menuSettingsBtn.innerHTML = `${MESSAGES.get('settingsButton')}${MESSAGES.settingsIcon}`;
+            this.menuSettingsBtn.innerHTML = `${MESSAGES.get('settingsButton')} ${MESSAGES.settingsIcon}`;
         }
 
         // Update sorting completion modal text if visible

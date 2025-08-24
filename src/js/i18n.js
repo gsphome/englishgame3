@@ -2,6 +2,7 @@ export const MESSAGES = {
     _currentLanguage: 'en', // Default language
     _listeners: [],
     settingsIcon: "⚙️ ",
+    aboutIcon: "ℹ️ ",
 
     es: {
         // General / App-wide
