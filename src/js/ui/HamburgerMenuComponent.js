@@ -40,6 +40,12 @@ export class HamburgerMenuComponent extends BaseComponent {
         if (this.menuLogoutBtn) {
             this.addListener(this.menuLogoutBtn, 'click', () => this.handleLogout());
         }
+        if (this.aboutBtn) {
+            this.addListener(this.aboutBtn, 'click', () => this.handleAbout());
+        }
+        if (this.menuSettingsBtn) {
+            this.addListener(this.menuSettingsBtn, 'click', () => this.handleSettings());
+        }
     }
 
     toggle(show) {
@@ -76,6 +82,22 @@ export class HamburgerMenuComponent extends BaseComponent {
         if (messageElement && modal) {
             messageElement.textContent = MESSAGES.get('confirmLogoutMessage');
             modal.classList.remove('hidden');
+        }
+    }
+
+    handleAbout() {
+        this.toggle(false);
+        const aboutModal = document.getElementById('about-modal');
+        if (aboutModal) {
+            aboutModal.classList.remove('hidden');
+        }
+    }
+
+    handleSettings() {
+        this.toggle(false);
+        const settingsModal = document.getElementById('settings-modal');
+        if (settingsModal) {
+            settingsModal.classList.remove('hidden');
         }
     }
 
