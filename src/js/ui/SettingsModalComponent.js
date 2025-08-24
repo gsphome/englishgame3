@@ -11,7 +11,11 @@ export class SettingsModalComponent extends ModalComponent {
         this.editBtn = document.getElementById('settings-edit-btn');
         this.isEditMode = false;
         this.isRendering = false;
+        this.modalTitle = this.element.querySelector('h2[data-i18n="settingsTitle"]');
         this.setupListeners();
+        
+        // Add i18n listener for modal title
+        MESSAGES.addListener(() => this.updateModalTitle());
     }
 
     setupListeners() {
@@ -436,5 +440,11 @@ export class SettingsModalComponent extends ModalComponent {
         select.disabled = !this.isEditMode;
         settingRow.appendChild(select);
         (this.currentGroupContainer || this.formContainer).appendChild(settingRow);
+    }
+
+    updateModalTitle() {
+        if (this.modalTitle) {
+            this.modalTitle.textContent = MESSAGES.get('settingsTitle');
+        }
     }
 }
