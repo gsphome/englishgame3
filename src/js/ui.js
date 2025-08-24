@@ -78,7 +78,7 @@ export const ui = {
     },
 
     updateAboutModalText() {
-        // TODO: Move to AboutModalComponent
+        // Handled by AboutModalComponent
     },
 
     updateFlashcardSummaryText() {
@@ -94,7 +94,15 @@ export const ui = {
     },
 
     updateSettingsModalText() {
-        // TODO: Move to SettingsModalComponent
+        // Handled by SettingsModalComponent
+    },
+
+    showAboutModal() {
+        return uiManager?.showAboutModal();
+    },
+
+    showSettingsModal() {
+        return uiManager?.showSettingsModal();
     },
 
     // Settings related methods - TODO: Move to SettingsComponent

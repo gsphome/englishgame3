@@ -6,6 +6,8 @@ import { GameSummaryComponent } from './GameSummaryComponent.js';
 import { FooterComponent } from './FooterComponent.js';
 import { SortingCompletionComponent } from './SortingCompletionComponent.js';
 import { ExplanationModalComponent } from './ExplanationModalComponent.js';
+import { AboutModalComponent } from './AboutModalComponent.js';
+import { SettingsModalComponent } from './SettingsModalComponent.js';
 import { MESSAGES } from '../i18n.js';
 
 export class UIManager {
@@ -26,6 +28,8 @@ export class UIManager {
         this.components.footer = new FooterComponent();
         this.components.sortingCompletion = new SortingCompletionComponent(this.gameManager, this.app);
         this.components.explanationModal = new ExplanationModalComponent();
+        this.components.aboutModal = new AboutModalComponent();
+        this.components.settingsModal = new SettingsModalComponent();
 
         // Setup i18n listeners
         this.setupI18nListeners();
@@ -76,6 +80,14 @@ export class UIManager {
 
     showSortingCompletionModal(moduleData) {
         this.components.sortingCompletion.show(moduleData);
+    }
+
+    showAboutModal() {
+        this.components.aboutModal.show();
+    }
+
+    showSettingsModal() {
+        this.components.settingsModal.show();
     }
 
     // Utility methods

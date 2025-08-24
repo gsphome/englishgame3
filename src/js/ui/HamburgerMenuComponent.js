@@ -87,17 +87,17 @@ export class HamburgerMenuComponent extends BaseComponent {
 
     handleAbout() {
         this.toggle(false);
-        const aboutModal = document.getElementById('about-modal');
-        if (aboutModal) {
-            aboutModal.classList.remove('hidden');
+        // Trigger through app to use UIManager
+        if (this.app && this.app.ui) {
+            this.app.ui.showAboutModal();
         }
     }
 
     handleSettings() {
         this.toggle(false);
-        const settingsModal = document.getElementById('settings-modal');
-        if (settingsModal) {
-            settingsModal.classList.remove('hidden');
+        // Trigger through app to use UIManager
+        if (this.app && this.app.ui) {
+            this.app.ui.showSettingsModal();
         }
     }
 

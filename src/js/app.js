@@ -43,6 +43,7 @@ export const app = {
         this.allLearningModules = await fetchAllLearningModules();
 
         ui.init(this); // Initialize UI module, pass app instance
+        this.ui = ui; // Add reference for components to access
         gameManager.init(this, appConfig.gameSettings); // Initialize GameManager, pass app instance and game settings
 
         // All game module instantiation moved to gameManager.init()
