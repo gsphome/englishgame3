@@ -15,6 +15,13 @@
     },
     "completionGame": {
       "itemCount": 10
-    }
+    },
+    "categories": [
+      "Vocabulary",
+      "PhrasalVerbs",
+      "Idioms",
+      "Grammar",
+      "Exercises"
+    ]
   }
 }

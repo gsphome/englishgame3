@@ -30,7 +30,7 @@
             "b2",
             "c1"
         ],
-        "category": "Phrasal Verbs"
+        "category": "PhrasalVerbs"
     },
     {
         "id": "quiz-idioms-emotions-feelings",
@@ -213,7 +213,7 @@
         "level": [
             "b2"
         ],
-        "category": "Phrasal Verbs"
+        "category": "PhrasalVerbs"
     },
     {
         "id": "completion-used-to",
@@ -233,7 +233,7 @@
         "level": [
             "c2"
         ],
-        "category": "Phrasal Verbs"
+        "category": "PhrasalVerbs"
     },
     {
         "id": "completion-complex-prepositions-conjunctions-c2",
