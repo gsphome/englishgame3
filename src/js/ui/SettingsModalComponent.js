@@ -10,6 +10,7 @@ export class SettingsModalComponent extends ModalComponent {
         this.closeBtn = document.getElementById('settings-close-btn');
         this.editBtn = document.getElementById('settings-edit-btn');
         this.isEditMode = false;
+        this.isRendering = false;
         this.setupListeners();
     }
 
@@ -78,7 +79,9 @@ export class SettingsModalComponent extends ModalComponent {
     }
 
     renderForm() {
-        if (!this.formContainer) return;
+        if (!this.formContainer || this.isRendering) return;
+        
+        this.isRendering = true;
         
         // Clear container completely
         this.formContainer.innerHTML = '';
@@ -91,10 +94,29 @@ export class SettingsModalComponent extends ModalComponent {
         this.formContainer.appendChild(mainTitle);
 
         this.buildForm(settings);
+        
+        this.isRendering = false;
     }
 
     buildForm(obj, prefix = '') {
-        for (const key in obj) {
+        // Define order for learningSettings properties
+        const learningOrder = ['flashcardMode', 'quizMode', 'completionMode', 'sortingMode', 'matchingMode'];
+        
+        let keys = Object.keys(obj);
+        
+        // Sort keys if we're in learningSettings
+        if (prefix === 'learningSettings') {
+            keys = keys.sort((a, b) => {
+                const aIndex = learningOrder.indexOf(a);
+                const bIndex = learningOrder.indexOf(b);
+                if (aIndex === -1 && bIndex === -1) return 0;
+                if (aIndex === -1) return 1;
+                if (bIndex === -1) return -1;
+                return aIndex - bIndex;
+            });
+        }
+        
+        for (const key of keys) {
             const keyPath = prefix ? `${prefix}.${key}` : key;
             
             if (Array.isArray(obj[key])) {
@@ -296,7 +318,11 @@ export class SettingsModalComponent extends ModalComponent {
             document.addEventListener('keydown', this.keyboardHandler);
         }
         
-        this.renderForm();
+        // Update disabled state of existing inputs instead of re-rendering
+        this.formContainer.querySelectorAll('input, select').forEach(input => {
+            input.disabled = !this.isEditMode;
+        });
+        
         this.updateText();
     }
 
