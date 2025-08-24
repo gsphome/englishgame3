@@ -199,6 +199,7 @@ export class SettingsModalComponent extends ModalComponent {
             const option = document.createElement('option');
             option.value = level;
             option.textContent = level.toUpperCase();
+            option.style.textAlign = 'center';
             select.appendChild(option);
         });
         
