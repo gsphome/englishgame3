@@ -1,6 +1,6 @@
 // src/js/ui/ModalManager.js
 import { BaseComponent } from './BaseComponent.js';
-import { MESSAGES } from '../i18n.js';
+import { MESSAGES } from '../utils/i18n.js';
 
 export class ModalManager extends BaseComponent {
     constructor() {

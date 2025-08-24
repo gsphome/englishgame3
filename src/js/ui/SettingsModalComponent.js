@@ -1,6 +1,6 @@
 import { ModalComponent } from './ModalComponent.js';
-import { MESSAGES } from '../i18n.js';
-import { settingsManager } from '../settingsManager.js';
+import { MESSAGES } from '../utils/i18n.js';
+import { settingsManager } from '../managers/settingsManager.js';
 
 export class SettingsModalComponent extends ModalComponent {
     constructor() {

@@ -8,7 +8,7 @@ import { SortingCompletionComponent } from './SortingCompletionComponent.js';
 import { ExplanationModalComponent } from './ExplanationModalComponent.js';
 import { AboutModalComponent } from './AboutModalComponent.js';
 import { SettingsModalComponent } from './SettingsModalComponent.js';
-import { MESSAGES } from '../i18n.js';
+import { MESSAGES } from '../utils/i18n.js';
 
 export class UIManager {
     constructor(auth, learningManager, app) {

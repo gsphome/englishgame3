@@ -1,6 +1,6 @@
 // src/js/ui/MenuManager.js
 import { BaseComponent } from './BaseComponent.js';
-import { MESSAGES } from '../i18n.js';
+import { MESSAGES } from '../utils/i18n.js';
 
 export class MenuManager extends BaseComponent {
     constructor(app) {

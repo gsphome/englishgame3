@@ -1,4 +1,4 @@
-import { MESSAGES } from './i18n.js';
+import { MESSAGES } from '../utils/i18n.js';
 import { app } from './app.js';
 // UI methods accessed through app instance
 

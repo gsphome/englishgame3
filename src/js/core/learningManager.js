@@ -3,11 +3,11 @@ import QuizModule from './components/QuizMode.js';
 import CompletionModule from './components/CompletionMode.js';
 import SortingModule from './components/SortingMode.js';
 import MatchingModule from './components/MatchingMode.js';
-import { fetchModuleData } from './dataManager.js';
-import { MESSAGES } from './i18n.js';
+import { fetchModuleData } from '../managers/dataManager.js';
+import { MESSAGES } from '../utils/i18n.js';
 import { auth } from './auth.js';
 // UI methods are now handled through callbacks
-import { settingsManager } from './settingsManager.js';
+import { settingsManager } from '../managers/settingsManager.js';
 
 export const learningManager = {
     flashcardModule: null,

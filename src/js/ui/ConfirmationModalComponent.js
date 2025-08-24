@@ -1,5 +1,5 @@
 import { ModalComponent } from './ModalComponent.js';
-import { MESSAGES } from '../i18n.js';
+import { MESSAGES } from '../utils/i18n.js';
 
 export class ConfirmationModalComponent extends ModalComponent {
     constructor(auth) {

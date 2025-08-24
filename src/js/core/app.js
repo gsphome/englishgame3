@@ -1,11 +1,11 @@
 import { auth } from './auth.js';
-import { MESSAGES } from './i18n.js';
+import { MESSAGES } from '../utils/i18n.js';
 import { UIManager } from './ui/UIManager.js';
 import { learningManager } from './learningManager.js'; // Import learningManager module
-import { settingsManager } from './settingsManager.js'; // Import settingsManager module
+import { settingsManager } from '../managers/settingsManager.js'; // Import settingsManager module
 
-import { shuffleArray, getLearningModeIconSvg } from './utils.js';
-import { fetchAllLearningModules, fetchAppConfig, getAppConfig } from './dataManager.js'; // fetchModuleData moved to learningManager
+import { shuffleArray, getLearningModeIconSvg } from '../utils/utils.js';
+import { fetchAllLearningModules, fetchAppConfig, getAppConfig } from '../managers/dataManager.js'; // fetchModuleData moved to learningManager
 
 /**
  * @file Manages the main application flow, module initialization, and global state.
