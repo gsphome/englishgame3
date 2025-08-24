@@ -171,7 +171,7 @@ export class SettingsModalComponent extends ModalComponent {
 
     createLanguageSelect(value, keyPath) {
         const select = document.createElement('select');
-        select.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-20 text-center';
+        select.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-24 text-center';
         select.dataset.keyPath = keyPath;
         
         const enOption = document.createElement('option');
@@ -191,7 +191,7 @@ export class SettingsModalComponent extends ModalComponent {
 
     createLevelSelect(value, keyPath) {
         const select = document.createElement('select');
-        select.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-20 text-center';
+        select.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-24 text-center';
         select.dataset.keyPath = keyPath;
         
         const levels = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
@@ -210,7 +210,7 @@ export class SettingsModalComponent extends ModalComponent {
     createNumberInput(value, keyPath) {
         const input = document.createElement('input');
         input.type = 'number';
-        input.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-20 text-center';
+        input.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-24 text-center';
         input.value = value;
         input.dataset.keyPath = keyPath;
         input.min = "1";
