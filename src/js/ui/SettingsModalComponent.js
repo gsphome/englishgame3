@@ -8,6 +8,8 @@ export class SettingsModalComponent extends ModalComponent {
         this.formContainer = document.getElementById('settings-form-container');
         this.saveBtn = document.getElementById('settings-save-btn');
         this.closeBtn = document.getElementById('settings-close-btn');
+        this.editBtn = document.getElementById('settings-edit-btn');
+        this.isEditMode = false;
         this.setupListeners();
     }
 
@@ -18,9 +20,13 @@ export class SettingsModalComponent extends ModalComponent {
         if (this.saveBtn) {
             this.addListener(this.saveBtn, 'click', () => this.handleSave());
         }
+        if (this.editBtn) {
+            this.addListener(this.editBtn, 'click', () => this.toggleEditMode());
+        }
     }
 
     show() {
+        this.isEditMode = false;
         this.renderForm();
         this.updateText();
         super.show();
@@ -110,6 +116,7 @@ export class SettingsModalComponent extends ModalComponent {
             inputElement = this.createTextInput(value, keyPath);
         }
         
+        inputElement.disabled = !this.isEditMode;
         settingRow.appendChild(inputElement);
         this.formContainer.appendChild(settingRow);
     }
@@ -130,6 +137,7 @@ export class SettingsModalComponent extends ModalComponent {
         select.appendChild(esOption);
         
         select.value = value;
+        select.disabled = !this.isEditMode;
         return select;
     }
 
@@ -141,6 +149,7 @@ export class SettingsModalComponent extends ModalComponent {
         input.dataset.keyPath = keyPath;
         input.min = "1";
         input.max = "50";
+        input.disabled = !this.isEditMode;
         return input;
     }
 
@@ -150,6 +159,7 @@ export class SettingsModalComponent extends ModalComponent {
         input.className = 'shadow appearance-none border rounded py-1 px-2 text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 w-32';
         input.value = value;
         input.dataset.keyPath = keyPath;
+        input.disabled = !this.isEditMode;
         return input;
     }
 
@@ -264,14 +274,27 @@ export class SettingsModalComponent extends ModalComponent {
         }
     }
 
+    toggleEditMode() {
+        this.isEditMode = !this.isEditMode;
+        this.renderForm();
+        this.updateText();
+    }
+
     updateText() {
         if (this.saveBtn) {
             this.saveBtn.textContent = MESSAGES.get('saveButton');
             this.saveBtn.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200';
+            this.saveBtn.style.display = this.isEditMode ? 'inline-block' : 'none';
         }
         if (this.closeBtn) {
             this.closeBtn.textContent = MESSAGES.get('closeButton');
             this.closeBtn.className = 'bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200';
+        }
+        if (this.editBtn) {
+            this.editBtn.textContent = this.isEditMode ? 'Cancel' : 'Edit';
+            this.editBtn.className = this.isEditMode ? 
+                'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200' :
+                'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200';
         }
     }
 }
