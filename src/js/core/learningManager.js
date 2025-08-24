@@ -1,8 +1,8 @@
-import FlashcardModule from './components/FlashcardMode.js';
-import QuizModule from './components/QuizMode.js';
-import CompletionModule from './components/CompletionMode.js';
-import SortingModule from './components/SortingMode.js';
-import MatchingModule from './components/MatchingMode.js';
+import FlashcardModule from '../components/FlashcardMode.js';
+import QuizModule from '../components/QuizMode.js';
+import CompletionModule from '../components/CompletionMode.js';
+import SortingModule from '../components/SortingMode.js';
+import MatchingModule from '../components/MatchingMode.js';
 import { fetchModuleData } from '../managers/dataManager.js';
 import { MESSAGES } from '../utils/i18n.js';
 import { auth } from './auth.js';
