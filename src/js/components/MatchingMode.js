@@ -237,6 +237,17 @@ class MatchingMode {
             return;
         }
 
+        // Check explanation modal first (child window)
+        const explanationModal = document.getElementById('explanation-modal');
+        if (explanationModal && !explanationModal.classList.contains('hidden')) {
+            if (e.key === 'Enter' || e.key === 'Escape') {
+                explanationModal.classList.add('hidden');
+                e.preventDefault();
+            }
+            return; // Consume event if explanation modal is handled
+        }
+
+        // Then check completion modal (parent window)
         const matchingCompletionModal = document.getElementById('matching-completion-modal');
         if (matchingCompletionModal && !matchingCompletionModal.classList.contains('hidden')) {
             if (e.key === 'Enter') {
